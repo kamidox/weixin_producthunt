@@ -29,6 +29,6 @@ class ProductItem(scrapy.Item):
     comment_url = scrapy.Field(output_processor=_add_url_prefix)
 
 class ProductItemLoader(ItemLoader):
-	default_item_class = ProductItem
-	default_output_processor = TakeFirst()
+    default_item_class = ProductItem
+    default_output_processor = TakeFirst()
 
