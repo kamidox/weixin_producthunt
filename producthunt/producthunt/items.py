@@ -27,6 +27,7 @@ class ProductItem(scrapy.Item):
     url = scrapy.Field(output_processor=_add_url_prefix)
     description = scrapy.Field()
     comment_url = scrapy.Field(output_processor=_add_url_prefix)
+    date = scrapy.Field()
 
 class ProductItemLoader(ItemLoader):
     default_item_class = ProductItem
