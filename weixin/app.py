@@ -1,8 +1,8 @@
 #!/bin/env python
 # -*- coding: utf-8 -*-
-import hashlib, urllib, urllib2, re, time, json
+import hashlib, time
 import xml.etree.ElementTree as ET
-from flask import Flask, request, render_template, send_from_directory
+from flask import Flask, request, render_template
 from private_const import *
 
 app = Flask(__name__)
@@ -31,16 +31,16 @@ def weixin_msg():
         msg = parse_msg(data)
         _log(msg)
         if user_subscribe_event(msg):
-            return help_info(msg)
+            return welcome_info(msg)
         else:
-            return help_info_cute(msg)
+            return help_info(msg)
     return 'message processing fail'
 
 # verify the weixin server
-def verification(request):
-    signature = request.args.get('signature')
-    timestamp = request.args.get('timestamp')
-    nonce = request.args.get('nonce')
+def verification(req):
+    signature = req.args.get('signature')
+    timestamp = req.args.get('timestamp')
+    nonce = req.args.get('nonce')
 
     token = APP_TOKEN
     tmplist = [token, timestamp, nonce]
@@ -62,11 +62,11 @@ def parse_msg(rawmsgstr):
 def user_subscribe_event(msg):
     return msg['MsgType'] == 'event' and msg['Event'] == 'subscribe'
 
+def welcome_info(msg):
+    return response_text_msg(msg, WELCOME_INFO)
+
 def help_info(msg):
     return response_text_msg(msg, HELP_INFO)
-
-def help_info_cute(msg):
-    return response_text_msg(msg, HELP_INFO_CUTE)
 
 def response_text_msg(msg, content):
     s = TEXT_MSG_TPL % (msg['FromUserName'], msg['ToUserName'],
