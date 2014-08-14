@@ -42,6 +42,9 @@ def verification(req):
     timestamp = req.args.get('timestamp')
     nonce = req.args.get('nonce')
 
+    if signature is None or timestamp is None or nonce is None:
+        return False
+
     token = APP_TOKEN
     tmplist = [token, timestamp, nonce]
     tmplist.sort()
