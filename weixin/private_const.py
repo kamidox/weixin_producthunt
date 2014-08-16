@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-APP_SECRET_KEY = 'your app secret key' #use os.urandom(24) to generate a key.
 APP_TOKEN = 'producthunt'
 
 # weixin message template
@@ -12,13 +11,17 @@ u"""
 
 Welcome to producthunt
 The best new products, every day
+
 """
 
 HELP_INFO = \
 u"""
-可以在这里直接回复你的建议，我们将尽快回复
-欢迎私聊，欢迎调戏*_*
-也可关注我们的微博：http://weibo.com/smartfoxstudio
+回复以下数字获取内容：
+1.实时信息
+2.昨日之最
+3.本周之最
+4.本用之最
+5.深度报导
 """
 
 TEXT_MSG_TPL = \
