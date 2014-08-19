@@ -8,6 +8,7 @@
 import scrapy
 from scrapy.contrib.loader import ItemLoader
 from scrapy.contrib.loader.processor import TakeFirst
+from scrapy.contrib.loader.processor import Join
 
 def _add_url_prefix(values):
     """ add producthunt.com prefix to url"""
@@ -21,22 +22,47 @@ def _to_int(values):
         if v is not None and v.strip() != '':
             return int(v)
 
+def _trim_at(values):
+    """ delete @ prefix of userid"""
+    for v in values:
+        if v is not None and v.startswith('@'):
+            return v[1:]
+
 class ProductItem(scrapy.Item):
-    # vote count
-    vote_count = scrapy.Field(default = "0", output_processor=_to_int)
     # user information
+    userid = scrapy.Field()
     user_name = scrapy.Field()
-    login_name = scrapy.Field()
     user_icon = scrapy.Field()
     user_title = scrapy.Field()
     # product information
     name = scrapy.Field()
     url = scrapy.Field(output_processor=_add_url_prefix)
     description = scrapy.Field()
+    postid = scrapy.Field()
     comment_url = scrapy.Field(output_processor=_add_url_prefix)
     date = scrapy.Field()
+    vote_count = scrapy.Field(default = "0", output_processor=_to_int)
+    comment_count = scrapy.Field(default = "0", output_processor=_to_int)
+
 
 class ProductItemLoader(ItemLoader):
     default_item_class = ProductItem
+    default_output_processor = TakeFirst()
+
+class CommentItem(scrapy.Item):
+    commentid = scrapy.Field()
+    parentid = scrapy.Field()
+    postid = scrapy.Field()
+    userid = scrapy.Field(output_processor=_trim_at)
+    user_name = scrapy.Field()
+    user_icon = scrapy.Field()
+    user_title = scrapy.Field()
+    vote_count = scrapy.Field(default = "0", output_processor=_to_int)
+    is_child = scrapy.Field(default = "0")
+    comment_html = scrapy.Field()
+    comment = scrapy.Field(output_processor=Join())
+
+class CommentItemLoader(ItemLoader):
+    default_item_class = CommentItem
     default_output_processor = TakeFirst()
 

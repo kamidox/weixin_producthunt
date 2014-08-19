@@ -8,7 +8,7 @@
 #     http://doc.scrapy.org/en/latest/topics/settings.html
 #
 
-LOG_LEVEL = 'INFO'
+#LOG_LEVEL = 'INFO'
 
 BOT_NAME = 'producthunt'
 
