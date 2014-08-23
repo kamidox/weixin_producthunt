@@ -3,17 +3,12 @@ import scrapy
 from scrapy.selector import Selector
 from producthunt.items import ProductItemLoader
 
-class HuntSpider(scrapy.Spider):
+class ProductsSpider(scrapy.Spider):
     name = "products"
     allowed_domains = ["producthunt.com"]
     start_urls = (
         'http://www.producthunt.com/',
     )
-
-    # fields used by RequiredFieldsPipeline
-    required_fields = ('name', 'description', 'url', 'date',
-        'user_name', 'userid', 'vote_count')
-    empty_fields = ('user_icon', 'user_title', 'comment_url')
 
     def parse(self, response):
         sel = Selector(response)

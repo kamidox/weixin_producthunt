@@ -10,16 +10,18 @@ from hashlib import md5
 from scrapy import log
 from scrapy.exceptions import DropItem
 from producthunt import settings
+from producthunt.items import CommentItem
+from producthunt.items import ProductItem
 import MySQLdb
 
 class RequiredFieldsPipeline(object):
     """A pipeline to ensure the item have the required fields."""
 
     def process_item(self, item, spider):
-        for field in spider.required_fields:
+        for field in item.required_fields:
             if not item.get(field):
                 raise DropItem("Field '%s' missing" % (field, ))
-        for field in spider.empty_fields:
+        for field in item.empty_fields:
             if not item.get(field):
                 item[field] = ""
         return item
@@ -59,8 +61,11 @@ class MySQLStorePipeline(object):
             self._upsert_product(conn, item)
             self._upsert_user(conn, item)
         elif spider.name == 'comments':
-            self._upsert_comment(conn, item)
-            self._upsert_user(conn, item)
+            if isinstance(item, CommentItem):
+                self._upsert_comment(conn, item)
+                self._upsert_user(conn, item)
+            elif isinstance(item, ProductItem):
+                self._upsert_product(conn, item)
         self.conn.commit()
 
     def _upsert_product(self, conn, item):
@@ -75,8 +80,10 @@ class MySQLStorePipeline(object):
 
         if ret:
             conn.execute("""
-                UPDATE products SET vote_count=%s, updated=%s WHERE guid=%s
-            """, (item['vote_count'], now, guid))
+                UPDATE products SET vote_count=%s, updated=%s,
+                comment_count=%s, postdate=%s WHERE guid=%s
+            """, (item['vote_count'], now,
+                item['comment_count'], item['date'], guid))
             log.msg("Product updated in db: %s %r" % (guid, item['name']))
         else:
             conn.execute("""

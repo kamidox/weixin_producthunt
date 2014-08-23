@@ -43,7 +43,10 @@ class ProductItem(scrapy.Item):
     date = scrapy.Field()
     vote_count = scrapy.Field(default = "0", output_processor=_to_int)
     comment_count = scrapy.Field(default = "0", output_processor=_to_int)
-
+    # fields used by RequiredFieldsPipeline
+    required_fields = ('name', 'description', 'url', 'postid')
+    empty_fields = ('user_icon', 'user_title', 'comment_url', 'date',
+        'user_name', 'userid', 'vote_count')
 
 class ProductItemLoader(ItemLoader):
     default_item_class = ProductItem
@@ -61,6 +64,9 @@ class CommentItem(scrapy.Item):
     is_child = scrapy.Field(default = "0")
     comment_html = scrapy.Field()
     comment = scrapy.Field(output_processor=Join())
+    # fields used by RequiredFieldsPipeline
+    required_fields = ('commentid', 'parentid', 'postid', 'userid', 'comment_html')
+    empty_fields = ('comment', 'user_title', 'user_icon')
 
 class CommentItemLoader(ItemLoader):
     default_item_class = CommentItem
