@@ -21,8 +21,9 @@ setup
     mysql> CREATE DATABASE producthunt
     mysql> source ../db/mysql.sql
 
-deploy - Flask + uwsgi + nginx
+deploy weixin backend first time
 =======================================
+deploy weixin backend by Flask + uwsgi + nginx for the first time
 1. config uwsgi
     1.1 save following config in "/etc/uwsgi/app-available/weixin.xml"
     <uwsgi>
@@ -76,6 +77,37 @@ deploy - Flask + uwsgi + nginx
     $ sudo chmod 666 /var/log/uwsgi/app/weixin.log
     $ tail /var/log/uwsgi/app/weixin.log
     $ mail me
+
+deploy producthunt spider first time
+=======================================
+we use scrapyd to manage spiders, assume that you already install scrapyd
+1. set deploy target in scrapy.cfg
+    [deploy]
+    url = http://localhost:6800/
+    project = producthunt
+    version = GIT
+2. deploy spiders
+    run "scrapy deploy" in "weixin_producthunt/producthunt" dir
+
+3. init database
+    run a spider to craw all data from producthunt.
+    curl http://localhost:6800/schedule.json -d project=producthunt -d spider=comments -d maxposts=7300
+    The maxposts is the max post id to crawl. You can set it a little larger than the latest postid in producthunt.com
+
+4. schedule spider to run
+    use crontab to schedule these two spider run every hour
+    schedule spider to crawl products within 3 days
+    curl http://localhost:6800/schedule.json -d project=producthunt -d spider=products
+    schedule spider to crawl comments within 3 days
+    curl http://localhost:6800/schedule.json -d project=producthunt -d spider=comments
+
+deploy when update
+=======================================
+1. depoly weixin backend when update
+    run "devdeploy.sh" in project root dir "weixin_producthunt"
+
+2. deploy producthunt spider when update
+    run "scrapy deploy" in spider's root dir "weixin_producthunt/producthunt"
 
 
 
