@@ -51,9 +51,9 @@ class CommentsSpider(scrapy.Spider):
             il.add_xpath("name", '*//a[@class="post-url"]/text()')
             il.add_xpath("url", '*//a[@class="post-url"]/@href')
             il.add_xpath("description", '*//span[@class="post-tagline"]/text()')
-            il.add_value("comment_url", '/posts/' + postid[0])
-            il.add_value("comment_count", "0")
-            il.add_value("date", "1970-01-01")
+            il.add_xpath("comment_url", '*//a[@class="permalink"]/@href')
+            il.add_xpath("comment_count", '//h2[@class="subhead"]/text()')
+            il.add_xpath("date", '*//a[@class="permalink"]/text()')
             yield il.load_item()
         # comments for this product
         threads = sel.xpath('//div[@class="comment-thread"]')

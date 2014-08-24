@@ -5,6 +5,8 @@
 # See documentation in:
 # http://doc.scrapy.org/en/latest/topics/items.html
 
+import re
+import datetime
 import scrapy
 from scrapy.contrib.loader import ItemLoader
 from scrapy.contrib.loader.processor import TakeFirst
@@ -20,13 +22,35 @@ def _to_int(values):
     """ convert to int value for vote_count"""
     for v in values:
         if v is not None and v.strip() != '':
-            return int(v)
+            m = re.match(r'([0-9]*).*', v)
+            if m is not None and m.group(1) != '':
+                return int(m.group(1))
 
 def _trim_at(values):
     """ delete @ prefix of userid"""
     for v in values:
         if v is not None and v.startswith('@'):
             return v[1:]
+
+def _convert_to_date(values):
+    """ convert str to date like '1 days ago' or '4 months ago' """
+    for v in values:
+        if v is not None and v.strip() != '':
+            m = re.match(r'\d\d\d\d-\d\d-\d\d', v)
+            if m is not None:
+                return m.group(0)
+            else:
+                d = datetime.datetime.utcnow()
+                m = re.match(r'\D*(\d*)\s*[day|days].*', v)
+                if m is not None and m.group(1) != '':
+                    days = int(m.group(1))
+                    d = d - datetime.timedelta(days)
+                    return '%04d-%02d-%02d' % (d.year, d.month, d.day)
+                m = re.match(r'\D*(\d*)\s*[month|months].*', v)
+                if m is not None and m.group(1) != '':
+                    months = int(m.group(1))
+                    d = d - datetime.timedelta(30 * months)
+                    return '%04d-%02d-%02d' % (d.year, d.month, d.day)
 
 class ProductItem(scrapy.Item):
     # user information
@@ -40,7 +64,7 @@ class ProductItem(scrapy.Item):
     description = scrapy.Field()
     postid = scrapy.Field()
     comment_url = scrapy.Field(output_processor=_add_url_prefix)
-    date = scrapy.Field()
+    date = scrapy.Field(output_processor=_convert_to_date)
     vote_count = scrapy.Field(default = "0", output_processor=_to_int)
     comment_count = scrapy.Field(default = "0", output_processor=_to_int)
     # fields used by RequiredFieldsPipeline
