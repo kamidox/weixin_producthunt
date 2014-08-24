@@ -4,6 +4,7 @@ import hashlib, time
 import xml.etree.ElementTree as ET
 from flask import Flask, request, render_template
 from private_const import *
+import view
 
 app = Flask(__name__)
 app.debug = True
@@ -13,6 +14,13 @@ app.debug = True
 def home():
     return render_template('index.html')
 
+#homepage just for fun
+@app.route('/test')
+def weixin_test():
+    ret = view.populate_test_data()
+    p = ret["product"]
+    c = ret["comments"]
+    return render_template('comments.jinja.html', product=p, comments=c)
 
 def user_subscribe_event(msg):
     return msg['MsgType'] == 'event' and msg['Event'] == 'subscribe'
