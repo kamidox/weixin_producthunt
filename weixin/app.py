@@ -15,7 +15,7 @@ def home():
     return render_template('index.html')
 
 #homepage just for fun
-@app.route('/test')
+@app.route('/weixin_test')
 def weixin_test():
     ret = view.populate_test_data()
     p = ret["product"]
