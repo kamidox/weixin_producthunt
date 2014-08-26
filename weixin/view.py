@@ -74,7 +74,8 @@ class ProductHuntDB:
     def _read_user(self, userid):
         """read user information from database. database should already connected"""
         user = None
-        self.conn.execute("""SELECT name, icon, title FROM users WHERE userid=%s""", userid)
+        self.conn.execute("""SELECT name, icon, title FROM users WHERE userid=%s""",
+            (userid))
         r = self.conn.fetchone()
         if r is not None:
             u = {}
@@ -83,7 +84,6 @@ class ProductHuntDB:
             u["icon"] = r[1]
             u["title"] = r[2]
             user = User(**u)
-            _log("_read_user: user:%r. title:%r" % (userid, user.title))
         else:
             _log("_read_user: user %r missing in database" % (userid))
         return user
@@ -100,7 +100,7 @@ class ProductHuntDB:
         comments = []
         # read comments
         self.conn.execute("""SELECT commentid, vote_count, comment_html, userid
-            FROM comments WHERE postid=%s AND is_child=0""", postid)
+            FROM comments WHERE postid=%s AND is_child=0""", (postid))
         results = self.conn.fetchall()
         if results is None:
             return comments
@@ -116,7 +116,7 @@ class ProductHuntDB:
 
         # read comment children
         self.conn.execute("""SELECT commentid, vote_count, comment_html, userid, parentid
-            FROM comments WHERE postid=%s AND is_child=1""", postid)
+            FROM comments WHERE postid=%s AND is_child=1""", (postid))
         results = self.conn.fetchall()
         if results is None:
             return comments
@@ -132,16 +132,16 @@ class ProductHuntDB:
             self._append_comment_child(comments, parentid, child)
         return comments
 
-    def read_latest_products(self, maxnum=10):
+    def read_top_vote_products(self, days = 2, maxnum = 10):
         """ return latest products order by vote_count"""
         self._open()
         try:
             self.conn.execute("""SELECT name, description, url, postid,
                 comment_url, postdate, vote_count, comment_count, userid, guid
                 FROM products WHERE
-                TO_DAYS(postdate)>(TO_DAYS(DATE_SUB(NOW(), INTERVAL 2 DAY)))
+                TO_DAYS(postdate)>(TO_DAYS(DATE_SUB(NOW(), INTERVAL %s DAY)))
                 ORDER BY vote_count DESC LIMIT %s
-                """, maxnum)
+                """, (days, maxnum))
             products= []
             results = self.conn.fetchall()
             for r in results:
@@ -169,7 +169,7 @@ class ProductHuntDB:
         try:
             self.conn.execute("""SELECT name, description, url, postid,
                 comment_url, postdate, vote_count, comment_count, userid
-                FROM products WHERE guid=%s""", guid)
+                FROM products WHERE guid=%s""", (guid))
             r = self.conn.fetchone()
             if r is not None:
                 p = {}

@@ -13,6 +13,7 @@ a {
 .comments-container {
     width: 100%;
     margin: auto;
+    padding-bottom: 100px;
 }
 
 .comments-header {
