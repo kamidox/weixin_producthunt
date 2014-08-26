@@ -145,9 +145,13 @@ def response_products_msg(msg, products):
         str(int(time.time())), len(products))
     for p in products:
         url = APP_HOST + p.guid
-        name = '[%d] %s' % (p.vote_count, p.name)
         tagline = '[%s] %s' % (p.postdate, p.description)
-        item = ARTICLES_ITEM_TPL % (name, tagline, p.user.icon, url)
+        title = '[%d] %s\r\n%s' % (p.vote_count, p.name, tagline)
+        if p == products[0]:
+            picUrl = "kamidox.com/static/img/producthunt.png"
+            item = ARTICLES_ITEM_TPL % (title, tagline, picUrl, url)
+        else:
+            item = ARTICLES_ITEM_TPL % (title, tagline, p.user.icon, url)
         s = s + item
     s = s + ARTICLES_MSG_TPL_TAIL
     return s
