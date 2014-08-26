@@ -26,11 +26,23 @@ def _to_int(values):
             if m is not None and m.group(1) != '':
                 return int(m.group(1))
 
-def _trim_at(values):
-    """ delete @ prefix of userid"""
+def _trim_userid(values):
+    """ delete '@' or '/' prefix of userid"""
     for v in values:
-        if v is not None and v.startswith('@'):
-            return v[1:]
+        if v is not None:
+            if v.startswith('@') or v.startswith('/'):
+                return v[1:]
+            else:
+                return v
+
+def _trim_user_title(values):
+    """ delete u' \xb7 ' prefix of user title"""
+    for v in values:
+        if v is not None:
+            if v.startswith(u' \xb7 '):
+                return v[3:]
+            else:
+                return v
 
 def _convert_to_date(values):
     """ convert str to date like '1 days ago' or '4 months ago' """
@@ -54,7 +66,7 @@ def _convert_to_date(values):
 
 class ProductItem(scrapy.Item):
     # user information
-    userid = scrapy.Field()
+    userid = scrapy.Field(output_processor=_trim_userid)
     user_name = scrapy.Field()
     user_icon = scrapy.Field()
     user_title = scrapy.Field()
@@ -80,10 +92,10 @@ class CommentItem(scrapy.Item):
     commentid = scrapy.Field()
     parentid = scrapy.Field()
     postid = scrapy.Field()
-    userid = scrapy.Field(output_processor=_trim_at)
+    userid = scrapy.Field(output_processor=_trim_userid)
     user_name = scrapy.Field()
     user_icon = scrapy.Field()
-    user_title = scrapy.Field()
+    user_title = scrapy.Field(output_processor=_trim_user_title)
     vote_count = scrapy.Field(default = "0", output_processor=_to_int)
     is_child = scrapy.Field(default = "0")
     comment_html = scrapy.Field()

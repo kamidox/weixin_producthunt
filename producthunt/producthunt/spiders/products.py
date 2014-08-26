@@ -22,10 +22,10 @@ class ProductsSpider(scrapy.Spider):
                 il.add_xpath("vote_count", '*//*[@class="vote-count"]/text()')
                 il.add_xpath("postid", '*//*[@class="vote-count"]/@data-id')
                 # user info
-                il.add_xpath("user_name", 'div[@class="user-image-holder"]/div/h3/text()', re=r'\s*(.*)\s*')
-                il.add_xpath("userid", 'div[@class="user-image-holder"]/div/h3/span/span/text()')
-                il.add_xpath("user_title", 'div[@class="user-image-holder"]/div/p/text()')
-                il.add_xpath("user_icon", 'div[@class="user-image-holder"]/a/img/@src')
+                il.add_xpath("user_name", '*//div[@class="user-hover-card"]/h3/text()', re=r'\s*(.*)\s*')
+                il.add_xpath("userid", '*//div[@class="user-hover-card"]/a/@href')
+                il.add_xpath("user_title", '*//h4[@class="user-headline"]/text()')
+                il.add_xpath("user_icon", '*//div[@class="user-hover-card"]/a/img/@src')
                 # product info
                 il.add_xpath("name", '*/a[@class="post-url"]/text()')
                 il.add_xpath("url", '*/a[@class="post-url"]/@href')

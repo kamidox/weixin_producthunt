@@ -1,41 +1,197 @@
 #!/bin/env python
 # -*- coding: utf-8 -*-
+import MySQLdb
+from private_const import *
 
 class User:
     """class to hold user information"""
-    userid = None
-    name = None
-    icon = None
-    title = None
+    def __init__(self, **kwargs):
+        self.userid = None
+        self.name = None
+        self.icon = None
+        self.title = None
+        self.__dict__.update(kwargs)
+
+
+class Comments:
+    """class to hold comment for products"""
 
     def __init__(self, **kwargs):
+        self.commentid = None
+        self.vote_count = None
+        self.comment_html = None
+        # refer to User class
+        self.user = None
+        # refer to list of Comments class
+        self.children = []
         self.__dict__.update(kwargs)
 
 class Product:
     """class to hold product information"""
-    name = None
-    description = None
-    url = None
-    postid = None
-    comment_url = None
-    postdate = None
-    vote_count = 0
-    comment_count = 0
-    userid = None
-    user = None
 
     def __init__(self, **kwargs):
+        self.name = None
+        self.description = None
+        self.url = None
+        self.postid = None
+        self.comment_url = None
+        self.postdate = None
+        self.vote_count = 0
+        self.comment_count = 0
+        self.guid = None
+        # refer to User class
+        self.user = None
+        # refer to list of Comments class
+        self.comments = []
         self.__dict__.update(kwargs)
 
-class Comments:
-    """class to hold comment for products"""
-    vote_count = None
-    comment_html = None
-    user = None
-    children = []
+class ProductHuntDB:
+    """ class to operate data in producthunt database """
+    db = None;
+    conn = None;
 
-    def __init__(self, **kwargs):
-        self.__dict__.update(kwargs)
+    def _open(self):
+        """open database"""
+        dbargs = dict(
+                    host=MYSQL_HOST,
+                    db=MYSQL_DBNAME,
+                    user=MYSQL_USER,
+                    passwd=MYSQL_PASSWD,
+                    charset='utf8',
+                    use_unicode=True,
+                )
+        self.db = MySQLdb.connect(**dbargs)
+        self.conn = self.db.cursor()
+
+    def _close(self):
+        """close database"""
+        if self.conn is not None:
+            self.conn.close()
+        if self.db is not None:
+            self.db.commit()
+            self.db.close()
+
+    def _read_user(self, userid):
+        """read user information from database. database should already connected"""
+        user = None
+        self.conn.execute("""SELECT name, icon, title FROM users WHERE userid=%s""", userid)
+        r = self.conn.fetchone()
+        if r is not None:
+            u = {}
+            u["userid"] = userid
+            u["name"] = r[0]
+            u["icon"] = r[1]
+            u["title"] = r[2]
+            user = User(**u)
+            _log("_read_user: user:%r. title:%r" % (userid, user.title))
+        else:
+            _log("_read_user: user %r missing in database" % (userid))
+        return user
+
+    def _append_comment_child(self, comments, parentid, child):
+        """append child to comments base on parentid"""
+        for c in comments:
+            if parentid == c.commentid:
+                c.children.append(child)
+                return
+
+    def _read_comments(self, postid):
+        """read comments from database by postid. database should already connected"""
+        comments = []
+        # read comments
+        self.conn.execute("""SELECT commentid, vote_count, comment_html, userid
+            FROM comments WHERE postid=%s AND is_child=0""", postid)
+        results = self.conn.fetchall()
+        if results is None:
+            return comments
+        _log("_read_comments: %d comment threads for postid: %s" % (len(results), postid))
+        for r in results:
+            c = {}
+            c["commentid"] = r[0]
+            c["vote_count"] = r[1]
+            c["comment_html"] = r[2]
+            c["user"] = self._read_user(r[3])
+            comment = Comments(**c)
+            comments.append(comment)
+
+        # read comment children
+        self.conn.execute("""SELECT commentid, vote_count, comment_html, userid, parentid
+            FROM comments WHERE postid=%s AND is_child=1""", postid)
+        results = self.conn.fetchall()
+        if results is None:
+            return comments
+        _log("_read_comments: %d comment child for postid: %s" % (len(results), postid))
+        for r in results:
+            c = {}
+            c["commentid"] = r[0]
+            c["vote_count"] = r[1]
+            c["comment_html"] = r[2]
+            c["user"] = self._read_user(r[3])
+            child = Comments(**c)
+            parentid = r[4]
+            self._append_comment_child(comments, parentid, child)
+        return comments
+
+    def read_latest_products(self, maxnum=10):
+        """ return latest products order by vote_count"""
+        self._open()
+        try:
+            self.conn.execute("""SELECT name, description, url, postid,
+                comment_url, postdate, vote_count, comment_count, userid, guid
+                FROM products WHERE
+                TO_DAYS(postdate)>(TO_DAYS(DATE_SUB(NOW(), INTERVAL 2 DAY)))
+                ORDER BY vote_count DESC LIMIT %s
+                """, maxnum)
+            products= []
+            results = self.conn.fetchall()
+            for r in results:
+                p = {}
+                p["name"] = r[0]
+                p["description"] = r[1]
+                p["url"] = r[2]
+                p["postid"] = r[3]
+                p["comment_url"] = r[4]
+                p["postdate"] = r[5]
+                p["vote_count"] = r[6]
+                p["comment_count"] = r[7]
+                p["user"] = self._read_user(r[8])
+                p["guid"] = r[9]
+                product = Product(**p)
+                products.append(product)
+            return products
+        finally:
+            self._close()
+
+    def read_product(self, guid):
+        """ return product and comments by postid """
+        product = None
+        self._open()
+        try:
+            self.conn.execute("""SELECT name, description, url, postid,
+                comment_url, postdate, vote_count, comment_count, userid
+                FROM products WHERE guid=%s""", guid)
+            r = self.conn.fetchone()
+            if r is not None:
+                p = {}
+                p["name"] = r[0]
+                p["description"] = r[1]
+                p["url"] = r[2]
+                p["postid"] = r[3]
+                p["comment_url"] = r[4]
+                p["postdate"] = r[5]
+                p["vote_count"] = r[6]
+                p["comment_count"] = r[7]
+                p["user"] = self._read_user(r[8])
+                p["comments"] = self._read_comments(p["postid"])
+                p["guid"] = guid
+                product = Product(**p)
+            return product
+        finally:
+            self._close()
+
+def _log(msg):
+    if APP_DEBUG:
+        print msg
 
 def populate_test_data():
     ud = {"userid" : "rrhoover",
@@ -123,11 +279,8 @@ def populate_test_data():
     comments = []
     comments.append(comment_1)
     comments.append(comment_2)
-
-    ret = {"product" : product,
-        "comments" : comments
-    }
-    return ret
+    product.comments = comments
+    return product
 
 if __name__ == "__main__":
     print populate_test_data()

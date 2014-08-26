@@ -80,11 +80,11 @@ class MySQLStorePipeline(object):
 
         if ret:
             conn.execute("""
-                UPDATE products SET vote_count=%s, updated=%s,
+                UPDATE products SET vote_count=%s, updated=%s, userid=%s,
                 comment_count=%s, postdate=%s WHERE guid=%s
-            """, (item['vote_count'], now,
+            """, (item['vote_count'], now, item['userid'],
                 item['comment_count'], item['date'], guid))
-            log.msg("Product updated in db: %s %r" % (guid, item['name']))
+            log.msg("Product updated in db: %s %r" % (item['postid'], item['name']))
         else:
             conn.execute("""
                 INSERT INTO products (guid, name, description, url,
@@ -99,7 +99,7 @@ class MySQLStorePipeline(object):
                 item['comment_url'], item['date'], item['vote_count'],
                 item['userid'], item['postid'], item['comment_count'],
                 now))
-            log.msg("Product stored in db: %s %r" % (guid, item['name']))
+            log.msg("Product stored in db: %s %r" % (item['postid'], item['name']))
 
     def _upsert_user(self, conn, item):
         """save users to database"""

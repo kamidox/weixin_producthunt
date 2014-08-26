@@ -7,7 +7,7 @@ from private_const import *
 import view
 
 app = Flask(__name__)
-app.debug = True
+app.debug = APP_DEBUG
 
 #homepage just for fun
 @app.route('/')
@@ -17,10 +17,8 @@ def home():
 #homepage just for fun
 @app.route('/weixin_test')
 def weixin_test():
-    ret = view.populate_test_data()
-    p = ret["product"]
-    c = ret["comments"]
-    return render_template('comments.jinja.html', product=p, comments=c)
+    p = view.populate_test_data()
+    return render_template('comments.jinja.html', product=p)
 
 def user_subscribe_event(msg):
     return msg['MsgType'] == 'event' and msg['Event'] == 'subscribe'
@@ -65,7 +63,12 @@ def push_help_info(msg):
     return response_text_msg(msg, HELP_INFO)
 
 def push_latest_products(msg):
-    return push_help_info(msg)
+    products = view.ProductHuntDB().read_latest_products()
+    _log("push_latest_products: %d products" % (len(products)))
+    if products is not None and len(products) > 0:
+        return response_products_msg(msg, products)
+    else:
+        return response_text_msg(msg, ERROR_INFO)
 
 def push_day_top_products(msg):
     return push_help_info(msg)
@@ -89,6 +92,16 @@ _event_procs = [
     (user_event_special, push_special_products), #CLICK->SPECIAL
     (user_event_unknow, push_help_info)
 ]
+
+# view product comments
+@app.route('/producthunt/<guid>', methods=['GET'])
+def view_product_comments(guid):
+    p = view.ProductHuntDB().read_product(guid)
+    if p is not None:
+        _log("view_product_comments: postid=%s" % (p.postid))
+        return render_template('comments.jinja.html', product=p)
+    else:
+        return ERROR_INFO
 
 # verify for weixin server.
 # weixin server will send GET request first to verify this backend
@@ -142,8 +155,19 @@ def response_text_msg(msg, content):
         str(int(time.time())), content)
     return s
 
+def response_products_msg(msg, products):
+    s = ARTICLES_MSG_TPL_HEAD % (msg['FromUserName'], msg['ToUserName'],
+        str(int(time.time())), len(products))
+    for p in products:
+        url = APP_HOST + p.guid
+        name = '[%d] %s' % (p.vote_count, p.name)
+        item = ARTICLES_ITEM_TPL % (name, p.description, p.user.icon, url)
+        s = s + item
+    s = s + ARTICLES_MSG_TPL_TAIL
+    return s
+
 def _log(msg):
-    if app.debug:
+    if APP_DEBUG:
         print msg
 
 if __name__ == '__main__':

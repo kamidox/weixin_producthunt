@@ -1,6 +1,15 @@
 # -*- coding: utf-8 -*-
 
 APP_TOKEN = 'producthunt'
+APP_HOST = 'kamidox.com/producthunt/'
+APP_DEBUG = True
+
+# database
+MYSQL_HOST = 'localhost'
+MYSQL_DBNAME = 'producthunt'
+MYSQL_USER = 'root'
+MYSQL_PASSWD = 'kamidox'
+
 
 # weixin message template
 WELCOME_INFO = \
@@ -26,6 +35,12 @@ u"""
 还有什么好玩的点子？一起来玩玩数据挖掘吧。比如评论最多的产品是哪个？所有评论点赞加起来最多的产品是哪个？
 """
 
+ERROR_INFO = \
+u"""
+oops!
+没找到你要的数据
+"""
+
 TEXT_MSG_TPL = \
 u"""
 <xml>
@@ -36,4 +51,31 @@ u"""
 <Content><![CDATA[%s]]></Content>
 <FuncFlag>0</FuncFlag>
 </xml>
+"""
+
+ARTICLES_MSG_TPL_HEAD = \
+u"""
+<xml>
+<ToUserName><![CDATA[%s]]></ToUserName>
+<FromUserName><![CDATA[%s]]></FromUserName>
+<CreateTime>%s</CreateTime>
+<MsgType><![CDATA[news]]></MsgType>
+<ArticleCount>%d</ArticleCount>
+<Articles>
+"""
+
+ARTICLES_MSG_TPL_TAIL = \
+u"""
+</Articles>
+</xml>
+"""
+
+ARTICLES_ITEM_TPL = \
+u"""
+<item>
+<Title><![CDATA[%s]]></Title>
+<Description><![CDATA[%s]]></Description>
+<PicUrl><![CDATA[%s]]></PicUrl>
+<Url><![CDATA[%s]]></Url>
+</item>
 """

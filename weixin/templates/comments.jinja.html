@@ -8,7 +8,8 @@
         <meta name="keywords" content="{{ product.name }} - producthunt" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <link rel="stylesheet" type="text/css" href="static/css/style.css" />
+        <link rel="stylesheet" type="text/css" href="/static/css/style.css" />
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     </head>
     <body>
         <div class="comments-container">
@@ -18,7 +19,7 @@
             <div class="post-show">
                 <h2 class="subhead">{{ product.comment_count }} COMMENTS</h2>
                 <div class="comments">
-                    {% for c in comments %}
+                    {% for c in product.comments %}
                         {{ comment_render.render_comment_thread(c) }}
                     {% endfor %}
                 </div>
