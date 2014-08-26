@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 APP_TOKEN = 'producthunt'
-APP_HOST = 'kamidox.com/producthunt/'
+APP_HOST = 'http://kamidox.com'
 APP_DEBUG = True
 
 # database
