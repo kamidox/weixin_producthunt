@@ -27,9 +27,9 @@ class ProductsSpider(scrapy.Spider):
                 il.add_xpath("user_title", '*//h4[@class="user-headline"]/text()')
                 il.add_xpath("user_icon", '*//div[@class="user-hover-card"]/a/img/@src')
                 # product info
-                il.add_xpath("name", '*/a[@class="post-url"]/text()')
-                il.add_xpath("url", '*/a[@class="post-url"]/@href')
-                il.add_xpath("description", '*/span[@class="post-tagline"]/text()')
+                il.add_xpath("name", '*/a[@class="post-url title"]/text()')
+                il.add_xpath("url", '*/a[@class="post-url title"]/@href')
+                il.add_xpath("description", '*/span[@class="post-tagline description"]/text()')
                 il.add_xpath("comment_url", 'a/@href')
                 il.add_xpath("comment_count", '*/p[@class="comment-count"]/text()')
                 il.add_value("date", date)
