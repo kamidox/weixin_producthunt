@@ -19,22 +19,23 @@ u"""
 让你和全球最新最前沿的互联网产品零距离接触
 
 Welcome to producthunt
-The best new products, every day
+The best new products, every day, in wechat
 
 """
 
 HELP_INFO = \
 u"""
-回复下面对应数字获取产品信息：
-1. 最近两天得票最多的产品
-2. 最近一周得票最多的产品
-3. 最近一月得票最多的产品
+回复下面对应单词获取产品信息：
+day - 最近两天得票最多的产品
+week - 最近一周得票最多的产品
+month - 最近一月得票最多的产品
+search:keyword - 搜索相关产品
 
-其他统计功能正在开发中，敬请期待：
-1. 评论最多的产品
-2. 评论+得票最多的产品
-3. 评论+得票+评论点赞最多的产品
-还有什么好玩的点子？欢迎反馈信息给我们，一起来玩玩数据挖掘吧。
+Use following command to get infomation you needed:
+day - get the top voted products in these two days
+week - get the top voted products in this week
+month - get the top voted products in this month
+search:keyword - search products base on keyword
 """
 
 ERROR_INFO = \

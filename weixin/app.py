@@ -26,20 +26,24 @@ def user_subscribe_event(msg):
 def user_event_day_top(msg):
     isclick = msg['MsgType'] == 'event' \
         and msg['Event'] == 'CLICK' and msg['EventKey'] == 'DAY_TOP'
-    iscmd = msg['MsgType'] == 'text' and msg['Content'] == '1'
+    iscmd = msg['MsgType'] == 'text' and msg['Content'] == 'day'
     return isclick or iscmd
 
 def user_event_week_top(msg):
     isclick = msg['MsgType'] == 'event' \
         and msg['Event'] == 'CLICK' and msg['EventKey'] == 'WEEK_TOP'
-    iscmd = msg['MsgType'] == 'text' and msg['Content'] == '2'
+    iscmd = msg['MsgType'] == 'text' and msg['Content'] == 'week'
     return isclick or iscmd
 
 def user_event_month_top(msg):
     isclick = msg['MsgType'] == 'event' \
         and msg['Event'] == 'CLICK' and msg['EventKey'] == 'MONTH_TOP'
-    iscmd = msg['MsgType'] == 'text' and msg['Content'] == '3'
+    iscmd = msg['MsgType'] == 'text' and msg['Content'] == 'month'
     return isclick or iscmd
+
+def user_event_search(msg):
+    iscmd = msg['MsgType'] == 'text' and msg['Content'].startswith("search:")
+    return iscmd
 
 def user_event_unknow(msg):
     return True
@@ -69,12 +73,20 @@ def push_month_top_products(msg):
     products = view.ProductHuntDB().read_top_vote_products(days = 30, maxnum = 10)
     return push_products(msg, products)
 
+def push_search_result_products(msg):
+    # skip prefix 'search:'
+    keyword = msg['Content'][7:]
+    products = view.ProductHuntDB().search_products(keyword)
+    _log("search_products: %s" % (keyword))
+    return push_products(msg, products)
+
 # weixin event handlers
 _event_procs = [
     (user_subscribe_event, push_welcome_info), # subscribe
     (user_event_day_top, push_day_top_products), #CLICK->DAY_TOP
     (user_event_week_top, push_week_top_products), #CLICK->WEEK_TOP
     (user_event_month_top, push_month_top_products), #CLICK->MONTH_TOP
+    (user_event_search, push_search_result_products), #CLICK->SEARCH
     (user_event_unknow, push_help_info)
 ]
 
@@ -145,12 +157,15 @@ def response_products_msg(msg, products):
         str(int(time.time())), len(products))
     for p in products:
         url = APP_HOST + "/producthunt/"+ p.guid
-        tagline = '[%s] %s' % (p.postdate, p.description)
-        title = '[%d] %s\r\n%s' % (p.vote_count, p.name, tagline)
+
         if p == products[0]:
+            tagline = '[%s] %s' % (p.postdate, p.description)
+            title = '[%d] [%s] %s - %s' % (p.vote_count, p.postdate, p.name, p.description)
             picUrl = APP_HOST + "/static/img/producthunt.png"
             item = ARTICLES_ITEM_TPL % (title, tagline, picUrl, url)
         else:
+            tagline = '[%s] %s' % (p.postdate, p.description)
+            title = '[%d] %s\r\n%s' % (p.vote_count, p.name, tagline)
             item = ARTICLES_ITEM_TPL % (title, tagline, p.user.icon, url)
         s = s + item
     s = s + ARTICLES_MSG_TPL_TAIL

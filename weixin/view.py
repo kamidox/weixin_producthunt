@@ -60,16 +60,20 @@ class ProductHuntDB:
                     charset='utf8',
                     use_unicode=True,
                 )
-        self.db = MySQLdb.connect(**dbargs)
-        self.conn = self.db.cursor()
+        if self.db is None:
+            self.db = MySQLdb.connect(**dbargs)
+        if self.conn is None:
+            self.conn = self.db.cursor()
 
     def _close(self):
         """close database"""
         if self.conn is not None:
             self.conn.close()
+            self.conn = None
         if self.db is not None:
             self.db.commit()
             self.db.close()
+            self.db = None
 
     def _read_user(self, userid):
         """read user information from database. database should already connected"""
@@ -186,6 +190,36 @@ class ProductHuntDB:
                 p["guid"] = guid
                 product = Product(**p)
             return product
+        finally:
+            self._close()
+
+    def search_products(self, keyword, maxnum=10):
+        """ search product by keyword from name/tagline/userid/username """
+        self._open()
+        try:
+            self.conn.execute("""SELECT name, description, url, postid,
+                comment_url, postdate, vote_count, comment_count, userid, guid
+                FROM products WHERE
+                name LIKE "%%"%s"%%" OR description LIKE "%%"%s"%%" OR userid LIKE "%%"%s"%%"
+                ORDER BY vote_count DESC LIMIT %s
+                """, (keyword, keyword, keyword, maxnum))
+            products= []
+            results = self.conn.fetchall()
+            for r in results:
+                p = {}
+                p["name"] = r[0]
+                p["description"] = r[1]
+                p["url"] = r[2]
+                p["postid"] = r[3]
+                p["comment_url"] = r[4]
+                p["postdate"] = r[5]
+                p["vote_count"] = r[6]
+                p["comment_count"] = r[7]
+                p["user"] = self._read_user(r[8])
+                p["guid"] = r[9]
+                product = Product(**p)
+                products.append(product)
+            return products
         finally:
             self._close()
 
