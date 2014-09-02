@@ -23,22 +23,67 @@ def weixin_test():
 def user_subscribe_event(msg):
     return msg['MsgType'] == 'event' and msg['Event'] == 'subscribe'
 
-def user_event_day_top(msg):
+def user_event_day_top_voted(msg):
     isclick = msg['MsgType'] == 'event' \
-        and msg['Event'] == 'CLICK' and msg['EventKey'] == 'DAY_TOP'
-    iscmd = msg['MsgType'] == 'text' and msg['Content'] == 'day'
+        and msg['Event'] == 'CLICK' and msg['EventKey'] == 'DAY_TOP_VOTED'
+    iscmd = msg['MsgType'] == 'text' and \
+        (msg['Content'].lower() == 'dtv' or msg['Content'].lower() == 'day_top_voted')
     return isclick or iscmd
 
-def user_event_week_top(msg):
+def user_event_week_top_voted(msg):
     isclick = msg['MsgType'] == 'event' \
-        and msg['Event'] == 'CLICK' and msg['EventKey'] == 'WEEK_TOP'
-    iscmd = msg['MsgType'] == 'text' and msg['Content'] == 'week'
+        and msg['Event'] == 'CLICK' and msg['EventKey'] == 'WEEK_TOP_VOTED'
+    iscmd = msg['MsgType'] == 'text' and \
+        (msg['Content'].lower() == 'wtv' or msg['Content'].lower() == 'week_top_voted')
     return isclick or iscmd
 
-def user_event_month_top(msg):
+def user_event_month_top_voted(msg):
     isclick = msg['MsgType'] == 'event' \
-        and msg['Event'] == 'CLICK' and msg['EventKey'] == 'MONTH_TOP'
-    iscmd = msg['MsgType'] == 'text' and msg['Content'] == 'month'
+        and msg['Event'] == 'CLICK' and msg['EventKey'] == 'MONTH_TOP_VOTED'
+    iscmd = msg['MsgType'] == 'text' and \
+        (msg['Content'].lower() == 'mtv' or msg['Content'].lower() == 'month_top_voted')
+    return isclick or iscmd
+
+def user_event_day_top_comments(msg):
+    isclick = msg['MsgType'] == 'event' \
+        and msg['Event'] == 'CLICK' and msg['EventKey'] == 'DAY_TOP_COMMENTS'
+    iscmd = msg['MsgType'] == 'text' and \
+        (msg['Content'].lower() == 'dtc' or msg['Content'].lower() == 'day_top_comments')
+    return isclick or iscmd
+
+def user_event_week_top_comments(msg):
+    isclick = msg['MsgType'] == 'event' \
+        and msg['Event'] == 'CLICK' and msg['EventKey'] == 'WEEK_TOP_COMMENTS'
+    iscmd = msg['MsgType'] == 'text' and \
+        (msg['Content'].lower() == 'wtc' or msg['Content'].lower() == 'week_top_comments')
+    return isclick or iscmd
+
+def user_event_month_top_comments(msg):
+    isclick = msg['MsgType'] == 'event' \
+        and msg['Event'] == 'CLICK' and msg['EventKey'] == 'MONTH_TOP_COMMENTS'
+    iscmd = msg['MsgType'] == 'text' and \
+        (msg['Content'].lower() == 'mtc' or msg['Content'].lower() == 'month_top_comments')
+    return isclick or iscmd
+
+def user_event_day_top_cv(msg):
+    isclick = msg['MsgType'] == 'event' \
+        and msg['Event'] == 'CLICK' and msg['EventKey'] == 'DAY_TOP_COMMENT_VOTED'
+    iscmd = msg['MsgType'] == 'text' and \
+        (msg['Content'].lower() == 'dtcv' or msg['Content'].lower() == 'day_top_comment_voted')
+    return isclick or iscmd
+
+def user_event_week_top_cv(msg):
+    isclick = msg['MsgType'] == 'event' \
+        and msg['Event'] == 'CLICK' and msg['EventKey'] == 'WEEK_TOP_COMMENT_VOTED'
+    iscmd = msg['MsgType'] == 'text' and \
+        (msg['Content'].lower() == 'wtcv' or msg['Content'].lower() == 'week_top_comment_voted')
+    return isclick or iscmd
+
+def user_event_month_top_cv(msg):
+    isclick = msg['MsgType'] == 'event' \
+        and msg['Event'] == 'CLICK' and msg['EventKey'] == 'MONTH_TOP_COMMENT_VOTED'
+    iscmd = msg['MsgType'] == 'text' and \
+        (msg['Content'].lower() == 'mtcv' or msg['Content'].lower() == 'month_top_comment_voted')
     return isclick or iscmd
 
 def user_event_search(msg):
@@ -61,16 +106,40 @@ def push_products(msg, products):
     else:
         return response_text_msg(msg, ERROR_INFO)
 
-def push_day_top_products(msg):
+def push_day_top_voted_products(msg):
     products = view.ProductHuntDB().read_top_vote_products(days = 2, maxnum = 10)
     return push_products(msg, products)
 
-def push_week_top_products(msg):
+def push_week_top_voted_products(msg):
     products = view.ProductHuntDB().read_top_vote_products(days = 7, maxnum = 10)
     return push_products(msg, products)
 
-def push_month_top_products(msg):
+def push_month_top_voted_products(msg):
     products = view.ProductHuntDB().read_top_vote_products(days = 30, maxnum = 10)
+    return push_products(msg, products)
+
+def push_day_top_comments_products(msg):
+    products = view.ProductHuntDB().read_top_comments_products(days = 2, maxnum = 10)
+    return push_products(msg, products)
+
+def push_week_top_comments_products(msg):
+    products = view.ProductHuntDB().read_top_comments_products(days = 7, maxnum = 10)
+    return push_products(msg, products)
+
+def push_month_top_comments_products(msg):
+    products = view.ProductHuntDB().read_top_comments_products(days = 30, maxnum = 10)
+    return push_products(msg, products)
+
+def push_day_top_cv_products(msg):
+    products = view.ProductHuntDB().read_top_cv_products(days = 2, maxnum = 10)
+    return push_products(msg, products)
+
+def push_week_top_cv_products(msg):
+    products = view.ProductHuntDB().read_top_cv_products(days = 7, maxnum = 10)
+    return push_products(msg, products)
+
+def push_month_top_cv_products(msg):
+    products = view.ProductHuntDB().read_top_cv_products(days = 30, maxnum = 10)
     return push_products(msg, products)
 
 def push_search_result_products(msg):
@@ -82,11 +151,17 @@ def push_search_result_products(msg):
 
 # weixin event handlers
 _event_procs = [
-    (user_subscribe_event, push_welcome_info), # subscribe
-    (user_event_day_top, push_day_top_products), #CLICK->DAY_TOP
-    (user_event_week_top, push_week_top_products), #CLICK->WEEK_TOP
-    (user_event_month_top, push_month_top_products), #CLICK->MONTH_TOP
-    (user_event_search, push_search_result_products), #CLICK->SEARCH
+    (user_subscribe_event, push_welcome_info),
+    (user_event_day_top_voted, push_day_top_voted_products),
+    (user_event_week_top_voted, push_week_top_voted_products),
+    (user_event_month_top_voted, push_month_top_voted_products),
+    (user_event_day_top_comments, push_day_top_comments_products),
+    (user_event_week_top_comments, push_week_top_comments_products),
+    (user_event_month_top_comments, push_month_top_comments_products),
+    (user_event_day_top_cv, push_day_top_cv_products),
+    (user_event_week_top_cv, push_week_top_cv_products),
+    (user_event_month_top_cv, push_month_top_cv_products),
+    (user_event_search, push_search_result_products),
     (user_event_unknow, push_help_info)
 ]
 
@@ -160,12 +235,22 @@ def response_products_msg(msg, products):
 
         if p == products[0]:
             tagline = '[%s] %s' % (p.postdate, p.description)
-            title = '[%d] [%s] %s - %s' % (p.vote_count, p.postdate, p.name, p.description)
+            if hasattr(p, 'sum_cv'):
+                title = '[%dCV %dV %dC] [%s] %s - %s' % (p.sum_cv, p.vote_count, \
+                    p.comment_count, p.postdate, p.name, p.description)
+            else:
+                title = '[%dV %dC] [%s] %s - %s' % (p.vote_count, \
+                    p.comment_count, p.postdate, p.name, p.description)
             picUrl = APP_HOST + "/static/img/producthunt.png"
             item = ARTICLES_ITEM_TPL % (title, tagline, picUrl, url)
         else:
             tagline = '[%s] %s' % (p.postdate, p.description)
-            title = '[%d] %s\r\n%s' % (p.vote_count, p.name, tagline)
+            if hasattr(p, 'sum_cv'):
+                title = '[%dCV %dV %dC] %s\r\n%s' % (p.sum_cv, p.vote_count, \
+                    p.comment_count, p.name, tagline)
+            else:
+                title = '[%dV %dC] %s\r\n%s' % (p.vote_count, p.comment_count, \
+                    p.name, tagline)
             item = ARTICLES_ITEM_TPL % (title, tagline, p.user.icon, url)
         s = s + item
     s = s + ARTICLES_MSG_TPL_TAIL

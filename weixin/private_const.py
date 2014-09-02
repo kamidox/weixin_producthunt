@@ -25,17 +25,55 @@ The best new products, every day, in wechat
 
 HELP_INFO = \
 u"""
-回复下面对应单词获取产品信息：
-day - 最近两天得票最多的产品
-week - 最近一周得票最多的产品
-month - 最近一月得票最多的产品
-search:keyword - 搜索相关产品
+回复下面命令获取产品信息：
+dtv - day_top_voted
+最近两天得票最多的产品
+wtv - week_top_voted
+最近一周得票最多的产品
+mtv - month_top_voted
+最近一月得票最多的产品
 
-Use following command to get infomation you needed:
-day - get the top voted products in these two days
-week - get the top voted products in this week
-month - get the top voted products in this month
-search:keyword - search products base on keyword
+dtc - day_top_comments
+最近两天评论最多的产品
+wtc - week_top_comments
+最近一周评论最多的产品
+mtc - month_top_comments
+最近一月评论最多的产品
+
+dtcv - day_top_comment_voted
+最近两天评论点赞最多的产品
+wtcv - week_top_comment_voted
+最近一周评论点赞最多的产品
+mtcv - month_top_comment_voted
+最近一月评论点赞最多的产品
+
+search:keyword
+搜索包含keyword的相关产品
+
+Try following commands:
+dtv - day_top_voted
+top voted products in these two days
+wtv - week_top_voted
+top voted products in this week
+mtv - month_top_voted
+top voted products in this month
+
+dtc - day_top_comments
+top comments products in these two days
+wtc - week_top_comments
+top comments products in this week
+mtc - month_top_comments
+top comments products in this month
+
+dtcv - day_top_comment_voted
+top comments voted(cv) products in these two days
+wtcv - week_top_comment_voted
+top comments voted(cv) products in this week
+mtcv - month_top_comment_voted
+top comments voted(cv) products in this month
+
+search:keyword
+search products base on keyword
 """
 
 ERROR_INFO = \

@@ -166,6 +166,71 @@ class ProductHuntDB:
         finally:
             self._close()
 
+    def read_top_comments_products(self, days = 2, maxnum = 10):
+        """ return latest products order by comment_count"""
+        self._open()
+        try:
+            self.conn.execute("""SELECT name, description, url, postid,
+                comment_url, postdate, vote_count, comment_count, userid, guid
+                FROM products WHERE
+                TO_DAYS(postdate)>(TO_DAYS(DATE_SUB(NOW(), INTERVAL %s DAY)))
+                ORDER BY comment_count DESC LIMIT %s
+                """, (days, maxnum))
+            products= []
+            results = self.conn.fetchall()
+            for r in results:
+                p = {}
+                p["name"] = r[0]
+                p["description"] = r[1]
+                p["url"] = r[2]
+                p["postid"] = r[3]
+                p["comment_url"] = r[4]
+                p["postdate"] = r[5]
+                p["vote_count"] = r[6]
+                p["comment_count"] = r[7]
+                p["user"] = self._read_user(r[8])
+                p["guid"] = r[9]
+                product = Product(**p)
+                products.append(product)
+            return products
+        finally:
+            self._close()
+
+    def read_top_cv_products(self, days = 2, maxnum = 10):
+        """ return latest products order by sum of comment's vote_count"""
+        self._open()
+        try:
+            self.conn.execute("""SELECT p.name, p.description, p.url, p.postid,
+                p.comment_url, p.postdate, p.vote_count, p.comment_count, p.userid,
+                p.guid, SUM(c.vote_count) as cv
+                FROM comments AS c
+                INNER JOIN products AS p
+                ON p.postid=c.postid
+                WHERE TO_DAYS(p.postdate)>(TO_DAYS(DATE_SUB(NOW(), INTERVAL %s DAY)))
+                GROUP BY p.postid
+                ORDER BY cv DESC LIMIT %s
+                """, (days, maxnum))
+            products= []
+            results = self.conn.fetchall()
+            for r in results:
+                p = {}
+                p["name"] = r[0]
+                p["description"] = r[1]
+                p["url"] = r[2]
+                p["postid"] = r[3]
+                p["comment_url"] = r[4]
+                p["postdate"] = r[5]
+                p["vote_count"] = r[6]
+                p["comment_count"] = r[7]
+                p["user"] = self._read_user(r[8])
+                p["guid"] = r[9]
+                p["sum_cv"] = r[10]
+                product = Product(**p)
+                products.append(product)
+            return products
+        finally:
+            self._close()
+
     def read_product(self, guid):
         """ return product and comments by postid """
         product = None
