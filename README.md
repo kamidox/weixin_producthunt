@@ -1,6 +1,13 @@
 intro
 ==================
 
+This is unoffical snapshot of producthunt.com. I try to introduce Product Hunt
+to China by Wechat(weixin) public account. And mainly focus on ranking and
+introduct products post on producthunt.com to China.
+
+For ranking, it support vote count of products, comment count of products and
+the sum of comment's vote count of products. Happy ranking.
+
 1. Populate products from www.producthunt.com to weixin.
 2. Get products information from wechat(weixin) public account
 3. Push the well selected translated product to user who follow @producthunt on wechat(weixin)
