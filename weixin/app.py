@@ -6,16 +6,16 @@ from flask import Flask, request, render_template
 from private_const import *
 import view
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path=APP_ROOT + '/static')
 app.debug = APP_DEBUG
 
 #homepage just for fun
-@app.route('/')
+@app.route(APP_ROOT + '/')
 def home():
     return render_template('index.html')
 
 #homepage just for fun
-@app.route('/weixin_test')
+@app.route(APP_ROOT + '/weixin_test')
 def weixin_test():
     p = view.populate_test_data()
     return render_template('comments.jinja.html', product=p)
@@ -166,7 +166,7 @@ _event_procs = [
 ]
 
 # view product comments
-@app.route('/producthunt/<guid>', methods=['GET'])
+@app.route(APP_ROOT + '/producthunt/<guid>', methods=['GET'])
 def view_product_comments(guid):
     p = view.ProductHuntDB().read_product(guid)
     if p is not None:
@@ -177,7 +177,7 @@ def view_product_comments(guid):
 
 # verify for weixin server.
 # weixin server will send GET request first to verify this backend
-@app.route('/weixin', methods=['GET'])
+@app.route(APP_ROOT + '/weixin', methods=['GET'])
 def weixin_access_verify():
     echostr = request.args.get('echostr')
     if verification(request) and echostr is not None:
@@ -185,7 +185,7 @@ def weixin_access_verify():
     return 'access verification fail'
 
 # reciever msgs from weixin server
-@app.route('/weixin', methods=['POST'])
+@app.route(APP_ROOT + '/weixin', methods=['POST'])
 def weixin_msg():
     if verification(request):
         data = request.data

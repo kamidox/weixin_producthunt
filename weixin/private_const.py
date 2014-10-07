@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 APP_TOKEN = 'producthunt'
-APP_HOST = 'http://kamidox.com'
+APP_ROOT = '/weixin'
+APP_HOST = 'http://kamidox.com/weixin'
 APP_DEBUG = True
 
 # database
