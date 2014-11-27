@@ -20,7 +20,7 @@ class ProductsSpider(scrapy.Spider):
                 il = ProductItemLoader(response = response, selector = p)
                 # vote_count
                 il.add_xpath("vote_count", '*//*[@class="vote-count"]/text()')
-                il.add_xpath("postid", '*//*[@class="vote-count"]/@data-id')
+                il.add_xpath("postid", 'div[@class="upvote"]/@data-vote-id')
                 # user info
                 il.add_xpath("user_name", '*//div[@class="user-hover-card"]/h3/text()', re=r'\s*(.*)\s*')
                 il.add_xpath("userid", '*//div[@class="user-hover-card"]/a/@href')
