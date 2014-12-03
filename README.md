@@ -22,8 +22,8 @@ usage
 ==================
 
 1. search:keyword - search products base on keyword
-2. dtv/wtv/mtv - search products by vote count by day/week/month
-3. dtc/wtc/mtc - search products by comment count by day/week/month
-4. dtcv/wtcv/mtcv - search products by comment's vote count by day/week/month
+2. 1/2/3 - search products by vote count by day/week/month
+3. 4/5/6 - search products by comment count by day/week/month
+4. 7/8/9 - search products by comment's vote count by day/week/month
 
 Send 'help' in Wechat(weixin) to producthunt to get help information

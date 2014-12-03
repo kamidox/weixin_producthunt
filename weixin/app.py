@@ -27,63 +27,81 @@ def user_event_day_top_voted(msg):
     isclick = msg['MsgType'] == 'event' \
         and msg['Event'] == 'CLICK' and msg['EventKey'] == 'DAY_TOP_VOTED'
     iscmd = msg['MsgType'] == 'text' and \
-        (msg['Content'].lower() == 'dtv' or msg['Content'].lower() == 'day_top_voted')
+        (msg['Content'].lower() == '1' \
+            or msg['Content'].lower() == 'dtv' \
+            or msg['Content'].lower() == 'day_top_voted')
     return isclick or iscmd
 
 def user_event_week_top_voted(msg):
     isclick = msg['MsgType'] == 'event' \
         and msg['Event'] == 'CLICK' and msg['EventKey'] == 'WEEK_TOP_VOTED'
     iscmd = msg['MsgType'] == 'text' and \
-        (msg['Content'].lower() == 'wtv' or msg['Content'].lower() == 'week_top_voted')
+        (msg['Content'].lower() == '2' \
+            or msg['Content'].lower() == 'wtv' \
+            or msg['Content'].lower() == 'week_top_voted')
     return isclick or iscmd
 
 def user_event_month_top_voted(msg):
     isclick = msg['MsgType'] == 'event' \
         and msg['Event'] == 'CLICK' and msg['EventKey'] == 'MONTH_TOP_VOTED'
     iscmd = msg['MsgType'] == 'text' and \
-        (msg['Content'].lower() == 'mtv' or msg['Content'].lower() == 'month_top_voted')
+        (msg['Content'].lower() == '3' \
+            or msg['Content'].lower() == 'mtv' \
+            or msg['Content'].lower() == 'month_top_voted')
     return isclick or iscmd
 
 def user_event_day_top_comments(msg):
     isclick = msg['MsgType'] == 'event' \
         and msg['Event'] == 'CLICK' and msg['EventKey'] == 'DAY_TOP_COMMENTS'
     iscmd = msg['MsgType'] == 'text' and \
-        (msg['Content'].lower() == 'dtc' or msg['Content'].lower() == 'day_top_comments')
+        (msg['Content'].lower() == '4' \
+            or msg['Content'].lower() == 'dtc' \
+            or msg['Content'].lower() == 'day_top_comments')
     return isclick or iscmd
 
 def user_event_week_top_comments(msg):
     isclick = msg['MsgType'] == 'event' \
         and msg['Event'] == 'CLICK' and msg['EventKey'] == 'WEEK_TOP_COMMENTS'
     iscmd = msg['MsgType'] == 'text' and \
-        (msg['Content'].lower() == 'wtc' or msg['Content'].lower() == 'week_top_comments')
+        (msg['Content'].lower() == '5' \
+            or msg['Content'].lower() == 'wtc' \
+            or msg['Content'].lower() == 'week_top_comments')
     return isclick or iscmd
 
 def user_event_month_top_comments(msg):
     isclick = msg['MsgType'] == 'event' \
         and msg['Event'] == 'CLICK' and msg['EventKey'] == 'MONTH_TOP_COMMENTS'
     iscmd = msg['MsgType'] == 'text' and \
-        (msg['Content'].lower() == 'mtc' or msg['Content'].lower() == 'month_top_comments')
+        (msg['Content'].lower() == '6' \
+            or msg['Content'].lower() == 'mtc' \
+            or msg['Content'].lower() == 'month_top_comments')
     return isclick or iscmd
 
 def user_event_day_top_cv(msg):
     isclick = msg['MsgType'] == 'event' \
         and msg['Event'] == 'CLICK' and msg['EventKey'] == 'DAY_TOP_COMMENT_VOTED'
     iscmd = msg['MsgType'] == 'text' and \
-        (msg['Content'].lower() == 'dtcv' or msg['Content'].lower() == 'day_top_comment_voted')
+        (msg['Content'].lower() == '7' \
+            or msg['Content'].lower() == 'dtcv' \
+            or msg['Content'].lower() == 'day_top_comment_voted')
     return isclick or iscmd
 
 def user_event_week_top_cv(msg):
     isclick = msg['MsgType'] == 'event' \
         and msg['Event'] == 'CLICK' and msg['EventKey'] == 'WEEK_TOP_COMMENT_VOTED'
     iscmd = msg['MsgType'] == 'text' and \
-        (msg['Content'].lower() == 'wtcv' or msg['Content'].lower() == 'week_top_comment_voted')
+        (msg['Content'].lower() == '8' \
+            or msg['Content'].lower() == 'wtcv' \
+            or msg['Content'].lower() == 'week_top_comment_voted')
     return isclick or iscmd
 
 def user_event_month_top_cv(msg):
     isclick = msg['MsgType'] == 'event' \
         and msg['Event'] == 'CLICK' and msg['EventKey'] == 'MONTH_TOP_COMMENT_VOTED'
     iscmd = msg['MsgType'] == 'text' and \
-        (msg['Content'].lower() == 'mtcv' or msg['Content'].lower() == 'month_top_comment_voted')
+        (msg['Content'].lower() == '9' \
+            or msg['Content'].lower() == 'mtcv' \
+            or msg['Content'].lower() == 'month_top_comment_voted')
     return isclick or iscmd
 
 def user_event_search(msg):
