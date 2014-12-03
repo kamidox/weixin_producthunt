@@ -108,6 +108,10 @@ def user_event_search(msg):
     iscmd = msg['MsgType'] == 'text' and msg['Content'].startswith("search:")
     return iscmd
 
+def user_event_mail(msg):
+    iscmd = msg['MsgType'] == 'text' and msg['Content'].startswith("mail:")
+    return iscmd
+
 def user_event_unknow(msg):
     return True
 
@@ -122,7 +126,46 @@ def push_products(msg, products):
     if products is not None and len(products) > 0:
         return response_products_msg(msg, products)
     else:
+        return
+
+def mail_products(msg, products, receiver):
+    """ Generate weixin href text and send to receiver """
+    if products is not None and len(products) > 0:
+        body = ""
+        for p in products:
+            item = WX_TEXT_TPL % (p.vote_count, p.url, p.name, p.description)
+            body += item
+        _send_mail(receiver, body)
+        return response_text_msg(msg, "mail sent to " + receiver)
+    else:
         return response_text_msg(msg, ERROR_INFO)
+
+def _send_mail(receiver, body):
+
+    import smtplib
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
+
+    sender = 'sfox.studio@qq.com'
+    subject = 'PH - ' + time.strftime("%Y%m%d")
+    smtpserver = 'smtp.qq.com'
+    username = 'sfox.studio@qq.com'
+    password = 'XXxx1234'
+
+    msgRoot = MIMEMultipart('related')
+    msgRoot['Subject'] = subject
+
+    # attachment
+    att = MIMEText(body, 'base64', 'utf-8')
+    att["Content-Type"] = 'text/plain'
+    att["Content-Disposition"] = 'attachment; filename="%s.txt"' % (time.strftime("%Y%m%d"))
+    msgRoot.attach(att)
+
+    smtp = smtplib.SMTP()
+    smtp.connect(smtpserver)
+    smtp.login(username, password)
+    smtp.sendmail(sender, receiver, msgRoot.as_string())
+    smtp.quit()
 
 def push_day_top_voted_products(msg):
     products = view.ProductHuntDB().read_top_vote_products(days = 2, maxnum = 10)
@@ -167,6 +210,13 @@ def push_search_result_products(msg):
     _log("search_products: %s" % (keyword))
     return push_products(msg, products)
 
+def mail_day_top_voted_products(msg):
+    # skip prefix 'mail:'
+    receiver = msg['Content'][5:]
+    products = view.ProductHuntDB().read_top_vote_products(days = 2, maxnum = 30)
+    _log("mailto: %s" % (receiver))
+    return mail_products(msg, products, receiver)
+
 # weixin event handlers
 _event_procs = [
     (user_subscribe_event, push_welcome_info),
@@ -180,6 +230,7 @@ _event_procs = [
     (user_event_week_top_cv, push_week_top_cv_products),
     (user_event_month_top_cv, push_month_top_cv_products),
     (user_event_search, push_search_result_products),
+    (user_event_mail, mail_day_top_voted_products),
     (user_event_unknow, push_help_info)
 ]
 

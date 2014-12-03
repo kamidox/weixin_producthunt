@@ -44,6 +44,12 @@ u"""
 oops! no data found!
 """
 
+WX_TEXT_TPL = \
+u"""
+[%sV]<a href=%s>%s</a>
+%s
+"""
+
 TEXT_MSG_TPL = \
 u"""
 <xml>
