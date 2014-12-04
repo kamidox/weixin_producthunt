@@ -20,6 +20,12 @@ def weixin_test():
     p = view.populate_test_data()
     return render_template('comments.jinja.html', product=p)
 
+@app.route(APP_ROOT + '/mailto/<receiver>')
+def view_mail_daily_products(receiver):
+    products = view.ProductHuntDB().read_top_vote_products(days = 2, maxnum = 50)
+    _log("mailto: %s" % (receiver))
+    return mail_products(None, products, receiver)
+
 def user_subscribe_event(msg):
     return msg['MsgType'] == 'event' and msg['Event'] == 'subscribe'
 
@@ -130,19 +136,23 @@ def push_products(msg, products):
 
 def mail_products(msg, products, receiver):
     """ Generate weixin href text and send to receiver """
+    info = "Mail sent to " + receiver
     if products is not None and len(products) > 0:
         body = ""
         for p in products:
             item = WX_TEXT_TPL % (p.vote_count, p.url, p.name, p.description)
             body += item
-        info = "Mail sent to "
         try:
             _send_mail(receiver, body)
         except:
-            info = "Failed to send mail to "
-        return response_text_msg(msg, info + receiver)
+            info = "Failed to send mail to " + receiver
     else:
-        return response_text_msg(msg, ERROR_INFO)
+        info = ERROR_INFO
+
+    if msg is not None:
+        return response_text_msg(msg, info)
+    else:
+        return info + "\n"
 
 def _send_mail(receiver, body):
 
