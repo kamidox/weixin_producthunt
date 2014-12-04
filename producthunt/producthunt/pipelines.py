@@ -81,9 +81,11 @@ class MySQLStorePipeline(object):
         if ret:
             conn.execute("""
                 UPDATE products SET vote_count=%s, updated=%s, userid=%s,
-                comment_count=%s, postdate=%s WHERE guid=%s
+                comment_count=%s, postdate=%s, name=%s,
+                description=%s WHERE guid=%s
             """, (item['vote_count'], now, item['userid'],
-                item['comment_count'], item['date'], guid))
+                item['comment_count'], item['date'], item['name'],
+                item['description'], guid))
             log.msg("Product updated in db: %s %r" % (item['postid'], item['name']))
         else:
             conn.execute("""

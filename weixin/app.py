@@ -135,8 +135,12 @@ def mail_products(msg, products, receiver):
         for p in products:
             item = WX_TEXT_TPL % (p.vote_count, p.url, p.name, p.description)
             body += item
-        _send_mail(receiver, body)
-        return response_text_msg(msg, "mail sent to " + receiver)
+        info = "Mail sent to "
+        try:
+            _send_mail(receiver, body)
+        except:
+            info = "Failed to send mail to "
+        return response_text_msg(msg, info + receiver)
     else:
         return response_text_msg(msg, ERROR_INFO)
 
