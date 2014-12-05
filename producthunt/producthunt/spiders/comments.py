@@ -41,23 +41,23 @@ class CommentsSpider(scrapy.Spider):
             return
 
         sel = Selector(response)
-        postid = sel.xpath('//div[@class="post-show"]/@data-id').extract()
+        postid = sel.xpath('//div[@class="modal-post--header--upvote upvote m-big"]/@data-vote-id').extract()
         # product in this comment
         if self.max_posts > 0:
-            p = sel.xpath('//div[@class="comments-header"]')
+            p = sel.xpath('//div[@class="modal-post"]')
             il = ProductItemLoader(response = response, selector = p)
             il.add_xpath('vote_count', '*//*[@class="vote-count"]/text()')
             il.add_value("postid", postid)
-            il.add_xpath("name", '*//a[@class="post-url"]/text()')
-            il.add_xpath("url", '*//a[@class="post-url"]/@href')
-            il.add_xpath("description", '*//span[@class="post-tagline"]/text()')
-            il.add_xpath("comment_url", '*//a[@class="permalink"]/@href')
-            il.add_xpath("comment_count", '//h2[@class="subhead"]/text()')
-            il.add_xpath("date", '*//a[@class="permalink"]/text()')
-            il.add_xpath("userid", '*//div[@class="post-user"]/a/@href')
+            il.add_xpath("name", 'header/div[2]/h1/a/text()')
+            il.add_xpath("url", 'header/div[2]/h1/a/@href')
+            il.add_xpath("description", '*//p[@class="modal-post--header--tagline"]/text()')
+            il.add_value("comment_url", 'http://www.producthunt.com/posts/' + postid[0])
+            il.add_xpath("comment_count", 'section[3]/h2/text()')
+            il.add_xpath("date", 'div/div[1]/h2/abbr/text()')
+            il.add_xpath("userid", 'div/div[1]/span/a/@href')
             yield il.load_item()
         # comments for this product
-        threads = sel.xpath('//div[@class="comment-thread"]')
+        threads = sel.xpath('//div[@class="modal-post--comment"]')
         for t in threads:
             comments = t.xpath('div')
             parentid = t.xpath('@data-parent-id').extract()
