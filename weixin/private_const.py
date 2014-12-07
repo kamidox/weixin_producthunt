@@ -46,7 +46,8 @@ oops! no data found!
 
 WX_TEXT_TPL = \
 u"""
-[%sV]<a href="%s">%s</a>
+%s
+%s
 %s
 """
 

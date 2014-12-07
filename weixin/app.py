@@ -140,7 +140,7 @@ def mail_products(msg, products, receiver):
     if products is not None and len(products) > 0:
         body = ""
         for p in products:
-            item = WX_TEXT_TPL % (p.vote_count, p.url, p.name, p.description)
+            item = WX_TEXT_TPL % (p.name, p.url, p.description)
             body += item
         try:
             _send_mail(receiver, body)
@@ -314,7 +314,7 @@ def response_products_msg(msg, products):
     s = ARTICLES_MSG_TPL_HEAD % (msg['FromUserName'], msg['ToUserName'],
         str(int(time.time())), len(products))
     for p in products:
-        url = APP_HOST + "/producthunt/"+ p.guid
+        url = "http://www.producthunt.com/posts/" + p.postid
 
         if p == products[0]:
             tagline = '[%s] %s' % (p.postdate, p.description)
