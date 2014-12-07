@@ -314,7 +314,7 @@ def response_products_msg(msg, products):
     s = ARTICLES_MSG_TPL_HEAD % (msg['FromUserName'], msg['ToUserName'],
         str(int(time.time())), len(products))
     for p in products:
-        url = "http://www.producthunt.com/posts/" + p.postid
+        url = p.url
 
         if p == products[0]:
             tagline = '[%s] %s' % (p.postdate, p.description)
