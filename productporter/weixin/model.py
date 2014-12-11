@@ -1,7 +1,7 @@
 #!/bin/env python
 # -*- coding: utf-8 -*-
 import MySQLdb
-from private_const import *
+from consts import *
 
 class User:
     """class to hold user information"""

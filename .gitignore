@@ -43,6 +43,9 @@ coverage.xml
 .pydevproject
 *.sublime-project
 *.sublime-workspace
+.venv
+productporter/configs/production.py
+productporter/configs/development.py
 
 # Rope
 .ropeproject
