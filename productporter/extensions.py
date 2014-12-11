@@ -11,7 +11,7 @@
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager
 from flask.ext.themes2 import Themes
-
+from flask.ext.cache import Cache
 
 # Database
 db = SQLAlchemy()
@@ -21,3 +21,6 @@ login_manager = LoginManager()
 
 # Themes
 themes = Themes()
+
+# Caching
+cache = Cache()

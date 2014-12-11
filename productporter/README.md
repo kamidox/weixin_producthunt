@@ -15,4 +15,4 @@ ProductPorter
     * `python manage.py createall`
 * Run the development server
     * `python manage.py runserver`
-* Visit [localhost:5050](http://localhost:5050)
+* Visit [localhost:5000](http://localhost:5000)
