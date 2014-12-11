@@ -20,18 +20,18 @@ class ProductsSpider(scrapy.Spider):
                 il = ProductItemLoader(response = response, selector = p)
                 # vote_count
                 il.add_xpath("vote_count", '*//*[@class="vote-count"]/text()')
-                il.add_xpath("postid", 'div[@class="upvote"]/@data-vote-id')
+                il.add_xpath("postid", '*//div[@class="upvote"]/@data-vote-id')
                 # user info
                 il.add_xpath("user_name", '*//div[@class="user-hover-card"]/h3/text()', re=r'\s*(.*)\s*')
                 il.add_xpath("userid", '*//div[@class="user-hover-card"]/a/@href')
                 il.add_xpath("user_title", '*//h4[@class="user-headline"]/text()')
                 il.add_xpath("user_icon", '*//div[@class="user-hover-card"]/a/img/@src')
                 # product info
-                il.add_xpath("name", '*/a[@class="post-url title"]/text()')
-                il.add_xpath("url", '*/a[@class="post-url title"]/@href')
-                il.add_xpath("description", '*/span[@class="post-tagline description"]/text()')
-                il.add_xpath("comment_url", 'a/@href')
-                il.add_xpath("comment_count", '*/p[@class="comment-count"]/text()')
+                il.add_xpath("name", '*//a[@class="post-url title"]/text()')
+                il.add_xpath("url", '*//a[@class="post-url title"]/@href')
+                il.add_xpath("description", '*//*[@class="post-tagline description"]/text()')
+                il.add_xpath("comment_url", 'div/@data-href')
+                il.add_xpath("comment_count", '*//*[@class="comment-count"]/text()')
                 il.add_value("date", date)
                 yield il.load_item()
 

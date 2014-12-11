@@ -43,6 +43,7 @@ coverage.xml
 .pydevproject
 *.sublime-project
 *.sublime-workspace
+.venv
 
 # Rope
 .ropeproject
