@@ -296,7 +296,6 @@ class User(db.Model, UserMixin):
 
         return self
 
-
 class Guest(AnonymousUserMixin):
     @property
     def permissions(self):

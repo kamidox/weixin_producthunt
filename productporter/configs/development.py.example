@@ -37,3 +37,7 @@ class DevelopmentConfig(DefaultConfig):
     MAIL_SENDER = ("Default Sender", "noreply@example.org")
     # The user who should recieve the error logs
     ADMINS = ["your_admin_user@gmail.com"]
+
+    ## ProductHuntAPI key and secret
+    PH_API_KEY = "your_producthunt_api_key"
+    PH_API_SECRET = "your_producthunt_api_secret"
