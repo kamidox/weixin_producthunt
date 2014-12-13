@@ -1,0 +1,205 @@
+{%- macro field_label(field) -%}
+    <label for="{{ field.id }}">{{ field.label.text }}</label>
+{% endmacro %}
+
+
+{%- macro field_description(field) -%}
+    {% if field.description %}
+        <span class="help-block">{{ field.description|safe }}</span>
+    {% endif %}
+{%- endmacro -%}
+
+
+{%- macro field_errors(field) -%}
+    {% if field.errors %}
+        {%- for error in field.errors -%}
+        <span class="help-block">{{error}}</span>
+        {%- endfor -%}
+    {% endif %}
+{%- endmacro -%}
+
+
+{%- macro render_boolean_field(field, inline=False) -%}
+<label class="checkbox {%- if inline -%}inline{%- endif -%}">
+    {{ field(**kwargs) }}
+    {{ field_label(field) }}
+    {{ field_description(field) }}
+    {{ field_errors(field) }}
+</label>
+{%- endmacro -%}
+
+{%- macro render_select_field(field, div_class='') -%}
+<div class="form-group">
+    {% if div_class %}
+    <div class="{{ div_class }}">
+    {% else %}
+    <div class="col-sm-5">
+    {% endif %}
+        <label>{{ field.label.text }}</label>
+        {% if field.type == 'QuerySelectMultipleField' or field.type == 'SelectMultipleField' %}
+            {{ field(multiple=True, class="form-control") }}
+        {% else %}
+            {{ field(class="form-control") }}
+        {%- endif -%}
+
+        {{ field_description(field) }}
+        {{ field_errors(field) }}
+    </div>
+</div>
+{%- endmacro -%}
+
+{%- macro render_field(field, div_class='', rows='') -%}
+<div class="form-group{%- if field.errors %} has-error{%- endif %}">
+    {% if div_class %}
+    <div class="{{ div_class }}">
+    {% else %}
+    <div class="col-sm-5">
+    {% endif %}
+        <label>{{ field.label.text }}</label>
+        {%- if kwargs['required'] or field.flags.required -%}
+            {% if rows %}
+                {{ field(class="form-control", required="required", rows=rows, placeholder=field.label.text) }}
+            {% else %}
+                {{ field(class="form-control", required="required", placeholder=field.label.text) }}
+            {% endif %}
+        {%- else -%}
+            {% if rows %}
+                {{ field(class="form-control", rows=rows, placeholder=field.label.text) }}
+            {% else %}
+                {{ field(class="form-control", placeholder=field.label.text) }}
+            {% endif %}
+        {%- endif -%}
+
+        {{ field_description(field) }}
+        {{ field_errors(field) }}
+    </div>
+</div>
+{%- endmacro -%}
+
+
+{%- macro inline_field(field, label_text='', label_class='') -%}
+<div class="form-group {%- if field.errors %} has-error{%- endif %}">
+    {{field.label(class="sr-only")}}
+
+    <div class="col-sm-4">
+    {%- if kwargs['required'] or field.flags.required -%}
+        {% if label_text %}
+            {{field(class='form-control', placeholder=label_text, required="required", **kwargs)}}
+        {% else %}
+            {{field(class='form-control', placeholder=field.label.text, required="required", **kwargs)}}
+        {% endif %}
+    {%- else -%}
+        {% if label_text %}
+            {{field(class='form-control', placeholder=label_text, **kwargs)}}
+        {% else %}
+            {{field(class='form-control', placeholder=field.label.text, **kwargs)}}
+        {% endif %}
+    {%- endif -%}
+    {{ field_description(field) }}
+    {{ field_errors(field) }}
+    </div>
+</div>
+{%- endmacro -%}
+
+
+{%- macro group_field(field, label_text='', label_class='') -%}
+    <div class="form-group {%- if field.errors %} has-error{%- endif %}" style="margin-bottom: 0px;">
+        {{field.label(class="sr-only")}}
+
+        {%- if kwargs['required'] or field.flags.required -%}
+            {% if label_text %}
+                {{field(class='form-control form-grouped', placeholder=label_text, required="required", **kwargs)}}
+            {% else %}
+                {{field(class='form-control form-grouped', placeholder=field.label.text, required="required", **kwargs)}}
+            {% endif %}
+        {%- else -%}
+            {% if label_text %}
+                {{field(class='form-control form-grouped', placeholder=label_text, **kwargs)}}
+            {% else %}
+                {{field(class='form-control form-grouped', placeholder=field.label.text, **kwargs)}}
+            {% endif %}
+        {%- endif -%}
+        {{ field_description(field) }}
+        {{ field_errors(field) }}
+    </div>
+{%- endmacro -%}
+
+
+{%- macro horizontal_field(field, label_text='', label_class='') -%}
+<div class="form-group row {%- if field.errors %} has-error{%- endif %}">
+
+    {% if class %}
+        {{ field.label(class=class) }}
+    {% else %}
+        {{ field.label(class="col-sm-3 control-label") }}
+    {% endif %}
+    <div class="col-sm-9">
+
+    {%- if kwargs['required'] or field.flags.required -%}
+        {% if label_text %}
+            {{ field(class='form-control', placeholder=label_text, required="required", **kwargs) }}
+        {% else %}
+            {{ field(class='form-control', placeholder=field.label.text, required="required", **kwargs) }}
+        {% endif %}
+    {%- else -%}
+        {% if label_text %}
+            {{ field(class='form-control', placeholder=label_text, **kwargs) }}
+        {% else %}
+            {{ field(class='form-control', placeholder=field.label.text, **kwargs) }}
+        {% endif %}
+    {%- endif -%}
+
+    {{ field_description(field) }}
+    {{ field_errors(field) }}
+    </div>
+</div>
+{%- endmacro -%}
+
+
+{% macro topnav(endpoint, name, icon='', active=False) %}
+<li {% if endpoint == request.endpoint or active == True %}class="active"{% endif %}>
+    <a href={{ url_for(endpoint) }}>
+        {% if icon %}<i class="{{ icon }}"></i> {% endif %}{{ name }}
+    </a>
+</li>
+{% endmacro %}
+
+
+{% macro navlink(endpoint, name, active=False) %}
+<li {% if endpoint == request.endpoint or active %}class="active"{% endif %}>
+    <a href={{ url_for(endpoint) }}>{{ name }}</a>
+</li>
+{% endmacro %}
+
+
+{% macro render_pagination(page_obj, url) %}
+<ul class="pagination" style="margin: 0; float:right">
+    <li><span class="pages-label">Pages: </span></li>
+    {%- for page in page_obj.iter_pages() %}
+        {% if page %}
+            {% if page != page_obj.page %}
+                <li><a href="{{ url }}?page={{ page }}">{{ page }}</a></li>
+            {% else %}
+                <li class="active"><a href="#">{{ page }}</a></li>
+            {% endif %}
+        {% endif %}
+    {%- else -%}
+        <li class="active"><a href="#">1</a></li>
+    {%- endfor %}
+    {% if page_obj.has_next %}
+        <li><a href="{{ url }}?page={{ page_obj.next_num }}">&raquo;</a></li>
+    {% endif %}
+</ul>
+{% endmacro %}
+
+
+{%- macro topic_pages(topic_obj, per_page=10) -%}
+{% set topic_pages = (topic_obj.post_count / per_page)|round|int %}
+{%- if topic_pages >  1 -%}
+<small>[
+    {% for page in range(0, topic_pages) %}
+            <a href="{{ url_for('forum.view_topic', topic_id=topic_obj.id) }}?page={{ page+1 }}">{{ page+1 }} </a>
+    {% endfor %}
+]</small>
+{%- endif -%}
+{%- endmacro -%}

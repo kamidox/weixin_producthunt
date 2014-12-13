@@ -57,3 +57,11 @@ class ProductionConfig(DefaultConfig):
     USER_URL_PREFIX = "/user"
     AUTH_URL_PREFIX = "/auth"
     ADMIN_URL_PREFIX = "/admin"
+
+    # Caching
+    CACHE_TYPE = "simple"
+    CACHE_DEFAULT_TIMEOUT = 60
+
+    ## ProductHuntAPI key and secret
+    PH_API_KEY = "your_producthunt_api_key"
+    PH_API_SECRET = "your_producthunt_api_secret"

@@ -57,13 +57,18 @@ class Product(db.Model):
         db.session.commit()
         return self
 
-    def from_json(self, json):
+    @classmethod
+    def from_json(cls, json):
         """
-        Import data from json object
+        Create from json data or update the exist one
         """
-        for k, v in Product.FIELD_MAP.items():
+        p = cls.query.filter(cls.postid==json['id']).first()
+        if not p:
+            p = cls()
+        for k, v in cls.FIELD_MAP.items():
             if '[' in v:
                 m = re.search(r"^(.+)\[(.+)\]$", v)
-                setattr(self, k, json[m.group(1)][m.group(2)])
+                setattr(p, k, json[m.group(1)][m.group(2)])
             else:
-                setattr(self, k, json[v])
+                setattr(p, k, json[v])
+        return p

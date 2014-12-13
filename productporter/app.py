@@ -14,9 +14,9 @@ import logging
 from flask import Flask
 
 from productporter.weixin.view import weixin
-from productporter.product.view import products
+from productporter.product.view import product
 # extensions
-from productporter.extensions import db
+from productporter.extensions import db, cache, themes
 # default config
 from productporter.configs.default import DefaultConfig
 
@@ -54,7 +54,7 @@ def configure_blueprints(app):
     Configures the blueprints
     """
     app.register_blueprint(weixin, url_prefix=app.config["WEIXIN_URL_PREFIX"])
-    app.register_blueprint(products, url_prefix=app.config["POSTS_URL_PREFIX"])
+    app.register_blueprint(product, url_prefix=app.config["PRODUCT_URL_PREFIX"])
 
 def configure_extensions(app):
     """
@@ -64,8 +64,11 @@ def configure_extensions(app):
     # Flask-SQLAlchemy
     db.init_app(app)
 
+    # Flask-Cache
+    cache.init_app(app)
+
     # Flask-Themes
-    # themes.init_themes(app, app_identifier="productporter")
+    themes.init_themes(app, app_identifier="productporter")
 
     # Flask-Login
     # login_manager.login_view = app.config["LOGIN_VIEW"]

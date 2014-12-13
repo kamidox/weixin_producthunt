@@ -57,7 +57,7 @@ class DefaultConfig(object):
     # URL Prefixes.
     ROOT_URL_PREFIX = "/weixin"
     # Blueprints URL Prefixs.
-    POSTS_URL_PREFIX = "/posts"
+    PRODUCT_URL_PREFIX = "/product"
     WEIXIN_URL_PREFIX = "/weixin"
     USER_URL_PREFIX = "/user"
     AUTH_URL_PREFIX = "/auth"
@@ -74,3 +74,10 @@ class DefaultConfig(object):
     ## ProductHuntAPI key and secret
     PH_API_KEY = "your_producthunt_api_key"
     PH_API_SECRET = "your_producthunt_api_secret"
+
+    # Caching
+    CACHE_TYPE = "simple"
+    CACHE_DEFAULT_TIMEOUT = 60
+
+    ## theme
+    DEFAULT_THEME = ""

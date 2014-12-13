@@ -10,7 +10,7 @@ import re
 from productporter.product.phapi import ProductHuntAPI
 from productporter.product.models import Product
 
-def test_old_posts(old_posts):
+def test_old_posts_not_empty(old_posts):
     """
     Test old posts not empty
     """
@@ -22,15 +22,14 @@ def test_posts_not_empty(posts):
     """
     assert len(posts) >= 0
 
-def test_save_posts(database, posts):
+def test_pull_posts(database, posts):
     """
     Save posts to database
     """
     for jsondata in posts:
         pi = Product.query.filter(Product.postid==jsondata['id']).first()
         assert pi is None
-        pi = Product()
-        pi.from_json(jsondata)
+        pi = Product.from_json(jsondata)
         pi.save()
 
     assert Product.query.count() == len(posts)

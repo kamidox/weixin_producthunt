@@ -1,0 +1,37 @@
+{% set page_title = "Posts" %}
+
+{% extends theme("layout.jinja.html") %}
+{% block content %}
+
+<ul class="breadcrumb">
+    <li>{{ date }} - Totally {{ post_count }} products</li>
+</ul>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Tagline</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for post in posts %}
+        <tr>
+            <td rowspan="3">{{ posts.index(post) + 1 }}</td>
+            <td><a href="{{ post.redirect_url }}">{{ post.name }}</a></td>
+            <td>{{ post.tagline }}</td>
+        </tr>
+        <tr>
+            <td colspan="2">{{ post.ctagname }}</td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center">
+                <img src="{{ post.screenshot_url }}" max-width="500"/>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

@@ -10,30 +10,44 @@
     :license: BSD, see LICENSE for more details.
 """
 import datetime
-from flask import Blueprint, request, render_template, current_app
+from flask import Blueprint, request, current_app
 
 from productporter.product.phapi import ProductHuntAPI
 from productporter.product.models import Product
+from productporter.utils import render_template, pull_and_save_posts
 
-products = Blueprint('products', __name__)
+product = Blueprint('product', __name__)
 
 #homepage just for fun
-@products.route('/')
-def home():
-    """ product home dashboard"""
-    day = request.args.get('day', '')
+@product.route('/posts')
+def posts():
+    """ product posts home dashboard """
+    spec_day = request.args.get('day', '')
+    day = spec_day
     if not day:
         d = datetime.date.today()
         day = '%d-%d-%d' % (d.year, d.month, d.day)
-    posts = Product.query.filter(Product.date==day).all()
-    return render_template('posts.jinja.html',
-        post_count=len(posts), posts=posts, date=day)
+    posts = Product.query.filter(Product.date==day).\
+        order_by(Product.votes_count.desc()).all()
+    post_count = len(posts)
+
+    # when not specific a day and the content is empty, we show yesterday's data
+    if not spec_day and post_count == 0:
+        delta = datetime.timedelta(days=-1)
+        d = datetime.date.today() + delta
+        day = '%d-%d-%d' % (d.year, d.month, d.day)
+    posts = Product.query.filter(Product.date==day).\
+        order_by(Product.votes_count.desc()).all()
+    post_count = len(posts)
+
+    return render_template('product/posts.jinja.html',
+        post_count=post_count, posts=posts, date=day)
 
 #homepage just for fun
-@products.route('/pull')
+@product.route('/pull')
 def pull():
     """ pull data from producthunt.com """
-    api = ProductHuntAPI()
     day = request.args.get('day', '')
-    api.posts(day)
+    count = pull_and_save_posts(day)
+    return "pulled %d posts " % (count)
 

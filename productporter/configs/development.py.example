@@ -38,6 +38,10 @@ class DevelopmentConfig(DefaultConfig):
     # The user who should recieve the error logs
     ADMINS = ["your_admin_user@gmail.com"]
 
+    # Caching
+    CACHE_TYPE = "simple"
+    CACHE_DEFAULT_TIMEOUT = 60
+
     ## ProductHuntAPI key and secret
     PH_API_KEY = "your_producthunt_api_key"
     PH_API_SECRET = "your_producthunt_api_secret"
