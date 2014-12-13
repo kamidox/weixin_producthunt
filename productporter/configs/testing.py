@@ -7,10 +7,14 @@
     :copyright: (c) 2014 by the ProductPorter Team.
     :license: BSD, see LICENSE for more details.
 """
+try:
+    from productporter.configs.development import DevelopmentConfig as Config
+except ImportError:
+    from productporter.configs.default import DefaultConfig as Config
+
 from productporter.configs.default import DefaultConfig
 
-
-class TestingConfig(DefaultConfig):
+class TestingConfig(Config):
 
     # Indicates that it is a testing environment
     DEBUG = False
@@ -20,7 +24,7 @@ class TestingConfig(DefaultConfig):
     # This will create in the applications folder (where manage.py is)
     # a database named flaskbb.sqlite.
     SQLALCHEMY_DATABASE_URI = (
-        'sqlite:///' + DefaultConfig._basedir + '/' + 'productporter.sqlite'
+        'sqlite:///' + DefaultConfig._basedir + '/' + 'tests.sqlite'
     )
 
     SERVER_NAME = "localhost:5000"

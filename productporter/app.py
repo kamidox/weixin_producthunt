@@ -14,6 +14,7 @@ import logging
 from flask import Flask
 
 from productporter.weixin.view import weixin
+from productporter.product.view import products
 # extensions
 from productporter.extensions import db
 # default config
@@ -53,6 +54,7 @@ def configure_blueprints(app):
     Configures the blueprints
     """
     app.register_blueprint(weixin, url_prefix=app.config["WEIXIN_URL_PREFIX"])
+    app.register_blueprint(products, url_prefix=app.config["POSTS_URL_PREFIX"])
 
 def configure_extensions(app):
     """

@@ -57,6 +57,7 @@ class DefaultConfig(object):
     # URL Prefixes.
     ROOT_URL_PREFIX = "/weixin"
     # Blueprints URL Prefixs.
+    POSTS_URL_PREFIX = "/posts"
     WEIXIN_URL_PREFIX = "/weixin"
     USER_URL_PREFIX = "/user"
     AUTH_URL_PREFIX = "/auth"

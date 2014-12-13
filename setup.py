@@ -45,6 +45,7 @@ setup(
         'Flask-Script',
         'Flask-Themes2',
         'Flask-WTF',
+        'Flask-Cache',
         'Jinja2',
         'SQLAlchemy',
         'WTForms',
@@ -54,6 +55,7 @@ setup(
         'pytest',
         'pytest-random',
         'pytest-cov',
+        'requests',
     ],
     classifiers=[
         'Development Status :: 4 - Beta',

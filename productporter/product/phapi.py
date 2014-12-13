@@ -17,9 +17,6 @@ from flask import current_app
 class ProductHuntAPI(object):
     """Wrapper for producthunt api"""
 
-    KEY = current_app.config["PH_API_KEY"]
-    SECRET = current_app.config["PH_API_SECRET"]
-
     SCHEMA = "https://"
     HOST = 'api.producthunt.com'
     URL_CLIENT_AUTH = '/v1/oauth/token'
@@ -40,8 +37,8 @@ class ProductHuntAPI(object):
         """OAuth Client Only Authentication"""
         current_app.logger.info('start auth on %d' % (int(time.time())))
         data = {
-            'client_id': self.KEY,
-            'client_secret': self.SECRET,
+            'client_id': current_app.config["PH_API_KEY"],
+            'client_secret': current_app.config["PH_API_SECRET"],
             'grant_type': 'client_credentials'
         }
         url = self.SCHEMA + self.HOST + self.URL_CLIENT_AUTH
@@ -52,22 +49,27 @@ class ProductHuntAPI(object):
             self.access_token = rsp['access_token']
         else:
             current_app.logger.error('auth failed. status_code=%d\n%s'
-                % (r.status_code, rsp))
+                % (r.status_code, json.dumps(rsp, sort_keys=True,
+                    indent=4, separators=(',', ': '))))
             raise Exception(rsp['error'])
 
-    def posts(self):
-        """Get posts of today"""
+    def posts(self, day=None):
+        """Get posts"""
         now = int(time.time())
         if self.access_token is None or self.expires_in < now:
             self.client_auth()
 
+        current_app.logger.info('get posts on %s' % (day or "today"))
+        params = None
+        if day:
+            params = {'day': day}
         url = self.SCHEMA + self.HOST + self.URL_POSTS
         headers = self.HEADER.copy()
         headers['Authorization'] = 'Bearer ' + self.access_token
-        r = requests.get(url, headers=headers)
+        r = requests.get(url, headers=headers, params=params)
         rsp = r.json()
         if r.status_code == 200:
-            return rsp
+            return rsp['posts']
         else:
             # access token may expires unexpect, we try it one more time
             if r.status_code == 401:
@@ -75,10 +77,11 @@ class ProductHuntAPI(object):
                 r = requests.get(url, headers=headers)
                 rsp = r.json()
                 if r.status_code == 200:
-                    return rsp
+                    return rsp['posts']
 
             current_app.logger.error('posts failed. status_code=%d\n%s'
-                % (r.status_code, rsp))
+                % (r.status_code, json.dumps(rsp, sort_keys=True,
+                    indent=4, separators=(',', ': '))))
             raise Exception(rsp['error'])
 
 

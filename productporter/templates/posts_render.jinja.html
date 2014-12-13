@@ -1,0 +1,7 @@
+{# macro to render product in comments page #}
+{% macro render_post(p) -%}
+    <h2 class="post-name">{{ p.name }}</h2>
+    <h4 class="post-tagline">{{ p.tagline }}</h4>
+    <img class="post-screenshot" src="{{ p.screenshot_url }}" width="500"/>
+    <br><br>
+{%- endmacro %}

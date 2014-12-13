@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+{% import 'posts_render.jinja.html' as posts_render %}
+<html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+        <title> posts </title>
+        <meta name="description" content="posts dashboard" />
+        <meta name="keywords" content="posts" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}" />
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    </head>
+    <body>
+        <div class="comments-container">
+            <h2>
+                {{ date }} - {{ post_count }} Products
+            </h2>
+            <div class="posts">
+                {% for p in posts %}
+                    {{ posts_render.render_post(p) }}
+                {% endfor %}
+            </div>
+            <div class="footer">
+                <hr class="comments-rule"></hr>
+                This is unofficial snapshot of <a href="http://www.producthunt.com">Product Hunt</a>. All right reserved by <a href="http://www.producthunt.com">Product Hunt</a>.
+                <br>
+            </div>
+        </div>
+    </body>
+</html>
