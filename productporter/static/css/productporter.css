@@ -3,6 +3,15 @@ body {
   height: 100%; /* The html and body elements cannot have any padding or margin. */
 }
 
+/* Narrow container */
+/* Customize container */
+@media (min-width: 768px) {
+  .container {
+    max-width: 80%;
+  }
+}
+/* End narrow container */
+
 /* Wrapper for page content to push down footer */
 #wrap {
   min-height: 100%;
@@ -21,7 +30,7 @@ body {
   margin: 20px 0;
 }
 #footer > .container {
-  margin: 0 auto 15px;
+  margin: 0 auto 0;
   padding-left: 15px;
   padding-right: 15px;
 }
@@ -188,3 +197,4 @@ margin-bottom: 0px;
   border-top-right-radius: 0;
 }
 /* End sidebar */
+

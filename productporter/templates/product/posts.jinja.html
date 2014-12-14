@@ -1,6 +1,7 @@
 {% set page_title = "Posts" %}
 
 {% extends theme("layout.jinja.html") %}
+{% from theme("macros.jinja.html") import render_field %}
 {% block content %}
 
 <ul class="breadcrumb">
@@ -23,11 +24,30 @@
             <td>{{ post.tagline }}</td>
         </tr>
         <tr>
-            <td colspan="2">{{ post.ctagname }}</td>
+            {% if edit_postid == post.postid %}
+            <td colspan="2">
+                <form class="form-horizontal" role="form" method="POST">
+                    {{ form.hidden_tag() }}
+                    {{ render_field(form.ctagline, div_class="col-sm-12", rows=2) }}
+                    <button type="submit" class="btn btn-success" name="button" value="submit">Submit</button>
+                </form>
+            </td>
+            {% else %}
+            <td colspan="2">
+                {% if post.ctagline %}
+                    {{ post.ctagline }}
+                    </br>
+                    <a href="{{ url_for('product.posts', edit_postid=post.postid) }}" class="btn btn-primary">I want Check</a>
+                {% else %}
+                    <a href="{{ url_for('product.posts', edit_postid=post.postid) }}" class="btn btn-primary">I want Translate</a>
+                {% endif %}
+
+            </td>
+            {% endif %}
         </tr>
         <tr>
             <td colspan="2" align="center">
-                <img src="{{ post.screenshot_url }}" max-width="500"/>
+                <img src="{{ post.screenshot_url }}" width="600"/>
             </td>
         </tr>
         {% endfor %}

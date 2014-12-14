@@ -10,18 +10,20 @@
     :license: BSD, see LICENSE for more details.
 """
 import datetime
-from flask import Blueprint, request, current_app
+from flask import Blueprint, request, current_app, flash, redirect, url_for
 
 from productporter.product.phapi import ProductHuntAPI
 from productporter.product.models import Product
 from productporter.utils import render_template, pull_and_save_posts
+from productporter.product.forms import TranslateForm
 
 product = Blueprint('product', __name__)
 
 #homepage just for fun
-@product.route('/posts')
+@product.route('/posts', methods=["GET", "POST"])
 def posts():
     """ product posts home dashboard """
+    edit_postid = request.args.get('edit_postid', '')
     spec_day = request.args.get('day', '')
     day = spec_day
     if not day:
@@ -40,8 +42,19 @@ def posts():
         order_by(Product.votes_count.desc()).all()
     post_count = len(posts)
 
+    form = TranslateForm(request.form)
+    if form.validate_on_submit():
+        form.save()
+        flash(("Translation saved"), "success")
+        return redirect(url_for("product.posts", day=day))
+
+    if edit_postid:
+        for p in posts:
+            if p.postid == edit_postid:
+                form.ctagline.data = p.ctagline
+                form.postid.data = p.postid
     return render_template('product/posts.jinja.html',
-        post_count=post_count, posts=posts, date=day)
+        post_count=post_count, posts=posts, date=day, edit_postid=edit_postid, form=form)
 
 #homepage just for fun
 @product.route('/pull')

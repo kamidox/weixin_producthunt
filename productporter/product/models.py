@@ -41,7 +41,6 @@ class Product(db.Model):
     comments_count = db.Column(db.Integer, default=0)
 
     # translate infomation
-    cname = db.Column(db.String(128))
     ctagline = db.Column(db.Text)
 
     # Methods
