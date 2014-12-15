@@ -15,3 +15,4 @@ pytest-cov==1.8.0
 pytest-random==0.02
 itsdangerous==0.24
 requests==2.5.0
+markdown2==2.3.0

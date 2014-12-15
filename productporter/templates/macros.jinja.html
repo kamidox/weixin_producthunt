@@ -48,7 +48,7 @@
 </div>
 {%- endmacro -%}
 
-{%- macro render_field(field, div_class='', rows='', postid='') -%}
+{%- macro render_field(field, wid, div_class='', rows='', postid='') -%}
 <div class="form-group{%- if field.errors %} has-error{%- endif %}">
     {% if div_class %}
     <div class="{{ div_class }}">

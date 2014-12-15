@@ -8,6 +8,8 @@
     :copyright: (c) 2014 by the ProductPorter Team.
     :license: BSD, see LICENSE for more details.
 """
+from markdown2 import markdown as render_markdown
+
 from flask import current_app
 from flask.ext.themes2 import render_theme_template
 
@@ -63,4 +65,11 @@ def render_template(template, **context):
     """
     theme = current_app.config['DEFAULT_THEME']
     return render_theme_template(theme, template, **context)
+
+def render_markup(text):
+    """Renders the given text as markdown
+
+    :param text: The text to be rendered
+    """
+    return render_markdown(text, extras=['tables'])
 

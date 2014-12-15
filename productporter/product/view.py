@@ -10,19 +10,38 @@
     :license: BSD, see LICENSE for more details.
 """
 import datetime
-from flask import Blueprint, request, current_app, flash, redirect, url_for
+import json
+from flask import Blueprint, request, current_app, flash, redirect, url_for, jsonify
 
 from productporter.product.phapi import ProductHuntAPI
 from productporter.product.models import Product
 from productporter.utils import render_template, pull_and_save_posts
 from productporter.product.forms import TranslateForm
+from productporter.utils import render_markup
 
 product = Blueprint('product', __name__)
 
-#homepage just for fun
-@product.route('/posts', methods=["GET", "POST"])
+# update post by AJAX
+def _update_post(request):
+    jsondata = json.loads(request.data)
+    postid = jsondata['postid']
+    ctagline = jsondata['ctagline']
+    post = Product.query.filter(Product.postid==postid).first_or_404()
+    post.ctagline = ctagline
+    post.save()
+    ret = {
+        'status': 'success',
+        'ctagline': render_markup(ctagline)
+        }
+    return jsonify(**ret)
+
+# posts
+@product.route('/posts', methods=["GET", "PUT"])
 def posts():
     """ product posts home dashboard """
+    if request.method == "PUT":
+        return _update_post(request)
+
     edit_postid = request.args.get('edit_postid', '')
     spec_day = request.args.get('day', '')
     day = spec_day

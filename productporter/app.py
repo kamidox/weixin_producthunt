@@ -15,6 +15,7 @@ from flask import Flask
 
 from productporter.weixin.view import weixin
 from productporter.product.view import product
+from productporter.utils import render_markup
 # extensions
 from productporter.extensions import db, cache, themes
 # default config
@@ -94,7 +95,7 @@ def configure_template_filters(app):
     """
     Configures the template filters
     """
-    pass
+    app.jinja_env.filters['markup'] = render_markup
 
 
 def configure_context_processors(app):

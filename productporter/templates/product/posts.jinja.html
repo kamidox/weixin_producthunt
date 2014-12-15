@@ -26,19 +26,25 @@
         <tr>
             <td colspan="2">
                 <div class="tagline-translate" data-postid="{{post.postid}}">
-                    {{ form.hidden_tag() }}
-                    {{ render_field(form.ctagline, rows=2, postid=post.postid) }}
-                    <br/>
-                    <button class="btn btn-success btn-translate" data-postid="{{post.postid}}">Submit</button>
+                    <div class="form-horizontal">
+                        {{ form.hidden_tag() }}
+                        {{ render_field(form.ctagline, rows=2, postid=post.postid) }}
+                        <button name="update" type="button" class="btn btn-success btn-translate"
+                            data-postid="{{post.postid}}">Submit</button>
+                        <button name="cancel" type="button" class="btn btn-warning btn-translate"
+                            data-postid="{{post.postid}}">Cancel</button>
+                    </div>
                 </div>
                 <div class="tagline-content" data-postid="{{post.postid}}">
                     {% if post.ctagline %}
                         <div class="tagline-content-data" data-postid="{{post.postid}}">
-                        {{ post.ctagline }}
+                            {% autoescape false %}
+                            {{ post.ctagline|markup }}
+                            {% endautoescape %}
                         </div>
-                        <button class="btn btn-primary btn-translate" data-postid="{{post.postid}}">I want Review</a>
+                        <button name="translate" type="button" class="btn btn-primary btn-translate" data-postid="{{post.postid}}">I want Review</a>
                     {% else %}
-                        <button class="btn btn-primary btn-translate" data-postid="{{post.postid}}">I want Translate</a>
+                        <button name="translate" type="button" class="btn btn-primary btn-translate" data-postid="{{post.postid}}">I want Translate</a>
                     {% endif %}
                 </div>
             </td>
