@@ -54,7 +54,7 @@ def posts():
                 form.ctagline.data = p.ctagline
                 form.postid.data = p.postid
     return render_template('product/posts.jinja.html',
-        post_count=post_count, posts=posts, date=day, edit_postid=edit_postid, form=form)
+        post_count=post_count, posts=posts, day=day, edit_postid=edit_postid, form=form)
 
 #homepage just for fun
 @product.route('/pull')
