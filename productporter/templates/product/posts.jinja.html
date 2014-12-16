@@ -9,7 +9,7 @@
 
 {% block content %}
 
-<div class="panel panel-success">
+<div class="panel panel-primary">
     <div class="panel-heading">
         <h3 class="panel-title">{{ day }}</h3>
     </div>
@@ -30,6 +30,50 @@
     </div>
 </div>
 
+{% for post in posts %}
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <div class="row">
+            <div class="col-md-10">
+                <h3>
+                    <span>{{ posts.index(post) + 1 }}# </span>
+                    <a href="{{ post.redirect_url }}">{{ post.name }}</a>
+                    <span> - {{ post.tagline }}</span>
+                </h3>
+            </div>
+            <div class="col-md-2">
+                <button name="translate" type="button" class="btn btn-primary"
+                        data-postid="{{post.postid}}">I want Translate</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="tagline-translate" data-postid="{{post.postid}}">
+                    <div class="form-horizontal">
+                        {{ form.hidden_tag() }}
+                        {{ render_field(form.ctagline, div_class="col-sm-12", rows=10, postid=post.postid) }}
+                        <button name="commit-translate" type="button" class="btn btn-success"
+                            data-postid="{{post.postid}}">Submit</button>
+                        <button name="cancel" type="button" class="btn btn-danger"
+                            data-postid="{{post.postid}}">Cancel</button>
+                    </div>
+                </div>
+                <div class="tagline-content" data-postid="{{post.postid}}">
+                    <div class="tagline-content-data" data-postid="{{post.postid}}">
+                        {% autoescape false %}
+                        {{ post.ctagline|markup }}
+                        {% endautoescape %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+<!--
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -73,7 +117,7 @@
         </tr>
         {% endfor %}
     </tbody>
-</table>
+</table> -->
 
 {% endblock %}
 

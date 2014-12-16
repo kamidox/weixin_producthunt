@@ -47,7 +47,7 @@ def post():
     post.save()
     ret = {
         'status': 'success',
-        'ctagline': render_markup(ctagline)
+        'ctagline': render_markup(post.ctagline)
         }
     return jsonify(**ret)
 

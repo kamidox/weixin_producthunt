@@ -29,6 +29,7 @@ $(document).ready(function () {
     // Cancel Translate
     $("button[name='cancel']").click(function() {
         var postid = $(this).attr('data-postid');
+        $("button[name='translate']").show();
         $('.tagline-translate[data-postid=' + postid + ']').hide();
         $('.tagline-content[data-postid=' + postid + ']').show();
     });
