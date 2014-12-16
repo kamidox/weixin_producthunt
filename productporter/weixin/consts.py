@@ -15,10 +15,15 @@ MYSQL_PASSWD = 'kamidox'
 # weixin message template
 WELCOME_INFO = \
 u"""
-欢迎关注producthut
-我们每天定时推送producthunt.com上的最新产品
-让你和全球最新最前沿的互联网产品零距离接触
+终于找到我们啦，不容易呀
+我们是一个众包翻译／介绍国外最新的互联网产品的兴趣小组
+
+LET COOL PRODUCTS EMBRACE CHINA!
+
+有空来<a href="http://kamidox.com/product/posts">这里</a>溜达一下吧
 """
+
+THANKS_INFO = u"""感谢留言，我们将尽快回复"""
 
 HELP_INFO = \
 u"""
@@ -26,14 +31,6 @@ u"""
 1 - 最近两天得票最多的产品
 2 - 最近一周得票最多的产品
 3 - 最近一月得票最多的产品
-
-4 - 最近两天评论最多的产品
-5 - 最近一周评论最多的产品
-6 - 最近一月评论最多的产品
-
-7 - 最近两天评论点赞最多的产品
-8 - 最近一周评论点赞最多的产品
-9 - 最近一月评论点赞最多的产品
 
 搜索包含keyword的相关产品
 search:keyword

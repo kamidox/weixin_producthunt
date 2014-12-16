@@ -8,11 +8,13 @@
     :copyright: (c) 2014 by the ProductPorter Team.
     :license: BSD, see LICENSE for more details.
 """
+import datetime
 from markdown2 import markdown as render_markdown
 
 from flask import current_app
 from flask.ext.themes2 import render_theme_template
 
+from productporter.extensions import db
 from productporter.user.models import User, Group
 from productporter.product.phapi import ProductHuntAPI
 from productporter.product.models import Product
@@ -72,4 +74,41 @@ def render_markup(text):
     :param text: The text to be rendered
     """
     return render_markdown(text, extras=['tables'])
+
+def query_products(spec_day=None):
+    """ get all the products of the day """
+    day = spec_day
+    if not day:
+        day = date_format(datetime.date.today())
+    posts = Product.query.filter(Product.date==day).\
+        order_by(Product.votes_count.desc()).all()
+
+    # when not specific a day and the content is empty, we show yesterday's data
+    if not spec_day and len(posts) == 0:
+        delta = datetime.timedelta(days=-1)
+        d = datetime.date.today() + delta
+        day = date_format(d)
+    posts = Product.query.filter(Product.date==day).\
+        order_by(Product.votes_count.desc()).all()
+
+    return day, posts
+
+def query_top_voted_products(days_ago=2, limit=10):
+    """ query to voted products days ago """
+    delta = datetime.timedelta(days=-days_ago)
+    d2 = datetime.date.today()
+    d1 = d2 + delta
+    return Product.query.filter(Product.date.between(d1, d2)).\
+        order_by(Product.votes_count.desc()).limit(limit).offset(0).all()
+
+def query_search_products(keyword, limit=10):
+    """ search product in product's name and tagline """
+    k = '%%%s%%' % (keyword)
+    return Product.query.filter(db.or_(Product.name.like(k), \
+        Product.tagline.like(k))).order_by(Product.votes_count.desc()).\
+        limit(limit).offset(0).all()
+
+def date_format(d):
+    """ format a datetime.date object to string """
+    return '%04d-%02d-%02d' % (d.year, d.month, d.day)
 

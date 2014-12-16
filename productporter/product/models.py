@@ -9,6 +9,7 @@
     :license: BSD, see LICENSE for more details.
 """
 import re
+import datetime
 from productporter.extensions import db
 
 # markdown template
@@ -39,7 +40,7 @@ class Product(db.Model):
     postid = db.Column(db.String(32), unique=True, nullable=False)
     name = db.Column(db.String(128), nullable=False)
     tagline = db.Column(db.Text, nullable=False)
-    date = db.Column(db.String(16), nullable=False)
+    date = db.Column(db.Date, nullable=False)
 
     redirect_url = db.Column(db.String(256), nullable=False)
     discussion_url = db.Column(db.String(256), nullable=False)
@@ -79,6 +80,9 @@ class Product(db.Model):
             if '[' in v:
                 m = re.search(r"^(.+)\[(.+)\]$", v)
                 setattr(p, k, json[m.group(1)][m.group(2)])
+            elif k == 'date':
+                ymd = json[v].split('-')
+                p.date = datetime.date(int(ymd[0]), int(ymd[1]), int(ymd[2]))
             else:
                 setattr(p, k, json[v])
         return p

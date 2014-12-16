@@ -12,31 +12,26 @@
 import hashlib, time
 import xml.etree.ElementTree as ET
 
-from flask import Blueprint, request, render_template, current_app
+from flask import Blueprint, request, current_app, redirect, url_for
 
 from productporter.weixin.consts import *
-from productporter.weixin import model
+from productporter.utils import query_products, date_format, \
+    query_top_voted_products, query_search_products
 
 weixin = Blueprint('weixin', __name__)
 
 #homepage just for fun
 @weixin.route('/')
-def home():
+def index():
     """ weixin backend home """
-    return render_template('index.html')
-
-#homepage just for fun
-@weixin.route('/weixin_test')
-def weixin_test():
-    """ populater test data """
-    products = model.populate_test_data()
-    return render_template('comments.jinja.html', product=products)
+    return redirect(url_for('product.posts'))
 
 @weixin.route('/mailto/<receiver>')
 def view_mail_daily_products(receiver):
     """ mail products to receiver """
-    products = model.ProductHuntDB().read_top_vote_products(days=2, maxnum=50)
-    current_app.logger.info("mailto: %s" % (receiver))
+    day, products = query_products()
+    current_app.logger.info("mailto %s of %s products in %s" % \
+        (receiver, len(products), day))
     return mail_products(None, products, receiver)
 
 def user_subscribe_event(msg):
@@ -83,7 +78,16 @@ def user_event_mail(msg):
     iscmd = msg['MsgType'] == 'text' and msg['Content'].startswith("mail:")
     return iscmd
 
-def user_event_unknow(msg):
+def user_event_help(msg):
+    """ help event """
+    isclick = msg['MsgType'] == 'event' \
+        and msg['Event'] == 'CLICK' and msg['EventKey'] == 'HELP'
+    iscmd = msg['MsgType'] == 'text' and \
+        (msg['Content'].lower() == 'h' \
+            or msg['Content'].lower() == 'help')
+    return isclick or iscmd
+
+def user_event_feedback(msg):
     """ last unknow event """
     return True
 
@@ -94,6 +98,10 @@ def push_welcome_info(msg):
 def push_help_info(msg):
     """ push help info """
     return response_text_msg(msg, HELP_INFO)
+
+def push_thanks_info(msg):
+    """ push thanks info """
+    return response_text_msg(msg, THANKS_INFO)
 
 def push_products(msg, products):
     """ push products """
@@ -109,8 +117,9 @@ def mail_products(msg, products, receiver):
     if products is not None and len(products) > 0:
         body = ""
         for prod in products:
-            item = WX_TEXT_TPL % (prod.name, prod.url, prod.description)
+            item = WX_TEXT_TPL % (prod.name, prod.redirect_url, prod.tagline)
             body += item
+
         try:
             _send_mail(receiver, body)
         except:
@@ -129,7 +138,7 @@ def _send_mail(receiver, body):
     from email.mime.multipart import MIMEMultipart
     from email.mime.text import MIMEText
 
-    sender = current_app.config["MAIL_SENDER"]
+    sender = current_app.config["MAIL_SENDER"][1]
     subject = 'PH - ' + time.strftime("%Y%m%d")
     smtpserver = current_app.config["MAIL_SERVER"]
     username = current_app.config["MAIL_USERNAME"]
@@ -153,24 +162,24 @@ def _send_mail(receiver, body):
 
 def push_day_top_voted_products(msg):
     """ push day top voted """
-    products = model.ProductHuntDB().read_top_vote_products(days=2, maxnum=10)
+    products = query_top_voted_products(days_ago=2, limit=10)
     return push_products(msg, products)
 
 def push_week_top_voted_products(msg):
     """ push week top voted """
-    products = model.ProductHuntDB().read_top_vote_products(days=7, maxnum=10)
+    products = query_top_voted_products(days_ago=7, limit=10)
     return push_products(msg, products)
 
 def push_month_top_voted_products(msg):
     """ push month top voted """
-    products = model.ProductHuntDB().read_top_vote_products(days=30, maxnum=10)
+    products = query_top_voted_products(days_ago=30, limit=10)
     return push_products(msg, products)
 
 def push_search_result_products(msg):
     """ push search result """
     # skip prefix 'search:'
     keyword = msg['Content'][7:]
-    products = model.ProductHuntDB().search_products(keyword)
+    products = query_search_products(keyword)
     current_app.logger.info("search_products: %s" % (keyword))
     return push_products(msg, products)
 
@@ -190,20 +199,9 @@ EVENT_PROCS = [
     (user_event_month_top_voted, push_month_top_voted_products),
     (user_event_search, push_search_result_products),
     (user_event_mail, mail_day_top_voted_products),
-    (user_event_unknow, push_help_info)
+    (user_event_help, push_help_info),
+    (user_event_feedback, push_thanks_info),
 ]
-
-# view product comments
-@weixin.route('/producthunt/<guid>', methods=['GET'])
-def view_product_comments(guid):
-    """ view product comments """
-    product = model.ProductHuntDB().read_product(guid)
-    if product is not None:
-        current_app.logger.info("view_product_comments: postid=%s" % \
-            (product.postid))
-        return render_template('comments.jinja.html', product=product)
-    else:
-        return ERROR_INFO
 
 # verify for weixin server.
 # weixin server will send GET request first to verify this backend
@@ -266,33 +264,15 @@ def response_products_msg(msg, products):
     result = ARTICLES_MSG_TPL_HEAD % (msg['FromUserName'], msg['ToUserName'],
         str(int(time.time())), len(products))
     for prod in products:
-        url = prod.url
-
+        tagline = '[%s] %s' % (date_format(prod.date), prod.tagline)
         if prod == products[0]:
-            tagline = '[%s] %s' % (prod.postdate, prod.description)
-            if hasattr(prod, 'sum_cv'):
-                title = '[%dCV %dV %dC] [%s] %s - %s' % \
-                    (prod.sum_cv, prod.vote_count, \
-                    prod.comment_count, prod.postdate, \
-                    prod.name, prod.description)
-            else:
-                title = '[%dV %dC] [%s] %s - %s' % (prod.vote_count, \
-                    prod.comment_count, prod.postdate, \
-                    prod.name, prod.description)
-            pic_url = current_app.config["ROOT_URL_PREFIX"] \
-                + "/static/img/producthunt.png"
-            item = ARTICLES_ITEM_TPL % (title, tagline, pic_url, url)
+            title = '[%dV] [%s] %s - %s' % (prod.votes_count, prod.date, \
+                prod.name, prod.tagline)
         else:
-            tagline = '[%s] %s' % (prod.postdate, prod.description)
-            if hasattr(prod, 'sum_cv'):
-                title = '[%dCV %dV %dC] %s\r\n%s' % \
-                    (prod.sum_cv, prod.vote_count, \
-                    prod.comment_count, prod.name, tagline)
-            else:
-                title = '[%dV %dC] %s\r\n%s' % \
-                    (prod.vote_count, prod.comment_count, \
-                    prod.name, tagline)
-            item = ARTICLES_ITEM_TPL % (title, tagline, prod.user.icon, url)
+            title = '[%dV] %s\r\n%s' % (prod.votes_count, prod.name, tagline)
+
+        item = ARTICLES_ITEM_TPL % (title, tagline, prod.screenshot_url, \
+            prod.redirect_url)
         result = result + item
     result = result + ARTICLES_MSG_TPL_TAIL
     return result

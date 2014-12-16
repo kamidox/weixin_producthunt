@@ -1,7 +1,6 @@
 {% set page_title = "Posts" %}
 
 {% extends theme("layout.jinja.html") %}
-{% from theme("macros.jinja.html") import render_field %}
 
 {% block custcss %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/datepicker3.css') }}">
@@ -52,9 +51,13 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="tagline-translate" data-postid="{{post.postid}}">
-                    <div class="form-horizontal">
-                        {{ form.hidden_tag() }}
-                        {{ render_field(form.ctagline, div_class="col-sm-12", rows=10, postid=post.postid) }}
+                    <div class="col-sm-12">
+                        <textarea class="form-control"
+                            data-postid="{{post.postid}}"
+                            id="ctagline" name="ctagline"
+                            placeholder="Translation" rows="10">
+                        </textarea>
+                        <br/>
                         <button name="commit-translate" type="button" class="btn btn-success"
                             data-postid="{{post.postid}}">Submit</button>
                         <button name="cancel" type="button" class="btn btn-danger"
@@ -73,51 +76,6 @@
     </div>
 </div>
 {% endfor %}
-<!--
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>#</th>
-            <th>Name</th>
-            <th>Tagline</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for post in posts %}
-        <tr>
-            <td class="post-index" rowspan="2">{{ posts.index(post) + 1 }}</td>
-            <td>
-                <a href="{{ post.redirect_url }}">{{ post.name }}</a>
-                <button name="translate" type="button" class="btn btn-success"
-                        data-postid="{{post.postid}}">I want Translate</button>
-            </td>
-            <td>{{ post.tagline }}</td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                <div class="tagline-translate" data-postid="{{post.postid}}">
-                    <div class="form-horizontal">
-                        {{ form.hidden_tag() }}
-                        {{ render_field(form.ctagline, div_class="col-sm-12", rows=10, postid=post.postid) }}
-                        <button name="commit-translate" type="button" class="btn btn-success"
-                            data-postid="{{post.postid}}">Submit</button>
-                        <button name="cancel" type="button" class="btn btn-danger"
-                            data-postid="{{post.postid}}">Cancel</button>
-                    </div>
-                </div>
-                <div class="tagline-content" data-postid="{{post.postid}}">
-                    <div class="tagline-content-data" data-postid="{{post.postid}}">
-                        {% autoescape false %}
-                        {{ post.ctagline|markup }}
-                        {% endautoescape %}
-                    </div>
-
-                </div>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table> -->
 
 {% endblock %}
 

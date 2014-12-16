@@ -13,8 +13,8 @@ import logging
 
 from flask import Flask
 
-from productporter.weixin.view import weixin
-from productporter.product.view import product
+from productporter.weixin.views import weixin
+from productporter.product.views import product
 from productporter.utils import render_markup
 # extensions
 from productporter.extensions import db, cache, themes

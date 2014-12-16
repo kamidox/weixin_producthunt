@@ -52,7 +52,8 @@ def createall():
     """Creates the database."""
     db.drop_all()
     db.create_all()
-    pull_and_save_posts()
+    cnt = pull_and_save_posts()
+    print('pull %d posts' % (cnt))
 
 if __name__ == "__main__":
     manager.run()
