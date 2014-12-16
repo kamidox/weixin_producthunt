@@ -11,8 +11,16 @@
 import re
 from productporter.extensions import db
 
+# markdown template
+_MD_TEMPLATE = """## [%s](%s)
+> %s
+
+![screenshot](%s)
+"""
+
 class Product(db.Model):
     __tablename__ = "products"
+
 
     # field map between Product and ProductHuntAPI JSON data
     FIELD_MAP = {
@@ -52,6 +60,9 @@ class Product(db.Model):
 
     def save(self):
         """Saves a product"""
+        if not self.ctagline:
+            self.ctagline = _MD_TEMPLATE % (self.name, self.redirect_url, \
+                self.tagline, self.screenshot_url)
         db.session.add(self)
         db.session.commit()
         return self

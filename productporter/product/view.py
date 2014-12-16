@@ -21,10 +21,26 @@ from productporter.utils import render_markup
 
 product = Blueprint('product', __name__)
 
-# update post by AJAX
-def _update_post(request):
+def _post_aquire_translate(request):
+    """aquire to translate post"""
+    postid = request.args.get('postid')
+    post = Product.query.filter(Product.postid==postid).first_or_404()
+    ret = {
+        'status': 'success',
+        'ctagline': post.ctagline
+    }
+    return jsonify(**ret)
+
+# post detail
+@product.route('/post', methods=["GET", "PUT"])
+def post():
+    if request.method == 'GET':
+        return _post_aquire_translate(request)
+
+    postid = request.args.get('postid')
     jsondata = json.loads(request.data)
-    postid = jsondata['postid']
+    if not postid:
+        postid = jsondata['postid']
     ctagline = jsondata['ctagline']
     post = Product.query.filter(Product.postid==postid).first_or_404()
     post.ctagline = ctagline
@@ -35,13 +51,10 @@ def _update_post(request):
         }
     return jsonify(**ret)
 
-# posts
-@product.route('/posts', methods=["GET", "PUT"])
+# posts list
+@product.route('/posts', methods=["GET"])
 def posts():
     """ product posts home dashboard """
-    if request.method == "PUT":
-        return _update_post(request)
-
     edit_postid = request.args.get('edit_postid', '')
     spec_day = request.args.get('day', '')
     day = spec_day
@@ -73,7 +86,7 @@ def posts():
                 form.ctagline.data = p.ctagline
                 form.postid.data = p.postid
     return render_template('product/posts.jinja.html',
-        post_count=post_count, posts=posts, day=day, edit_postid=edit_postid, form=form)
+        post_count=post_count, posts=posts, day=day, form=form)
 
 #homepage just for fun
 @product.route('/pull')

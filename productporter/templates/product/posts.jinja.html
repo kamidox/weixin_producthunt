@@ -2,11 +2,33 @@
 
 {% extends theme("layout.jinja.html") %}
 {% from theme("macros.jinja.html") import render_field %}
+
+{% block custcss %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/datepicker3.css') }}">
+{% endblock %}
+
 {% block content %}
 
-<ul class="breadcrumb">
-    <li>{{ day }} - Totally {{ post_count }} products</li>
-</ul>
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <h3 class="panel-title">{{ day }}</h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div id="input-select-day" class="col-md-2">
+                <input type="text" type="text" class="form-control" value="{{ day }}">
+            </div>
+            <div class="col-md-8">
+                <h4>Totally {{ post_count }} products</h4>
+            </div>
+<!--
+            <div class="col-md-2">
+                <button id="btn-show-screenshot" type="button" class="btn btn-info">Hide Screenshot</button>
+            </div>
+-->
+        </div>
+    </div>
+</div>
 
 <table class="table table-bordered">
     <thead>
@@ -19,8 +41,12 @@
     <tbody>
         {% for post in posts %}
         <tr>
-            <td rowspan="3">{{ posts.index(post) + 1 }}</td>
-            <td><a href="{{ post.redirect_url }}">{{ post.name }}</a></td>
+            <td class="post-index" rowspan="2">{{ posts.index(post) + 1 }}</td>
+            <td>
+                <a href="{{ post.redirect_url }}">{{ post.name }}</a>
+                <button name="translate" type="button" class="btn btn-success"
+                        data-postid="{{post.postid}}">I want Translate</button>
+            </td>
             <td>{{ post.tagline }}</td>
         </tr>
         <tr>
@@ -28,30 +54,21 @@
                 <div class="tagline-translate" data-postid="{{post.postid}}">
                     <div class="form-horizontal">
                         {{ form.hidden_tag() }}
-                        {{ render_field(form.ctagline, rows=2, postid=post.postid) }}
-                        <button name="update" type="button" class="btn btn-success btn-translate"
+                        {{ render_field(form.ctagline, div_class="col-sm-12", rows=10, postid=post.postid) }}
+                        <button name="commit-translate" type="button" class="btn btn-success"
                             data-postid="{{post.postid}}">Submit</button>
-                        <button name="cancel" type="button" class="btn btn-warning btn-translate"
+                        <button name="cancel" type="button" class="btn btn-danger"
                             data-postid="{{post.postid}}">Cancel</button>
                     </div>
                 </div>
                 <div class="tagline-content" data-postid="{{post.postid}}">
-                    {% if post.ctagline %}
-                        <div class="tagline-content-data" data-postid="{{post.postid}}">
-                            {% autoescape false %}
-                            {{ post.ctagline|markup }}
-                            {% endautoescape %}
-                        </div>
-                        <button name="translate" type="button" class="btn btn-primary btn-translate" data-postid="{{post.postid}}">I want Review</a>
-                    {% else %}
-                        <button name="translate" type="button" class="btn btn-primary btn-translate" data-postid="{{post.postid}}">I want Translate</a>
-                    {% endif %}
+                    <div class="tagline-content-data" data-postid="{{post.postid}}">
+                        {% autoescape false %}
+                        {{ post.ctagline|markup }}
+                        {% endautoescape %}
+                    </div>
+
                 </div>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="2" align="center">
-                <img src="{{ post.screenshot_url }}" width="600"/>
             </td>
         </tr>
         {% endfor %}
@@ -61,6 +78,7 @@
 {% endblock %}
 
 {% block scripts %}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/datepicker/bootstrap-datepicker.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/product.js') }}"></script>
 {% endblock %}
 
