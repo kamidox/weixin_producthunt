@@ -29,7 +29,6 @@ except ImportError:
     from productporter.configs.default import DefaultConfig as Config
 
 app = create_app(Config)
-app.root_path = os.path.join(app.root_path, "productporter")
 manager = Manager(app)
 
 # Run local server

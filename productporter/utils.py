@@ -112,3 +112,6 @@ def date_format(d):
     """ format a datetime.date object to string """
     return '%04d-%02d-%02d' % (d.year, d.month, d.day)
 
+def root_url_prefix(app, prefix_key):
+    """ return the url prefix """
+    return app.config["ROOT_URL_PREFIX"] + app.config[prefix_key]

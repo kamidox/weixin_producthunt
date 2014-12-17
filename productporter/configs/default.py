@@ -54,10 +54,11 @@ class DefaultConfig(object):
     REAUTH_VIEW = "auth.reauth"
     LOGIN_MESSAGE_CATEGORY = "error"
 
-    # URL Prefixes.
-    ROOT_URL_PREFIX = "/weixin"
+    # URL Prefixes. If you deply application on example.com/app1/app2
+    # then, the value here should be app1/app2
+    ROOT_URL_PREFIX = ""
     # Blueprints URL Prefixs.
-    PRODUCT_URL_PREFIX = "/product"
+    PRODUCT_URL_PREFIX = ""
     WEIXIN_URL_PREFIX = "/weixin"
     USER_URL_PREFIX = "/user"
     AUTH_URL_PREFIX = "/auth"

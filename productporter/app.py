@@ -15,7 +15,7 @@ from flask import Flask
 
 from productporter.weixin.views import weixin
 from productporter.product.views import product
-from productporter.utils import render_markup
+from productporter.utils import render_markup, root_url_prefix
 # extensions
 from productporter.extensions import db, cache, themes
 # default config
@@ -31,7 +31,7 @@ def create_app(config=None):
     else:
         static_url_path = config.ROOT_URL_PREFIX + '/static'
     # Initialize the app
-    app = Flask("ProductPorter", static_url_path=static_url_path)
+    app = Flask("productporter", static_url_path=static_url_path)
 
     # Use the default config and override it afterwards
     app.config.from_object('productporter.configs.default.DefaultConfig')
@@ -46,7 +46,7 @@ def create_app(config=None):
     configure_context_processors(app)
     configure_before_handlers(app)
     configure_errorhandlers(app)
-    configure_logging(app)
+    #configure_logging(app)
 
     return app
 
@@ -54,8 +54,8 @@ def configure_blueprints(app):
     """
     Configures the blueprints
     """
-    app.register_blueprint(weixin, url_prefix=app.config["WEIXIN_URL_PREFIX"])
-    app.register_blueprint(product, url_prefix=app.config["PRODUCT_URL_PREFIX"])
+    app.register_blueprint(weixin, url_prefix=root_url_prefix(app, 'WEIXIN_URL_PREFIX'))
+    app.register_blueprint(product, url_prefix=root_url_prefix(app, 'PRODUCT_URL_PREFIX'))
 
 def configure_extensions(app):
     """
@@ -133,7 +133,7 @@ def configure_logging(app):
     Configures logging.
     """
 
-    logs_folder = os.path.join(app.root_path, "logs")
+    logs_folder = os.path.join(app.root_path, os.pardir, "logs")
     from logging.handlers import SMTPHandler
     formatter = logging.Formatter(
         '%(asctime)s %(levelname)s: %(message)s '

@@ -39,7 +39,6 @@ class ProductionConfig(DefaultConfig):
     # The user who should recieve the error logs
     ADMINS = ["your_admin_user@gmail.com"]
 
-
     ## Error/Info Logging
     # If SEND_LOGS is set to True, the admins (see the mail configuration) will
     # recieve the error logs per email.
@@ -50,13 +49,9 @@ class ProductionConfig(DefaultConfig):
     INFO_LOG = "info.log"
     ERROR_LOG = "error.log"
 
-    # URL Prefixes.
-    ROOT_URL_PREFIX = "/weixin"
-    # Blueprints URL Prefixs.
-    WEIXIN_URL_PREFIX = "/weixin"
-    USER_URL_PREFIX = "/user"
-    AUTH_URL_PREFIX = "/auth"
-    ADMIN_URL_PREFIX = "/admin"
+    # URL Prefixes. If you deply application on example.com/app1/app2
+    # then, the value here should be app1/app2
+    ROOT_URL_PREFIX = ""
 
     # Caching
     CACHE_TYPE = "simple"
