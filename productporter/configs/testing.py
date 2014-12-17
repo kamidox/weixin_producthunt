@@ -20,13 +20,6 @@ class TestingConfig(Config):
     DEBUG = False
     TESTING = True
 
-    # SQLAlchemy connection options
-    # This will create in the applications folder (where manage.py is)
-    # a database named flaskbb.sqlite.
-    SQLALCHEMY_DATABASE_URI = (
-        'sqlite:///' + DefaultConfig._basedir + '/' + 'tests.sqlite'
-    )
-
     SERVER_NAME = "localhost:5000"
 
     # This will print all SQL statements

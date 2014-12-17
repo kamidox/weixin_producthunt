@@ -12,6 +12,9 @@ from productporter.configs.default import DefaultConfig
 
 class DevelopmentConfig(DefaultConfig):
 
+    ## Instance path is used to store database and config file
+    INSTANCE_PATH = '/tmp'
+
     # Indicates that it is a dev environment
     DEBUG = True
 
@@ -19,7 +22,7 @@ class DevelopmentConfig(DefaultConfig):
     # This will create in the applications folder (where manage.py is)
     # a database named productporter.sqlite.
     #SQLALCHEMY_DATABASE_URI = "mysql://root@localhost"
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DefaultConfig._basedir + '/' + \
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + INSTANCE_PATH + '/' + \
                               'productporter.sqlite'
 
     # This will print all SQL statements

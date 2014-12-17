@@ -14,11 +14,8 @@ import os
 
 class DefaultConfig(object):
 
-    # Get the app root path
-    #            <_basedir>
-    # ../../ -->  weixin_producthunt/ProductPorter/configs/base.py
-    _basedir = os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(
-                            os.path.dirname(__file__)))))
+    ## Instance path is used to store database and config file
+    INSTANCE_PATH = '/tmp'
 
     DEBUG = False
     TESTING = False
@@ -34,7 +31,7 @@ class DefaultConfig(object):
     ERROR_LOG = "error.log"
 
     # Default Database
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + _basedir + '/' + \
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + INSTANCE_PATH + '/' + \
                               'productporter.sqlite'
 
     # This will print all SQL statements

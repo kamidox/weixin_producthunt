@@ -26,19 +26,22 @@ def create_app(config=None):
     Creates the app.
     """
     static_url_path = ''
+    instance_path = None
     if config is None:
         static_url_path = DefaultConfig.ROOT_URL_PREFIX + '/static'
+        instance_path = DefaultConfig.INSTANCE_PATH
     else:
         static_url_path = config.ROOT_URL_PREFIX + '/static'
+        instance_path = config.INSTANCE_PATH
     # Initialize the app
-    app = Flask("productporter", static_url_path=static_url_path)
+    app = Flask("productporter",
+        static_url_path=static_url_path,
+        instance_path=instance_path)
 
     # Use the default config and override it afterwards
     app.config.from_object('productporter.configs.default.DefaultConfig')
     # Update the config
     app.config.from_object(config)
-    # try to update the config via the environment variable
-    app.config.from_envvar("PRODUCTPORTER_SETTINGS", silent=True)
 
     configure_blueprints(app)
     configure_extensions(app)
@@ -46,7 +49,7 @@ def create_app(config=None):
     configure_context_processors(app)
     configure_before_handlers(app)
     configure_errorhandlers(app)
-    #configure_logging(app)
+    configure_logging(app)
 
     return app
 
@@ -133,7 +136,7 @@ def configure_logging(app):
     Configures logging.
     """
 
-    logs_folder = os.path.join(app.root_path, os.pardir, "logs")
+    logs_folder = os.path.join(app.instance_path, "logs")
     from logging.handlers import SMTPHandler
     formatter = logging.Formatter(
         '%(asctime)s %(levelname)s: %(message)s '

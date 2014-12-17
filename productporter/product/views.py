@@ -72,6 +72,12 @@ def translate():
     return jsonify(**ret)
 
 # posts list
+@product.route('/', methods=["GET"])
+def index():
+    """ product posts home dashboard """
+    return redirect(url_for('product.posts'))
+
+# posts list
 @product.route('/posts', methods=["GET"])
 def posts():
     """ product posts home dashboard """
