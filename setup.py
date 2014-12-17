@@ -22,7 +22,7 @@ Resources
 * `issues <https://github.com/kamidox/weixin_product/issues>`_
 
 """
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='ProductPorter',
@@ -33,7 +33,7 @@ setup(
     author_email='kamidox@gmail.com',
     description='A product porter written with flask',
     long_description=__doc__,
-    packages=['productporter'],
+    packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
     platforms='any',

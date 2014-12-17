@@ -11,13 +11,16 @@
     :license: BSD, see LICENSE for more details.
 """
 import os
+import json
 
 from flask import current_app
 from flask.ext.script import (Manager, Shell, Server)
 
 from productporter.app import create_app
+from productporter.product.models import Product
 from productporter.extensions import db
 from productporter.utils import pull_and_save_posts
+from tests.fixtures.sampledata import SAMPLE_DATA
 
 # Use the development configuration if available
 try:
@@ -52,8 +55,12 @@ def createall():
     """Creates the database."""
     db.drop_all()
     db.create_all()
-    cnt = pull_and_save_posts()
-    print('pull %d posts' % (cnt))
+    jsondata = json.loads(SAMPLE_DATA)
+    some_posts = jsondata['posts']
+    for p in some_posts:
+        pi = Product.from_json(p)
+        pi.save()
+    print('pull %d posts' % (len(some_posts)))
 
 if __name__ == "__main__":
     manager.run()
