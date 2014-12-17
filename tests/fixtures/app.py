@@ -20,7 +20,7 @@ def app():
     """application with context."""
     app = create_app(Config)
     app.root_path = os.path.join(app.root_path, "productporter")
-    print("ROOT:" + app.root_path)
+    print("CHANGE APP ROOT:" + app.root_path)
     ctx = app.app_context()
     ctx.push()
     yield app
@@ -42,3 +42,8 @@ def database():
 def default_groups(database):
     """Creates the default groups"""
     return create_default_groups()
+
+@pytest.fixture()
+def server_url():
+    """return server url for this app"""
+    return 'http://' + Config.SERVER_NAME

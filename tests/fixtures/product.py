@@ -26,7 +26,7 @@ def some_posts(some_day):
     """
     Pull posts from producthunt.com with offical API
     """
-    if Config.PH_API_USE_LOCAL_SAMPLE_DATA:
+    if Config.PH_API_USE_SAMPLE_DATA:
         from sampledata import SAMPLE_DATA
         jsondata = json.loads(SAMPLE_DATA)
         return jsondata['posts']

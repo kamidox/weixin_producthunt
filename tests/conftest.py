@@ -10,3 +10,4 @@
 from tests.fixtures.app import *
 from tests.fixtures.product import *
 from tests.fixtures.user import *
+from tests.fixtures.weixin import *

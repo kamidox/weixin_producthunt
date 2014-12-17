@@ -76,7 +76,11 @@ class DefaultConfig(object):
     PH_API_SECRET = "your_producthunt_api_secret"
     ## if you do not have ProductHuntAPI key and secret plesae use local data
     ## to run unit test
-    PH_API_USE_LOCAL_SAMPLE_DATA = False
+    PH_API_USE_SAMPLE_DATA = False
+
+    ## weixin token
+    WEIXIN_UNITTEST = False
+    WEIXIN_TOKEN = "your_weixin_token"
 
     # Caching
     CACHE_TYPE = "simple"
