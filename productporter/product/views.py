@@ -11,7 +11,8 @@
 """
 import datetime
 import json
-from flask import Blueprint, request, current_app, flash, redirect, url_for, jsonify
+from flask import Blueprint, request, current_app, flash, redirect, \
+    url_for, jsonify, make_response
 
 from productporter.product.phapi import ProductHuntAPI
 from productporter.product.models import Product
@@ -23,29 +24,49 @@ product = Blueprint('product', __name__)
 def _post_aquire_translate(request):
     """aquire to translate post"""
     postid = request.args.get('postid')
+    current_app.logger.info('aquire translation for post ' + postid)
     post = Product.query.filter(Product.postid==postid).first_or_404()
     ret = {
         'status': 'success',
+        'postid': post.postid,
         'ctagline': post.ctagline
     }
     return jsonify(**ret)
 
-# post detail
-@product.route('/post', methods=["GET", "PUT"])
-def post():
+# translate detail
+@product.route('/translate', methods=["GET", "PUT", "POST"])
+def translate():
+    """
+    use GET to aquire translation
+    use PUT to commit translation
+
+    return json data of product tagline
+    """
     if request.method == 'GET':
         return _post_aquire_translate(request)
 
     postid = request.args.get('postid')
-    jsondata = json.loads(request.data)
+    jsondata = None
+    try:
+        jsondata = json.loads(request.data)
+    except ValueError:
+        ret = {
+            'status': 'error',
+            'message': "invalid json data"
+        }
+        resp = make_response(jsonify(**ret), 405)
+        return resp
+
     if not postid:
         postid = jsondata['postid']
     ctagline = jsondata['ctagline']
+    current_app.logger.info('commit translation for post ' + postid)
     post = Product.query.filter(Product.postid==postid).first_or_404()
     post.ctagline = ctagline
     post.save()
     ret = {
         'status': 'success',
+        'postid': post.postid,
         'ctagline': render_markup(post.ctagline)
         }
     return jsonify(**ret)

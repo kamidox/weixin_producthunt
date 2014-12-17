@@ -41,6 +41,9 @@ class DevelopmentConfig(DefaultConfig):
     ## ProductHuntAPI key and secret. You need this to pass unittest
     PH_API_KEY = "your_producthunt_api_key"
     PH_API_SECRET = "your_producthunt_api_secret"
+    ## if you do not have ProductHuntAPI key and secret plesae use local data
+    ## to run unit test
+    PH_API_USE_LOCAL_SAMPLE_DATA = True
 
     # Caching
     CACHE_TYPE = "simple"

@@ -5,7 +5,7 @@ $(document).ready(function () {
     // Translate & Review
     $("button[name='translate']").click(function () {
         var postid = $(this).attr('data-postid');
-        var url = getPostUrl(window.location.href, postid);
+        var url = getTranslateUrl(window.location.href, postid);
         var settings = {
             type: "GET",
             url: url,
@@ -42,7 +42,7 @@ $(document).ready(function () {
             postid: postid,
             ctagline: $.trim(ctagline)
         };
-        var url = getPostUrl(window.location.href, postid);
+        var url = getTranslateUrl(window.location.href, postid);
         var settings = {
             type: "PUT",
             url: url,
@@ -92,11 +92,11 @@ $(document).ready(function () {
         window.location.href = url;
     });
 
-    function getPostUrl(url, postid) {
+    function getTranslateUrl(url, postid) {
         if (postid) {
-            return getUrlParent(url).concat("/post?postid=").concat(postid);
+            return getUrlParent(url).concat("/translate?postid=").concat(postid);
         } else {
-            return getUrlParent(url).concat("/post")
+            return getUrlParent(url).concat("/translate")
         }
     }
 

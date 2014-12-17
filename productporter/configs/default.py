@@ -74,6 +74,9 @@ class DefaultConfig(object):
     ## ProductHuntAPI key and secret
     PH_API_KEY = "your_producthunt_api_key"
     PH_API_SECRET = "your_producthunt_api_secret"
+    ## if you do not have ProductHuntAPI key and secret plesae use local data
+    ## to run unit test
+    PH_API_USE_LOCAL_SAMPLE_DATA = False
 
     # Caching
     CACHE_TYPE = "simple"
