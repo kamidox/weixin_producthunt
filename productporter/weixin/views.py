@@ -138,7 +138,7 @@ def _send_mail(receiver, body):
     from email.mime.multipart import MIMEMultipart
     from email.mime.text import MIMEText
 
-    sender = current_app.config["MAIL_SENDER"][1]
+    sender = current_app.config["MAIL_SENDER"]
     subject = 'PH - ' + time.strftime("%Y%m%d")
     smtpserver = current_app.config["MAIL_SERVER"]
     username = current_app.config["MAIL_USERNAME"]

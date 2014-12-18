@@ -65,7 +65,7 @@ class DefaultConfig(object):
     MAIL_SERVER = "localhost"
     MAIL_USERNAME = "noreply@example.org"
     MAIL_PASSWORD = ""
-    MAIL_SENDER = ("Default Sender", "noreply@example.org")
+    MAIL_SENDER = "noreply@example.org"
     # The user who should recieve the error logs
     ADMINS = ["your_admin_user@gmail.com"]
 

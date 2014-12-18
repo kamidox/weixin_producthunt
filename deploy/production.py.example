@@ -13,6 +13,9 @@ from productporter.configs.default import DefaultConfig
 class ProductionConfig(DefaultConfig):
     """production config"""
 
+    DEBUG = False
+    TESTING = False
+
     ## Instance path is used to store database and config file
     INSTANCE_PATH = '/home/ubuntu/webapp/data'
 
@@ -23,6 +26,9 @@ class ProductionConfig(DefaultConfig):
     # For SQLite:
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + INSTANCE_PATH + '/' + \
                               'productporter.sqlite'
+
+    # This will print all SQL statements
+    SQLALCHEMY_ECHO = False
 
     ## Security
     # This is the secret key that is used for session signing.
@@ -39,7 +45,7 @@ class ProductionConfig(DefaultConfig):
     MAIL_SERVER = "localhost"
     MAIL_USERNAME = "noreply@example.org"
     MAIL_PASSWORD = ""
-    MAIL_SENDER = ("Default Sender", "noreply@example.org")
+    MAIL_SENDER = "noreply@example.org"
     # The user who should recieve the error logs
     ADMINS = ["your_admin_user@gmail.com"]
 
@@ -64,3 +70,10 @@ class ProductionConfig(DefaultConfig):
     ## ProductHuntAPI key and secret
     PH_API_KEY = "your_producthunt_api_key"
     PH_API_SECRET = "your_producthunt_api_secret"
+    ## if you do not have ProductHuntAPI key and secret plesae use local data
+    ## to run unit test
+    PH_API_USE_SAMPLE_DATA = True
+
+    ## weixin token
+    WEIXIN_UNITTEST = False
+    WEIXIN_TOKEN = "your weixin backend token"

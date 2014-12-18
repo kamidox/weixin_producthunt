@@ -171,12 +171,22 @@ def configure_logging(app):
             SMTPHandler(app.config['MAIL_SERVER'],
                         app.config['MAIL_SENDER'],
                         app.config['ADMINS'],
-                        'application error, no admins specified',
+                        'ProductPorter application error',
                         (
                             app.config['MAIL_USERNAME'],
                             app.config['MAIL_PASSWORD'],
                         ))
 
         mail_handler.setLevel(logging.ERROR)
-        mail_handler.setFormatter(formatter)
+        mail_handler.setFormatter(logging.Formatter('''
+            Message type:       %(levelname)s
+            Location:           %(pathname)s:%(lineno)d
+            Module:             %(module)s
+            Function:           %(funcName)s
+            Time:               %(asctime)s
+
+            Message:
+
+            %(message)s
+            '''))
         app.logger.addHandler(mail_handler)
