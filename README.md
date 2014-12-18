@@ -45,6 +45,7 @@ If you deploy the first time or setup a new server instance. Please follow these
 * setup nginx config file on remote server, please refer to `deploy/nginxconf.example`
 * setup uwsgi config file on remote server, please refer to `deploy/uwsgiconf.example`
 * run `fab -H newserver.example.com bootstrap`
+* create a crontab to pull products periodic
 
 ### continuous deploy
 
