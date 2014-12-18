@@ -12,8 +12,6 @@ try:
 except ImportError:
     from productporter.configs.default import DefaultConfig as Config
 
-from productporter.configs.default import DefaultConfig
-
 class TestingConfig(Config):
 
     # Indicates that it is a testing environment

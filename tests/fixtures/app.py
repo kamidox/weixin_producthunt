@@ -46,4 +46,4 @@ def default_groups(database):
 @pytest.fixture()
 def server_url():
     """return server url for this app"""
-    return 'http://' + Config.SERVER_NAME
+    return 'http://' + Config.SERVER_NAME + Config.ROOT_URL_PREFIX

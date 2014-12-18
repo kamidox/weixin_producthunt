@@ -8,15 +8,16 @@
 """
 import json
 from productporter.product.models import Product
+from productporter.configs.testing import TestingConfig as Config
 
 def test_view_empty_posts(app, database, test_client, server_url):
     """Test to show empty product posts page"""
-    r = test_client.get(server_url + '/product/posts')
+    r = test_client.get(server_url + Config.PRODUCT_URL_PREFIX + '/posts')
     assert r.status_code == 200
 
 def test_view_sample_posts(app, test_client, db_posts, some_day, server_url):
     """Test to show product posts page"""
-    r = test_client.get(server_url + '/product/posts?day=' + str(some_day))
+    r = test_client.get(server_url + Config.PRODUCT_URL_PREFIX + '/posts?day=' + str(some_day))
     assert r.status_code == 200
 
 def test_translate(app, test_client, db_posts, server_url):
@@ -24,7 +25,7 @@ def test_translate(app, test_client, db_posts, server_url):
     p = Product.query.filter().first();
     assert p is not None
 
-    url = server_url + '/product/translate'
+    url = server_url + Config.PRODUCT_URL_PREFIX + '/translate'
     param = {'postid': p.postid}
     invalid_param = {'postid': 'non-exist-postid'}
 
@@ -44,7 +45,7 @@ def test_translate_commit(app, test_client, db_posts, server_url):
     p = Product.query.filter().first();
     assert p is not None
 
-    url = server_url + '/product/translate'
+    url = server_url + Config.PRODUCT_URL_PREFIX + '/translate'
     param = {'postid': p.postid}
 
     # test to commit translation
