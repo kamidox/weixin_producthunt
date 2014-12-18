@@ -1,0 +1,15 @@
+<uwsgi>
+    <plugins>python</plugins>
+    <master>true</master>
+    <processes>4</processes>
+    <no-orphans>true</no-orphans>
+    <vacuum>true</vacuum>
+    <chmod-socket>666</chmod-socket>
+    <socket>/tmp/uwsgi.pp.sock</socket>
+    <uid>www-data</uid>
+    <gid>www-data</gid>
+    <virtualenv>/home/kamidox/work/weixin_producthunt/.venv</virtualenv>
+    <pythonpath>/home/kamidox/work/weixin_producthunt</pythonpath>
+    <module>run</module>
+    <callable>app</callable>
+</uwsgi>

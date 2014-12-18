@@ -1,0 +1,33 @@
+from fabric.api import env, local, put, run, cd
+
+# the user to use for the remote commands
+env.user = 'ubuntu'
+# the servers where the commands are executed
+env.hosts = ['kamidox.com']
+env.key_filename = '/path/to/your/key/file.pem'
+
+INSTANCE_PATH='/home/ubuntu/webapp/data'
+APP_ROOT_PATH='/home/ubuntu/webapp'
+APP_GIT_URL='https://github.com/kamidox/weixin_producthunt.git'
+APP_LOCAL_NAME='code'
+APP_BRANCH='v2'
+
+def deploy():
+    """continuous development deploy"""
+    with cd('%s/%s' % (APP_ROOT_PATH, APP_LOCAL_NAME)):
+        run('git pull')
+        run('git branch %s' % (APP_BRANCH))
+        # restart uwsgi service, we should do this graceful later
+        run('sudo service uwsgi restart')
+
+def bootstrap():
+    """setup new server instance"""
+    put('deply/bootstrap.sh', '/tmp/bootstrap.sh')
+    run('chmod a+x /tmp/bootstrap.sh')
+    with cd('/tmp'):
+        run('./bootstrap.sh %s %s %s %s %s' % (INSTANCE_PATH, APP_ROOT_PATH, \
+            APP_GIT_URL, APP_LOCAL_NAME, APP_BRANCH))
+
+
+
+

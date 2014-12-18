@@ -24,6 +24,8 @@ from tests.fixtures.sampledata import SAMPLE_DATA
 
 # Use the development configuration if available
 try:
+    from productporter.configs.production import ProductionConfig as Config
+except ImportError:
     from productporter.configs.development import DevelopmentConfig as Config
 except ImportError:
     from productporter.configs.default import DefaultConfig as Config
@@ -52,8 +54,13 @@ def dropdb():
 @manager.command
 def createall():
     """Creates the database."""
+    print("create database in %s" % (Config.SQLALCHEMY_DATABASE_URI))
     db.drop_all()
     db.create_all()
+
+@manager.command
+def pullsample():
+    """pull sample data"""
     jsondata = json.loads(SAMPLE_DATA)
     some_posts = jsondata['posts']
     for p in some_posts:

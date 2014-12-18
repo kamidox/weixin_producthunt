@@ -1,0 +1,20 @@
+server {
+     listen 80 default_server;
+     charset utf-8;
+     root /home/kamidox/work/blogs/output;
+     server_name localhost;
+
+     location / {
+       index index.html;
+     }
+
+     location /weixin/ {
+       include uwsgi_params;
+       uwsgi_pass unix://tmp/uwsgi.weixin.sock;
+     }
+
+     location /pp/ {
+       include uwsgi_params;
+       uwsgi_pass unix://tmp/uwsgi.pp.sock;
+     }
+}

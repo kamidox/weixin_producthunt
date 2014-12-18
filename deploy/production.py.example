@@ -11,17 +11,18 @@ from productporter.configs.default import DefaultConfig
 
 
 class ProductionConfig(DefaultConfig):
+    """production config"""
 
     ## Instance path is used to store database and config file
-    INSTANCE_PATH = '/tmp'
+    INSTANCE_PATH = '/var/www/app'
 
     ## Database
     # If no SQL service is choosen, it will fallback to sqlite
     # For PostgresSQL:
     #SQLALCHEMY_DATABASE_URI = "postgresql://localhost/example"
     # For SQLite:
-    #SQLALCHEMY_DATABASE_URI = 'sqlite:///' + INSTANCE_PATH + '/' + \
-    #                          'productporter.sqlite'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + INSTANCE_PATH + '/' + \
+                              'productporter.sqlite'
 
     ## Security
     # This is the secret key that is used for session signing.
@@ -53,7 +54,7 @@ class ProductionConfig(DefaultConfig):
     ERROR_LOG = "error.log"
 
     # URL Prefixes. If you deply application on example.com/app1/app2
-    # then, the value here should be app1/app2
+    # then, the value here should be /app1/app2
     ROOT_URL_PREFIX = ""
 
     # Caching

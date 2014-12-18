@@ -47,6 +47,8 @@ coverage.xml
 .venv
 productporter/configs/production.py
 productporter/configs/development.py
+fabfile.py
+deploy/production.py
 
 # Rope
 .ropeproject
