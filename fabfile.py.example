@@ -1,4 +1,4 @@
-from fabric.api import env, local, put, run, cd
+from fabric.api import env, local, put, run, cd, sudo
 
 # the user to use for the remote commands
 env.user = 'ubuntu'
@@ -23,6 +23,9 @@ def deploy():
     with cd('%s/%s' % (APP_ROOT_PATH, APP_LOCAL_NAME)):
         run('git pull')
         run('git checkout %s' % (APP_BRANCH))
+        # upload production configure file
+        put('deploy/production.py', '%s/%s/productporter/configs/production.py' % \
+            (APP_ROOT_PATH, APP_LOCAL_NAME))
         # restart uwsgi service, we should do this graceful later
         sudo('service uwsgi restart')
 
