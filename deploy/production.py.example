@@ -14,7 +14,7 @@ class ProductionConfig(DefaultConfig):
     """production config"""
 
     ## Instance path is used to store database and config file
-    INSTANCE_PATH = '/var/www/app'
+    INSTANCE_PATH = '/home/ubuntu/webapp/data'
 
     ## Database
     # If no SQL service is choosen, it will fallback to sqlite
@@ -46,16 +46,16 @@ class ProductionConfig(DefaultConfig):
     ## Error/Info Logging
     # If SEND_LOGS is set to True, the admins (see the mail configuration) will
     # recieve the error logs per email.
-    SEND_LOGS = False
+    SEND_LOGS = True
 
     # The filename for the info and error logs. The logfiles are stored at
     # weixin_producthunt/logs
     INFO_LOG = "info.log"
     ERROR_LOG = "error.log"
 
-    # URL Prefixes. If you deply application on example.com/app1/app2
-    # then, the value here should be /app1/app2
-    ROOT_URL_PREFIX = ""
+    # URL Prefixes. If you deply application on kamidox.com/pp
+    # then, the value here should be /pp
+    ROOT_URL_PREFIX = "/pp"
 
     # Caching
     CACHE_TYPE = "simple"

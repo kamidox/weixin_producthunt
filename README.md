@@ -41,17 +41,18 @@ Send 'help' in Wechat(weixin) to producthunt to get help information
 
 If you deploy the first time or setup a new server instance. Please follow these steps:
 
-* setup nginx config file, please refer to `deploy/nginxconf.example`
-* setup uwsgi config file, please refer to `deploy/uwsgiconf.example`
+* install nginx/uwsgi/pip and other tools. This can be done in fabric automatically, but we do not do this currently.
+* setup nginx config file on remote server, please refer to `deploy/nginxconf.example`
+* setup uwsgi config file on remote server, please refer to `deploy/uwsgiconf.example`
 * run `fab -H newserver.example.com bootstrap`
 
 ### continuous deploy
 
 * run `fab deploy`
 
-### more on nginx and uwsgi
+### more on deploy
 
-I deploy this app in aws by nginx + uwsgi. Explain more about the nginx config and uwsgi config. For `deploy/nginxconf.example`, I deploy multi app in one server instance. This app is deploy in `SERVER_NAME/pp` as:
+I deploy this app in aws by nginx + uwsgi. Explain more about the nginx config and uwsgi config. For `deploy/nginxconf.example`, I deploy multi app in one aws instance. This app is deploy in `kamidox.com/pp` as:
 
 ```text
     location /pp/ {
@@ -60,7 +61,7 @@ I deploy this app in aws by nginx + uwsgi. Explain more about the nginx config a
     }
 ```
 
-For uwsgi, it's important to note the following three parameters:
+For uwsgi, it's important to note the following parameters:
 
 ```xml
     <virtualenv>/home/kamidox/work/weixin_producthunt/.venv</virtualenv>
@@ -69,7 +70,7 @@ For uwsgi, it's important to note the following three parameters:
     <callable>app</callable>
 ```
 
-`virtualenv` to setup the virtualenv of the app. uwsgi will lookfor `run.py` in `/home/kamidox/work/weixin_producthunt` and find the object called `app` and call `app.run()` to launch application.
+`virtualenv` to setup the virtualenv of the app. uwsgi will look for `run.py` in `/home/kamidox/work/weixin_producthunt` and find the object called `app` and call `app.run()` to launch application.
 
 
 

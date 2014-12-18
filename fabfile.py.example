@@ -4,29 +4,59 @@ from fabric.api import env, local, put, run, cd
 env.user = 'ubuntu'
 # the servers where the commands are executed
 env.hosts = ['kamidox.com']
-env.key_filename = '/path/to/your/key/file.pem'
+env.key_filename = '/path/to/your/aws/instance/ssh/login/key/file.pem'
 
+# this value should be the same of INSTANCE_PATH in production.py
 INSTANCE_PATH='/home/ubuntu/webapp/data'
 APP_ROOT_PATH='/home/ubuntu/webapp'
 APP_GIT_URL='https://github.com/kamidox/weixin_producthunt.git'
 APP_LOCAL_NAME='code'
 APP_BRANCH='v2'
 
+def virtualenv(command):
+    """run command in virtualenv"""
+    with cd('%s/%s' % (APP_ROOT_PATH, APP_LOCAL_NAME)):
+        run('source .venv/bin/activate && ' + command)
+
 def deploy():
     """continuous development deploy"""
     with cd('%s/%s' % (APP_ROOT_PATH, APP_LOCAL_NAME)):
         run('git pull')
-        run('git branch %s' % (APP_BRANCH))
+        run('git checkout %s' % (APP_BRANCH))
         # restart uwsgi service, we should do this graceful later
-        run('sudo service uwsgi restart')
+        sudo('service uwsgi restart')
 
 def bootstrap():
     """setup new server instance"""
-    put('deply/bootstrap.sh', '/tmp/bootstrap.sh')
-    run('chmod a+x /tmp/bootstrap.sh')
-    with cd('/tmp'):
-        run('./bootstrap.sh %s %s %s %s %s' % (INSTANCE_PATH, APP_ROOT_PATH, \
-            APP_GIT_URL, APP_LOCAL_NAME, APP_BRANCH))
+    # install virtualenv if not present
+    sudo('pip install virtualenv')
+    # init instance path to store database and logs
+    run('mkdir -p %s' % (INSTANCE_PATH))
+    run('mkdir -p %s' % (INSTANCE_PATH + '/logs'))
+    run('mkdir -p %s' % (APP_ROOT_PATH))
+
+    # clone source
+    with cd('%s' % (APP_ROOT_PATH)):
+        run('git clone %s %s' % (APP_GIT_URL, APP_LOCAL_NAME))
+    with cd('%s/%s' % (APP_ROOT_PATH, APP_LOCAL_NAME)):
+        run('git checkout %s' % (APP_BRANCH))
+        # upload production configure file
+        put('deploy/production.py', '%s/%s/productporter/configs/production.py' % \
+            (APP_ROOT_PATH, APP_LOCAL_NAME))
+        # setup virtual env
+        run('virtualenv .venv')
+
+    virtualenv('pip install -r requirements.txt')
+    # setup database
+    virtualenv('python manage.py createall')
+    virtualenv('python manage.py pullsample')
+
+    # setup data owner and permission
+    sudo('chown -R www-data:www-data %s' % (INSTANCE_PATH))
+    # restart nginx and uwsgi
+    sudo('service nginx restart')
+    sudo('service uwsgi restart')
+
 
 
 
