@@ -52,9 +52,9 @@ class DevelopmentConfig(DefaultConfig):
     WEIXIN_UNITTEST = False
     WEIXIN_TOKEN = "your_weixin_token"
 
-    # URL Prefixes. If you deply application on example.com/app1/app2
-    # then, the value here should be app1/app2
-    ROOT_URL_PREFIX = ""
+    # URL Prefixes. If you deply application on example.com/porter
+    # then, the value here should be /porter
+    ROOT_URL_PREFIX = "/porter"
 
     # Caching
     CACHE_TYPE = "simple"

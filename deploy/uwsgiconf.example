@@ -5,7 +5,7 @@
     <no-orphans>true</no-orphans>
     <vacuum>true</vacuum>
     <chmod-socket>666</chmod-socket>
-    <socket>/tmp/uwsgi.pp.sock</socket>
+    <socket>/tmp/uwsgi.porter.sock</socket>
     <uid>www-data</uid>
     <gid>www-data</gid>
     <virtualenv>/home/kamidox/work/weixin_producthunt/.venv</virtualenv>

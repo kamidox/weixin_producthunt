@@ -53,9 +53,9 @@ class ProductionConfig(DefaultConfig):
     INFO_LOG = "info.log"
     ERROR_LOG = "error.log"
 
-    # URL Prefixes. If you deply application on kamidox.com/pp
-    # then, the value here should be /pp
-    ROOT_URL_PREFIX = "/pp"
+    # URL Prefixes. If you deply application on kamidox.com/porter
+    # then, the value here should be /porter
+    ROOT_URL_PREFIX = "/porter"
 
     # Caching
     CACHE_TYPE = "simple"
