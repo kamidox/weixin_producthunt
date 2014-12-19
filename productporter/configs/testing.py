@@ -7,6 +7,7 @@
     :copyright: (c) 2014 by the ProductPorter Team.
     :license: BSD, see LICENSE for more details.
 """
+import os
 try:
     from productporter.configs.development import DevelopmentConfig as Config
 except ImportError:
@@ -19,6 +20,17 @@ class TestingConfig(Config):
     TESTING = True
 
     SERVER_NAME = "localhost:5000"
+
+    # Get the app root path
+    #            <_basedir>
+    # ../../ -->  productporter/productporter/configs/base.py
+    _basedir = os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(
+                            os.path.dirname(__file__)))))
+
+    # a database named productporter.sqlite.
+    #SQLALCHEMY_DATABASE_URI = "mysql://root@localhost"
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + _basedir + '/' + \
+                              'productporter.sqlite'
 
     # This will print all SQL statements
     SQLALCHEMY_ECHO = False
