@@ -47,8 +47,8 @@ class DefaultConfig(object):
     WTF_CSRF_SECRET_KEY = "reallyhardtoguess"
 
     # Auth
-    LOGIN_VIEW = "auth.login"
-    REAUTH_VIEW = "auth.reauth"
+    LOGIN_VIEW = "user.login"
+    REAUTH_VIEW = "user.reauth"
     LOGIN_MESSAGE_CATEGORY = "error"
 
     # URL Prefixes. If you deply application on example.com/app1/app2
@@ -58,8 +58,6 @@ class DefaultConfig(object):
     PRODUCT_URL_PREFIX = ""
     WEIXIN_URL_PREFIX = "/weixin"
     USER_URL_PREFIX = "/user"
-    AUTH_URL_PREFIX = "/auth"
-    ADMIN_URL_PREFIX = "/admin"
 
     ## Mail
     MAIL_SERVER = "localhost"

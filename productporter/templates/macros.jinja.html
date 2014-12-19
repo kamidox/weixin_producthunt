@@ -48,24 +48,25 @@
 </div>
 {%- endmacro -%}
 
-{%- macro render_field(field, div_class='', rows='', postid='') -%}
+{%- macro render_field(field, div_class='', rows='') -%}
 <div class="form-group{%- if field.errors %} has-error{%- endif %}">
     {% if div_class %}
     <div class="{{ div_class }}">
     {% else %}
     <div class="col-sm-5">
     {% endif %}
+        <label>{{ field.label.text }}</label>
         {%- if kwargs['required'] or field.flags.required -%}
             {% if rows %}
-                {{ field(class="form-control", required="required", rows=rows, placeholder=field.label.text, data_postid=postid) }}
+                {{ field(class="form-control", required="required", rows=rows, placeholder=field.label.text) }}
             {% else %}
-                {{ field(class="form-control", required="required", placeholder=field.label.text, data_postid=postid) }}
+                {{ field(class="form-control", required="required", placeholder=field.label.text) }}
             {% endif %}
         {%- else -%}
             {% if rows %}
-                {{ field(class="form-control", rows=rows, placeholder=field.label.text, data_postid=postid) }}
+                {{ field(class="form-control", rows=rows, placeholder=field.label.text) }}
             {% else %}
-                {{ field(class="form-control", placeholder=field.label.text, data_postid=postid) }}
+                {{ field(class="form-control", placeholder=field.label.text) }}
             {% endif %}
         {%- endif -%}
 

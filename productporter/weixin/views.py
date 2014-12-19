@@ -17,6 +17,7 @@ from flask import Blueprint, request, current_app, redirect, url_for
 from productporter.weixin.consts import *
 from productporter.utils import query_products, date_format, \
     query_top_voted_products, query_search_products
+from productporter.utils import send_mail
 
 weixin = Blueprint('weixin', __name__)
 
@@ -121,7 +122,7 @@ def mail_products(msg, products, receiver):
             body += item
 
         try:
-            _send_mail(receiver, body)
+            send_mail('PH - ' + time.strftime("%Y%m%d"), receiver, body, True)
         except:
             info = "Failed to send mail to " + receiver
     else:
@@ -131,34 +132,6 @@ def mail_products(msg, products, receiver):
         return response_text_msg(msg, info)
     else:
         return info + "\n"
-
-def _send_mail(receiver, body):
-    """ send mail """
-    import smtplib
-    from email.mime.multipart import MIMEMultipart
-    from email.mime.text import MIMEText
-
-    sender = current_app.config["MAIL_SENDER"]
-    subject = 'PH - ' + time.strftime("%Y%m%d")
-    smtpserver = current_app.config["MAIL_SERVER"]
-    username = current_app.config["MAIL_USERNAME"]
-    password = current_app.config["MAIL_PASSWORD"]
-
-    msgroot = MIMEMultipart('related')
-    msgroot['Subject'] = subject
-
-    # attachment
-    att = MIMEText(body, 'base64', 'utf-8')
-    att["Content-Type"] = 'text/plain'
-    att["Content-Disposition"] = \
-        'attachment; filename="%s.txt"' % (time.strftime("%Y%m%d"))
-    msgroot.attach(att)
-
-    smtp = smtplib.SMTP()
-    smtp.connect(smtpserver)
-    smtp.login(username, password)
-    smtp.sendmail(sender, receiver, msgroot.as_string())
-    smtp.quit()
 
 def push_day_top_voted_products(msg):
     """ push day top voted """

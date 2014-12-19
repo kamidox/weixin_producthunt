@@ -1,0 +1,43 @@
+{% extends theme("layout.jinja.html") %}
+{% block content %}
+
+<table class="table table-bordered">
+    <thead>
+      <th><a href="{{ user.url }}">{{ user.username }}</a></th>
+      <th>Info</th>
+      <th>User Stats</th>
+    </thead>
+    <tbody>
+        <tr>
+
+          <td width="250px">
+            <table class="table table-borderless">
+              <tbody>
+                <tr>
+                  <td align="right">Group:</td>
+                  <td>{{ user.primary_group.name }}</td>
+                </tr>
+                <tr>
+                  <td align="right">Joined:</td>
+                  <td>{{ user.date_joined }}</td>
+                </tr>
+                <tr>
+                  <td align="right">Last seen:</td>
+                  <td>{%- if user.lastseen -%} {{ user.lastseen }} {%- else -%} Never seen {%- endif -%}</td>
+                </tr>
+                <tr>
+                  <td align="right">Location:</td>
+                  <td>{%- if user.location -%} {{ user.location }} {%- else -%} No Info {%- endif -%}</td>
+                </tr>
+                <tr>
+                  <td align="right">Birthday:</td>
+                  <td>{% if user.birthday %} {{ user.birthday }} {% else %} No Info {% endif %} {% if user.gender %} ({{ user.gender }}) {% endif %}</td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+
+        </tr>
+    </tbody>
+</table>
+{% endblock %}

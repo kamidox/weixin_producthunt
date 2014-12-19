@@ -13,6 +13,7 @@ from markdown2 import markdown as render_markdown
 
 from flask import current_app
 from flask.ext.themes2 import render_theme_template
+from flask import render_template as flask_render_template
 
 from productporter.extensions import db
 from productporter.user.models import User, Group
@@ -115,3 +116,44 @@ def date_format(d):
 def root_url_prefix(app, prefix_key):
     """ return the url prefix """
     return app.config["ROOT_URL_PREFIX"] + app.config[prefix_key]
+
+def send_reset_token(user, token):
+    send_mail(
+        subject="Reset password ",
+        recipient=user.email,
+        body=flask_render_template(
+            "user/reset_password.txt",
+            user=user,
+            token=token
+        )
+    )
+
+def send_mail(subject, recipient, body, as_attachment=False):
+    """ send mail """
+    import smtplib
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
+
+    sender = current_app.config["MAIL_SENDER"]
+    smtpserver = current_app.config["MAIL_SERVER"]
+    username = current_app.config["MAIL_USERNAME"]
+    password = current_app.config["MAIL_PASSWORD"]
+
+    # attachment
+    if as_attachment:
+        msgroot = MIMEMultipart('related')
+        msgroot['Subject'] = subject
+        att = MIMEText(body, 'base64', 'utf-8')
+        att["Content-Type"] = 'text/plain'
+        att["Content-Disposition"] = \
+            'attachment; filename="%s.txt"' % (time.strftime("%Y%m%d"))
+        msgroot.attach(att)
+    else:
+        msgroot = MIMEText(body, 'base64', 'utf-8')
+        msgroot['Subject'] = subject
+
+    smtp = smtplib.SMTP()
+    smtp.connect(smtpserver)
+    smtp.login(username, password)
+    smtp.sendmail(sender, recipient, msgroot.as_string())
+    smtp.quit()

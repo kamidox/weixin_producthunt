@@ -15,9 +15,11 @@ from flask import Flask
 
 from productporter.weixin.views import weixin
 from productporter.product.views import product
+from productporter.user.views import user
+from productporter.user.models import Guest, User
 from productporter.utils import render_markup, root_url_prefix
 # extensions
-from productporter.extensions import db, cache, themes
+from productporter.extensions import db, cache, themes, login_manager
 # default config
 from productporter.configs.default import DefaultConfig
 
@@ -59,6 +61,7 @@ def configure_blueprints(app):
     """
     app.register_blueprint(weixin, url_prefix=root_url_prefix(app, 'WEIXIN_URL_PREFIX'))
     app.register_blueprint(product, url_prefix=root_url_prefix(app, 'PRODUCT_URL_PREFIX'))
+    app.register_blueprint(user, url_prefix=root_url_prefix(app, 'USER_URL_PREFIX'))
 
 def configure_extensions(app):
     """
@@ -75,23 +78,23 @@ def configure_extensions(app):
     themes.init_themes(app, app_identifier="productporter")
 
     # Flask-Login
-    # login_manager.login_view = app.config["LOGIN_VIEW"]
-    # login_manager.refresh_view = app.config["REAUTH_VIEW"]
-    # login_manager.anonymous_user = Guest
+    login_manager.login_view = app.config["LOGIN_VIEW"]
+    login_manager.refresh_view = app.config["REAUTH_VIEW"]
+    login_manager.anonymous_user = Guest
 
-    # @login_manager.user_loader
-    # def load_user(id):
-    #     """
-    #     Loads the user. Required by the `login` extension
-    #     """
-    #     user = db.session.query(User).filter(User.id == id).first()
+    @login_manager.user_loader
+    def load_user(id):
+        """
+        Loads the user. Required by the `login` extension
+        """
+        u = db.session.query(User).filter(User.id == id).first()
 
-    #     if u:
-    #         return user
-    #     else:
-    #         return None
+        if u:
+            return u
+        else:
+            return None
 
-    # login_manager.init_app(app)
+    login_manager.init_app(app)
 
 
 def configure_template_filters(app):
