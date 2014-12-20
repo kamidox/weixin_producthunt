@@ -1,0 +1,22 @@
+{% extends theme("layout.jinja.html") %}
+{% block content %}
+{%- from theme('macros.jinja.html') import navlink with context -%}
+
+<div class="row">
+    <div class="col-sm-3">
+        <div class="sidebar">
+            <ul class="nav sidenav">
+                <li class="nav-header">Settings</li>
+                {{ navlink('user.settings', 'Profile') }}
+                {{ navlink('user.settings_email', 'E-Mail Address') }}
+                {{ navlink('user.settings_password', 'Password') }}
+            </ul>
+        </div> <!--/.sidebar -->
+    </div><!--/.col-sm-3 -->
+    <div class="col-sm-9">
+        {% block settings_content %}{% endblock %}
+    </div><!--/.col-sm-9 -->
+</div><!--/row-->
+
+{% endblock %}
+

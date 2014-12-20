@@ -15,7 +15,9 @@ from flask.ext.login import (current_user, login_user, login_required,
 
 from productporter.utils import render_template, send_reset_token
 from productporter.user.forms import (LoginForm, ReauthForm, ForgotPasswordForm,
-                                ResetPasswordForm, RegisterForm)
+                                ResetPasswordForm, RegisterForm,
+                                ChangeUserProfileForm, ChangeEmailForm,
+                                ChangePasswordForm)
 from productporter.user.models import User
 
 user = Blueprint("user", __name__)
@@ -161,7 +163,40 @@ def translations():
     """show user translations"""
     return redirect(url_for("product.posts"))
 
-@user.route("/settings", methods=['GET'])
+@user.route("/settings/profile", methods=['GET', 'POST'])
+@login_required
 def settings():
     """user settings"""
-    return redirect(url_for("product.posts"))
+    form = ChangeUserProfileForm(obj=current_user)
+
+    if form.validate_on_submit():
+        form.populate_obj(current_user)
+        current_user.save()
+
+        flash("Your profile have been updated!", "success")
+
+    return render_template("user/settings_profile.jinja.html", form=form)
+
+@user.route("/settings/email", methods=['GET', 'POST'])
+@login_required
+def settings_email():
+    """setting email"""
+
+    form = ChangeEmailForm(current_user)
+    if form.validate_on_submit():
+        current_user.email = form.new_email.data
+        current_user.save()
+
+        flash("Your email have been updated!", "success")
+    return render_template("user/settings_email.jinja.html", form=form)
+
+@user.route("/settings/password", methods=["POST", "GET"])
+@login_required
+def settings_password():
+    form = ChangePasswordForm()
+    if form.validate_on_submit():
+        current_user.password = form.new_password.data
+        current_user.save()
+
+        flash("Your password have been updated!", "success")
+    return render_template("user/settings_password.jinja.html", form=form)

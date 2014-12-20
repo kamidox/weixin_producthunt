@@ -1,0 +1,36 @@
+{% extends theme("user/settings_layout.jinja.html") %}
+{% from theme("macros.jinja.html") import horizontal_field %}
+
+{% block custcss %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/datepicker3.css') }}">
+{% endblock %}
+
+{% block settings_content %}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h1 class="panel-title">Change Your Profile</h1>
+    </div>
+    <div class="panel-body">
+        <form class="form-horizontal" role="form" method="POST">
+            {{ form.hidden_tag() }}
+            {{ horizontal_field(form.birthday) }}
+            {{ horizontal_field(form.gender) }}
+            {{ horizontal_field(form.location) }}
+            {{ horizontal_field(form.website) }}
+            {{ horizontal_field(form.signature, rows=2, div_class="col-sm-9") }}
+            {{ horizontal_field(form.notes, rows=5, div_class="col-sm-9") }}
+
+            <div class="form-group row">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <button type="submit" class="btn btn-success">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/datepicker/bootstrap-datepicker.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/settings_profile.js') }}"></script>
+{% endblock %}
