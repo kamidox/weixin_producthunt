@@ -17,6 +17,7 @@ from wtforms.validators import (DataRequired, Email, EqualTo, regexp, Optional,
                                 URL, Length, ValidationError)
 
 from productporter.user.models import User
+from productporter.extensions import db
 
 USERNAME_RE = r'^[\w.+-]+$'
 is_username = regexp(USERNAME_RE,
@@ -78,7 +79,6 @@ class ForgotPasswordForm(Form):
         DataRequired(message="Email reguired"),
         Email()])
 
-
 class ResetPasswordForm(Form):
     token = HiddenField('Token')
 
@@ -117,13 +117,17 @@ class ChangeEmailForm(Form):
         kwargs['obj'] = self.user
         super(ChangeEmailForm, self).__init__(*args, **kwargs)
 
-    def validate_email(self, field):
+    def validate_new_email(self, field):
         user = User.query.filter(db.and_(
                                  User.email.like(field.data),
                                  db.not_(User.id == self.user.id))).first()
         if user:
             raise ValidationError("This email is taken")
 
+    def validate_old_email(self, field):
+        user = User.query.filter(User.email == field.data).first()
+        if not user:
+            raise ValidationError("Your old email is not correct")
 
 class ChangePasswordForm(Form):
     old_password = PasswordField("Old Password", validators=[
@@ -136,6 +140,15 @@ class ChangePasswordForm(Form):
         DataRequired(message="Password required"),
         EqualTo("new_password", message="Passwords do not match")])
 
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        kwargs['obj'] = self.user
+        super(ChangePasswordForm, self).__init__(*args, **kwargs)
+
+    def validate_old_password(self, field):
+        user = User.query.filter(User.username==self.user.username).first()
+        if not user.check_password(field.data):
+            raise ValidationError("Old password not matched!")
 
 class ChangeUserProfileForm(Form):
 

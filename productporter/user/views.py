@@ -33,10 +33,6 @@ def login():
     """
     Logs the user in
     """
-
-    if current_user is not None and current_user.is_authenticated():
-        return redirect(url_for("user.profile"))
-
     form = LoginForm(request.form)
     if form.validate_on_submit():
         user, authenticated = User.authenticate(form.login.data,
@@ -64,7 +60,7 @@ def reauth():
             confirm_login()
             flash(("Reauthenticates success"), "success")
             return redirect(request.args.get("next") or
-                            url_for("user.profile"))
+                url_for("user.profile", username=current_user.username))
         return render_template("user/reauth.jinja.html", form=form)
     return redirect(request.args.get("next") or
                     url_for("user.profile", username=current_user.username))
@@ -82,10 +78,6 @@ def register():
     """
     Register a new user
     """
-
-    if current_user is not None and current_user.is_authenticated():
-        return redirect(url_for("user.profile"))
-
     form = RegisterForm(request.form)
 
     if form.validate_on_submit():
@@ -102,10 +94,6 @@ def forgot_password():
     """
     Sends a reset password token to the user.
     """
-
-    if not current_user.is_anonymous():
-        return redirect(url_for("product.posts"))
-
     form = ForgotPasswordForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -115,7 +103,7 @@ def forgot_password():
             send_reset_token(user, token=token)
 
             flash(("E-Mail sent! Please check your inbox."), "info")
-            return redirect(url_for("user.forgot_password"))
+            return redirect(url_for("user.login"))
         else:
             flash(("You have entered an username or email that is not linked \
                 with your account"), "danger")
@@ -127,10 +115,6 @@ def reset_password(token):
     """
     Handles the reset password process.
     """
-
-    if not current_user.is_anonymous():
-        return redirect(url_for("product.posts"))
-
     form = ResetPasswordForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -193,7 +177,7 @@ def settings_email():
 @user.route("/settings/password", methods=["POST", "GET"])
 @login_required
 def settings_password():
-    form = ChangePasswordForm()
+    form = ChangePasswordForm(current_user)
     if form.validate_on_submit():
         current_user.password = form.new_password.data
         current_user.save()

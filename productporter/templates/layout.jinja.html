@@ -86,6 +86,10 @@
 
 
             <div class="container">
+                {% block messages %}
+                    {% include theme('flashed_messages.jinja.html') %}
+                {% endblock %}
+
                 {% block content %}
                 {% endblock %}
             </div> <!-- /container -->
