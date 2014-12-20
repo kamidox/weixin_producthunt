@@ -5,9 +5,9 @@ body {
 
 /* Narrow container */
 /* Customize container */
-@media (min-width: 768px) {
+@media (min-width: 1200px) {
   .container {
-    max-width: 80%;
+    max-width: 980px;
   }
 }
 /* End narrow container */

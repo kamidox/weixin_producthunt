@@ -1,43 +1,59 @@
+{% set page_title = "Profile" %}
+
 {% extends theme("layout.jinja.html") %}
 {% block content %}
 
-<table class="table table-bordered">
-    <thead>
-      <th><a href="{{ user.url }}">{{ user.username }}</a></th>
-      <th>Info</th>
-      <th>User Stats</th>
-    </thead>
-    <tbody>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h1 class="panel-title">Profile</h1>
+    </div>
+    <div class="panel-body">
+        <a id="sign-up" href="{{url_for('user.reauth')}}">reauth</a>
+    </div>
+    <table class="table">
         <tr>
-
-          <td width="250px">
-            <table class="table table-borderless">
-              <tbody>
-                <tr>
-                  <td align="right">Group:</td>
-                  <td>{{ user.primary_group.name }}</td>
-                </tr>
-                <tr>
-                  <td align="right">Joined:</td>
-                  <td>{{ user.date_joined }}</td>
-                </tr>
-                <tr>
-                  <td align="right">Last seen:</td>
-                  <td>{%- if user.lastseen -%} {{ user.lastseen }} {%- else -%} Never seen {%- endif -%}</td>
-                </tr>
-                <tr>
-                  <td align="right">Location:</td>
-                  <td>{%- if user.location -%} {{ user.location }} {%- else -%} No Info {%- endif -%}</td>
-                </tr>
-                <tr>
-                  <td align="right">Birthday:</td>
-                  <td>{% if user.birthday %} {{ user.birthday }} {% else %} No Info {% endif %} {% if user.gender %} ({{ user.gender }}) {% endif %}</td>
-                </tr>
-              </tbody>
-            </table>
-          </td>
-
+            <td>Username</td>
+            <td>{{ user.username }}<td>
         </tr>
-    </tbody>
-</table>
+        <tr>
+            <td>E-Mail</td>
+            <td>{{ user.email }}</td>
+        </tr>
+        <tr>
+            <td>Group</td>
+            <td>
+                {%- if user.primary_group.name -%}
+                {{ user.primary_group.name }}
+                {%- else -%} No Info {%- endif -%}
+            </td>
+        </tr>
+        <tr>
+            <td>Joined</td>
+            <td>{{ user.date_joined }}</td>
+        </tr>
+        <tr>
+            <td>Last seen</td>
+            <td>
+                {%- if user.lastseen -%} {{ user.lastseen }}
+                {%- else -%} Never seen {%- endif -%}
+            </td>
+        </tr>
+        <tr>
+            <td>Location</td>
+            <td>
+                {%- if user.location -%} {{ user.location }}
+                {%- else -%} No Info {%- endif -%}
+            </td>
+        </tr>
+        <tr>
+            <td>Birthday</td>
+            <td>
+                {% if user.birthday %} {{ user.birthday }}
+                {% else %} No Info {% endif %}
+                {% if user.gender %} ({{ user.gender }}) {% endif %}
+            </td>
+        </tr>
+    </table>
+</div>
+
 {% endblock %}

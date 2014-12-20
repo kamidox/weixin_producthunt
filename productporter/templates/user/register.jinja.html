@@ -4,34 +4,44 @@
 {% block content %}
 {% from theme("macros.jinja.html") import horizontal_field %}
 
-<form class="form-horizontal" role="form" method="POST">
-    <h2>Register</h2>
-    <hr>
-    {{ form.hidden_tag() }}
-    {{ horizontal_field(form.username)}}
-    {{ horizontal_field(form.email)}}
-    {{ horizontal_field(form.password)}}
-    {{ horizontal_field(form.confirm_password)}}
 
-    {% if config["RECAPTCHA_ENABLED"] %}
-        {{ horizontal_field(form.recaptcha) }}
-    {% endif %}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h1 class="panel-title">Sign up</h1>
+    </div>
+    <div class="panel-body">
+        <form class="form-horizontal" role="form" method="POST">
+            {{ form.hidden_tag() }}
+            {{ horizontal_field(form.username)}}
+            {{ horizontal_field(form.email)}}
+            {{ horizontal_field(form.password)}}
+            {{ horizontal_field(form.confirm_password)}}
 
-    <div class="form-group">
-        <div class="col-lg-offset-2 col-lg-3">
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox"> {{ form.accept_tos }} I accept the <a href="#">Terms of Service</a>
-                </label>
+            {% if config["RECAPTCHA_ENABLED"] %}
+                {{ horizontal_field(form.recaptcha) }}
+            {% endif %}
+
+            <div class="form-group">
+                <div class="col-lg-offset-2 col-lg-3">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox"> {{ form.accept_tos }} I accept the <a href="#">Terms of Service</a>
+                        </label>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
 
-    <div class="form-group">
-        <div class="col-lg-offset-2 col-lg-10">
-            <button type="submit" class="btn btn-success">Register</button>
-        </div>
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-3">
+                    <button type="submit" class="btn btn-success">Sign up</button>
+
+                </div>
+                <div class="col-sm-6">
+                    you can <a id="sign-in" href="{{url_for('user.login')}}">Sign in</a> if you already have an account
+                </div>
+            </div>
+        </form>
     </div>
-</form>
+</div>
 
 {% endblock %}

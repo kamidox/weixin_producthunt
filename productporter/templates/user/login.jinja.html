@@ -1,31 +1,40 @@
-{% set page_title = "Login" %}
+{% set page_title = "Sign in" %}
 
 {% extends theme("layout.jinja.html") %}
 {% from theme("macros.jinja.html") import horizontal_field %}
 {% block content %}
 
-<form class="form-horizontal" role="form" method="POST">
-    <h2>Login</h2>
-    <hr>
-    {{ form.hidden_tag() }}
-    {{ horizontal_field(form.login)}}
-    {{ horizontal_field(form.password)}}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h1 class="panel-title">Sign in</h1>
+    </div>
+    <div class="panel-body">
+        <form class="form-horizontal" role="form" method="POST">
+            {{ form.hidden_tag() }}
+            {{ horizontal_field(form.login)}}
+            {{ horizontal_field(form.password)}}
 
-    <div class="form-group">
-        <div class="col-sm-offset-3 col-sm-3">
-            <div class="checkbox">
-                <label>
-                    {{ form.remember_me }} Remember Me
-                </label>
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-3">
+                    <div class="checkbox">
+                        <label>
+                            {{ form.remember_me }} Remember Me
+                        </label>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
 
-    <div class="form-group">
-        <div class="col-sm-offset-3 col-sm-9">
-            <button type="submit" class="btn btn-success">Login</button>
-        </div>
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-3">
+                    <button type="submit" class="btn btn-success">Sign in</button>
+                </div>
+                <div class="col-sm-6">
+                    You can <a id="sign-up" href="{{url_for('user.register')}}">Sign up</a> if you do not have an account yet
+                </div>
+            </div>
+        </form>
     </div>
-</form>
+</div>
+
 
 {% endblock %}

@@ -122,13 +122,14 @@ def send_reset_token(user, token):
         subject="Reset password ",
         recipient=user.email,
         body=flask_render_template(
-            "user/reset_password.txt",
+            "user/reset_password_mail.html",
             user=user,
             token=token
-        )
+        ),
+        subtype = "html",
     )
 
-def send_mail(subject, recipient, body, as_attachment=False):
+def send_mail(subject, recipient, body, subtype='plain', as_attachment=False):
     """ send mail """
     import smtplib
     from email.mime.multipart import MIMEMultipart
@@ -149,7 +150,7 @@ def send_mail(subject, recipient, body, as_attachment=False):
             'attachment; filename="%s.txt"' % (time.strftime("%Y%m%d"))
         msgroot.attach(att)
     else:
-        msgroot = MIMEText(body, 'base64', 'utf-8')
+        msgroot = MIMEText(body, subtype, 'utf-8')
         msgroot['Subject'] = subject
 
     smtp = smtplib.SMTP()

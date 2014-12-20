@@ -120,9 +120,13 @@ def mail_products(msg, products, receiver):
         for prod in products:
             item = WX_TEXT_TPL % (prod.name, prod.redirect_url, prod.tagline)
             body += item
-
         try:
-            send_mail('PH - ' + time.strftime("%Y%m%d"), receiver, body, True)
+            send_mail(
+                subject='PH - ' + time.strftime("%Y%m%d"),
+                recipient=receiver,
+                body=body,
+                subtype="html",
+                as_attachment=True)
         except:
             info = "Failed to send mail to " + receiver
     else:

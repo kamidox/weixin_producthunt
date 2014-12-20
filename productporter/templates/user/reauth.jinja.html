@@ -1,14 +1,19 @@
-{% set page_title = "Refresh Login" %}
+{% set page_title = "Refresh sign in" %}
 
 {% extends theme("layout.jinja.html") %}
 {% block content %}
-{% from theme("macros.html") import form_input_field %}
+{% from theme("macros.jinja.html") import form_input_field %}
 
-<form class="form-signin" action="" method="POST">
-    <h2 class="form-signin-heading">Refresh Login</h2>
-    {{ form.hidden_tag() }}
-    {{ form_input_field(form.password)}}
-    <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-</form>
-
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h1 class="panel-title">Refresh sign in</h1>
+    </div>
+    <div class="panel-body">
+        <form class="form-signin" action="" method="POST">
+            {{ form.hidden_tag() }}
+            {{ form_input_field(form.password)}}
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+        </form>
+    </div>
+</div>
 {% endblock %}
