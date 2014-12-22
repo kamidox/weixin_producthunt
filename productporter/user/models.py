@@ -35,11 +35,16 @@ class Group(db.Model):
     # Group types
     admin = db.Column(db.Boolean, default=False, nullable=False)
     mod = db.Column(db.Boolean, default=False, nullable=False)
+    member = db.Column(db.Boolean, default=False, nullable=False)
     guest = db.Column(db.Boolean, default=False, nullable=False)
 
     # User permissions
-    editproduct = db.Column(db.Boolean, default=True, nullable=False)
-    deleteproduct = db.Column(db.Boolean, default=False, nullable=False)
+    perm_translate = db.Column(db.Boolean, default=True, nullable=False)
+    perm_comment = db.Column(db.Boolean, default=True, nullable=False)
+    perm_review = db.Column(db.Boolean, default=True, nullable=False)
+    perm_report = db.Column(db.Boolean, default=False, nullable=False)
+    perm_topic = db.Column(db.Boolean, default=False, nullable=False)
+    perm_setgroup = db.Column(db.Boolean, default=False, nullable=False)
 
     # Methods
     def __repr__(self):
@@ -204,6 +209,8 @@ class User(db.Model, UserMixin):
 
         if not self.in_group(group):
             self.secondary_groups.append(group)
+            db.session.commit()
+            self.invalidate_cache()
             return self
 
     def remove_from_group(self, group):
@@ -214,6 +221,8 @@ class User(db.Model, UserMixin):
 
         if self.in_group(group):
             self.secondary_groups.remove(group)
+            db.session.commit()
+            self.invalidate_cache()
             return self
 
     def in_group(self, group):
@@ -261,28 +270,8 @@ class User(db.Model, UserMixin):
 
         cache.delete_memoized(self.get_permissions, self)
 
-    def save(self, groups=None):
-        """Saves a user. If a list with groups is provided, it will add those
-        to the secondary groups from the user.
-
-        :param groups: A list with groups that should be added to the
-                       secondary groups from user.
-        """
-
-        if groups:
-            # TODO: Only remove/add groups that are selected
-            secondary_groups = self.secondary_groups.all()
-            for group in secondary_groups:
-                self.remove_from_group(group)
-            db.session.commit()
-
-            for group in groups:
-                # Do not add the primary group to the secondary groups
-                if group.id == self.primary_group_id:
-                    continue
-                self.add_to_group(group)
-
-            self.invalidate_cache()
+    def save(self):
+        """Saves a user"""
 
         db.session.add(self)
         db.session.commit()
