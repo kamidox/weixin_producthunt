@@ -28,7 +28,7 @@ def user(default_groups):
     return user
 
 @pytest.fixture
-def moderator_user(user, default_groups):
+def moderator_user(default_groups):
     """
     Creates a test user with moderator permissions.
     """
