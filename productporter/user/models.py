@@ -39,13 +39,12 @@ class Group(db.Model):
     guest = db.Column(db.Boolean, default=False, nullable=False)
 
     # User permissions
-    perm_translate = db.Column(db.Boolean, default=False, nullable=False)
-    perm_comment = db.Column(db.Boolean, default=False, nullable=False)
-    perm_review = db.Column(db.Boolean, default=False, nullable=False)
-    perm_topic = db.Column(db.Boolean, default=False, nullable=False)
+    perm_translate = db.Column(db.Boolean, default=True, nullable=False)
+    perm_comment = db.Column(db.Boolean, default=True, nullable=False)
+    perm_review = db.Column(db.Boolean, default=True, nullable=False)
     perm_report = db.Column(db.Boolean, default=False, nullable=False)
+    perm_topic = db.Column(db.Boolean, default=False, nullable=False)
     perm_setgroup = db.Column(db.Boolean, default=False, nullable=False)
-
 
     # Methods
     def __repr__(self):

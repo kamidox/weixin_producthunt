@@ -22,8 +22,8 @@ fixture = OrderedDict((
         'perm_translate': True,
         'perm_comment': True,
         'perm_review': True,
-        'perm_topic': True,
         'perm_report': True,
+        'perm_topic': True,
         'perm_setgroup': True,
     }),
     ('Moderator', {
@@ -35,8 +35,8 @@ fixture = OrderedDict((
         'perm_translate': True,
         'perm_comment': True,
         'perm_review': True,
-        'perm_topic': True,
         'perm_report': True,
+        'perm_topic': True,
         'perm_setgroup': False,
     }),
     ('Member', {
@@ -48,8 +48,8 @@ fixture = OrderedDict((
         'perm_translate': True,
         'perm_comment': True,
         'perm_review': True,
-        'perm_topic': False,
         'perm_report': False,
+        'perm_topic': False,
         'perm_setgroup': False,
     }),
     ('Guest', {
