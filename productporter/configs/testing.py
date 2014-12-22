@@ -37,6 +37,6 @@ class TestingConfig(Config):
 
     # Security
     SECRET_KEY = "SecretKeyForSessionSigning"
-    WTF_CSRF_ENABLED = True
+    WTF_CSRF_ENABLED = False
     WTF_CSRF_SECRET_KEY = "reallyhardtoguess"
 

@@ -9,6 +9,7 @@
 import json
 from productporter.product.models import Product
 from productporter.configs.testing import TestingConfig as Config
+from flask import url_for
 
 def test_view_empty_posts(app, database, test_client, server_url):
     """Test to show empty product posts page"""
@@ -68,6 +69,23 @@ def test_translate_commit(app, test_client, db_posts, server_url):
     jsondata = json.loads(r.data)
     assert jsondata['status'] == 'error'
 
+def test_user_profile(app, test_client, user, server_url):
+    """test view user profile"""
+
+    url = server_url + Config.USER_URL_PREFIX + '/'
+    r = test_client.get(url + user.username)
+    assert r.status_code == 200
+
+    r = test_client.get(url + 'user-not-exist')
+    assert r.status_code == 404
+
+def test_login(app, test_client, user):
+    """test login as user"""
+
+    url = url_for('user.login')
+    data = {'username': user.username, 'password': 'test'}
+    r = test_client.post(url, data=data, follow_redirects=True)
+    assert r.status_code == 200
 
 
 
