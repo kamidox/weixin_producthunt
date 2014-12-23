@@ -13,27 +13,34 @@ from flask import url_for
 
 def captured_flash_message(app, recorded, **extra):
     """capture flash message for unit test"""
+
     def record(sender, message, category):
         recorded.append((message, category))
     from flask import message_flashed
     return message_flashed.connected_to(record, app)
 
-def test_view_empty_posts(app, database, test_client, server_url):
+def test_view_empty_posts(app, database, test_client):
     """Test to show empty product posts page"""
-    r = test_client.get(server_url + Config.PRODUCT_URL_PREFIX + '/posts')
+
+    url = url_for('product.posts')
+    r = test_client.get(url)
     assert r.status_code == 200
 
-def test_view_sample_posts(app, test_client, db_posts, some_day, server_url):
+def test_view_sample_posts(app, test_client, db_posts, some_day):
     """Test to show product posts page"""
-    r = test_client.get(server_url + Config.PRODUCT_URL_PREFIX + '/posts?day=' + str(some_day))
+
+    url = url_for('product.posts')
+    param = {'day': str(some_day)}
+    r = test_client.get(url, query_string=param)
     assert r.status_code == 200
 
-def test_translate(app, test_client, db_posts, server_url):
+def test_translate(app, test_client, db_posts):
     """Test to aquire translation request and commmit translation"""
+
     p = Product.query.filter().first();
     assert p is not None
 
-    url = server_url + Config.PRODUCT_URL_PREFIX + '/translate'
+    url = url_for('product.translate')
     param = {'postid': p.postid}
     invalid_param = {'postid': 'non-exist-postid'}
 
@@ -48,12 +55,13 @@ def test_translate(app, test_client, db_posts, server_url):
     r = test_client.get(url, query_string=invalid_param)
     assert r.status_code == 404
 
-def test_translate_commit(app, test_client, db_posts, server_url):
+def test_translate_commit(app, test_client, db_posts):
     """Test to aquire translation request and commmit translation"""
+
     p = Product.query.filter().first();
     assert p is not None
 
-    url = server_url + Config.PRODUCT_URL_PREFIX + '/translate'
+    url = url_for('product.translate')
     param = {'postid': p.postid}
 
     # test to commit translation
@@ -76,14 +84,15 @@ def test_translate_commit(app, test_client, db_posts, server_url):
     jsondata = json.loads(r.data)
     assert jsondata['status'] == 'error'
 
-def test_user_profile(app, test_client, user, server_url):
+def test_user_profile(app, test_client, user):
     """test view user profile"""
 
-    url = server_url + Config.USER_URL_PREFIX + '/'
-    r = test_client.get(url + user.username)
+    url = url_for('user.profile', username=user.username)
+    r = test_client.get(url)
     assert r.status_code == 200
 
-    r = test_client.get(url + 'user-not-exist')
+    url = url_for('user.profile', username='user-not-exist')
+    r = test_client.get(url)
     assert r.status_code == 404
 
 def test_login(app, test_client, user):

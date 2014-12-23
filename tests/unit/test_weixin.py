@@ -9,8 +9,9 @@
 
 import time
 import random
+from flask import url_for
 
-def test_weixin_verification(app, test_client, server_url, weixin_signature):
+def test_weixin_verification(app, test_client, weixin_signature):
     """weixin signature verify"""
 
     if not app.config['WEIXIN_UNITTEST']:
@@ -21,11 +22,12 @@ def test_weixin_verification(app, test_client, server_url, weixin_signature):
         'nonce': weixin_signature[2],
         'echostr': 'access ok'
     }
-    r = test_client.get(server_url + '/weixin/weixin', query_string=param)
+    url = url_for('weixin.weixin_access_verify')
+    r = test_client.get(url, query_string=param)
     assert r.status_code == 200
     assert r.data == 'access ok'
 
-def test_weixin_send_msg(app, test_client, server_url, weixin_signature, db_posts):
+def test_weixin_send_msg(app, test_client, weixin_signature, db_posts):
     """send msg to weixin backend"""
     if not app.config['WEIXIN_UNITTEST']:
         return
@@ -51,10 +53,10 @@ def test_weixin_send_msg(app, test_client, server_url, weixin_signature, db_post
         "content": '1',
         "id": str(random.random())[-10:]}
 
-    r = test_client.post(server_url + '/weixin/weixin', \
-        data = TPL_TEXT % msg, query_string=param)
+    url = url_for('weixin.weixin_msg')
+    r = test_client.post(url, data = TPL_TEXT % msg, query_string=param)
     assert r.status_code == 200
-    print(r.data)
+
 
 
 

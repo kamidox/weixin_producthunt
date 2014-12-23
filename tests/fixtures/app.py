@@ -40,8 +40,3 @@ def database():
 def default_groups(database):
     """Creates the default groups"""
     return create_default_groups()
-
-@pytest.fixture()
-def server_url():
-    """return server url for this app"""
-    return 'http://' + Config.SERVER_NAME + Config.ROOT_URL_PREFIX
