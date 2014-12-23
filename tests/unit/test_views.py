@@ -11,6 +11,13 @@ from productporter.product.models import Product
 from productporter.configs.testing import TestingConfig as Config
 from flask import url_for
 
+def captured_flash_message(app, recorded, **extra):
+    """capture flash message for unit test"""
+    def record(sender, message, category):
+        recorded.append((message, category))
+    from flask import message_flashed
+    return message_flashed.connected_to(record, app)
+
 def test_view_empty_posts(app, database, test_client, server_url):
     """Test to show empty product posts page"""
     r = test_client.get(server_url + Config.PRODUCT_URL_PREFIX + '/posts')
@@ -82,13 +89,206 @@ def test_user_profile(app, test_client, user, server_url):
 def test_login(app, test_client, user):
     """test login as user"""
 
+    messages = []
     url = url_for('user.login')
-    data = {'username': user.username, 'password': 'test'}
-    r = test_client.post(url, data=data, follow_redirects=True)
-    assert r.status_code == 200
+    data = {'login': user.username, 'password': 'test'}
+    with captured_flash_message(app, messages):
+        r = test_client.post(url, data=data, follow_redirects=True)
+        assert r.status_code == 200
+        assert len(messages) == 1
+        assert messages[0][0] == 'Sign in successful'
 
+    messages = []
+    data = {'login': user.username, 'password': 'error-password'}
+    with captured_flash_message(app, messages):
+        r = test_client.post(url, data=data, follow_redirects=True)
+        assert r.status_code == 200
+        assert len(messages) == 1
+        assert messages[0][0] == 'Username or password error'
 
+def test_register(app, test_client, database):
+    """test register"""
 
+    messages = []
+    url = url_for('user.register')
+    data = {'username': 'test_normal',
+        'email': 'test_normal@example.org',
+        'password': 'test',
+        'confirm_password': 'test',
+        'accept_tos': 'y'}
+    with captured_flash_message(app, messages):
+        r = test_client.post(url, data=data, follow_redirects=True)
+        assert r.status_code == 200
+        assert len(messages) == 1
+        assert messages[0][0] == 'Thanks for registering'
+
+    # register a duplicate user will failed
+    messages = []
+    with captured_flash_message(app, messages):
+        r = test_client.post(url, data=data, follow_redirects=True)
+        assert r.status_code == 200
+        assert len(messages) == 0
+
+def test_forgot_and_reset_password(app, test_client, user):
+    """test forget password"""
+
+    # test for forget password
+    messages = []
+    url = url_for('user.forgot_password')
+    data = {'email': 'test_normal@example.org'}
+    with captured_flash_message(app, messages):
+        r = test_client.post(url, data=data, follow_redirects=True)
+        assert r.status_code == 200
+        assert len(messages) == 1
+        assert messages[0][0] == 'E-Mail sent! Please check your inbox.'
+
+    messages = []
+    data = {'email': 'not_exist@example.org'}
+    with captured_flash_message(app, messages):
+        r = test_client.post(url, data=data, follow_redirects=True)
+        assert r.status_code == 200
+        assert len(messages) == 1
+        assert messages[0][0] == 'E-mail not exist!'
+
+    # test for reset password
+    messages = []
+    token = 'invalid-token'
+    url = url_for('user.reset_password', token=token)
+    data = {'token': token,
+        'email': user.email,
+        'password': 'new_password',
+        'confirm_password': 'new_password'}
+    with captured_flash_message(app, messages):
+        r = test_client.post(url, data=data, follow_redirects=True)
+        assert r.status_code == 200
+        assert len(messages) == 1
+        assert messages[0][0] == 'Your password token is invalid.'
+
+    messages = []
+    token = user.make_reset_token()
+    url = url_for('user.reset_password', token=token)
+    data = {'token': token,
+        'email': user.email,
+        'password': 'new_password',
+        'confirm_password': 'new_password'}
+    with captured_flash_message(app, messages):
+        r = test_client.post(url, data=data, follow_redirects=True)
+        assert r.status_code == 200
+        assert len(messages) == 1
+        assert messages[0][0] == 'Your password has been updated.'
+
+    # test go sign in with new password
+    messages = []
+    url = url_for('user.login')
+    data = {'login': user.username, 'password': 'new_password'}
+    with captured_flash_message(app, messages):
+        r = test_client.post(url, data=data, follow_redirects=True)
+        assert r.status_code == 200
+        assert len(messages) == 1
+        assert messages[0][0] == 'Sign in successful'
+
+def test_change_email(app, test_client, user, moderator_user):
+    """ test to change email and password """
+
+    # sign in first
+    messages = []
+    url = url_for('user.login')
+    data = {'login': user.email, 'password': 'test'}
+    with captured_flash_message(app, messages):
+        r = test_client.post(url, data=data, follow_redirects=True)
+        assert r.status_code == 200
+        assert len(messages) == 1
+        assert messages[0][0] == 'Sign in successful'
+
+    # change email with old email not exist
+    messages = []
+    url = url_for('user.settings_email')
+    data = {'old_email': 'not_exist@example.org',
+        'new_email': 'new_email@example.org',
+        'confirm_new_email': 'new_email@example.org'}
+    with captured_flash_message(app, messages):
+        r = test_client.post(url, data=data, follow_redirects=True)
+        assert r.status_code == 200
+        assert len(messages) == 0
+
+    # change email with new email already exist
+    messages = []
+    url = url_for('user.settings_email')
+    data = {'old_email': user.email,
+        'new_email': moderator_user.email,
+        'confirm_new_email': moderator_user.email}
+    with captured_flash_message(app, messages):
+        r = test_client.post(url, data=data, follow_redirects=True)
+        assert r.status_code == 200
+        assert len(messages) == 0
+
+    # change email
+    messages = []
+    url = url_for('user.settings_email')
+    data = {'old_email': user.email,
+        'new_email': 'new_email@example.org',
+        'confirm_new_email': 'new_email@example.org'}
+    with captured_flash_message(app, messages):
+        r = test_client.post(url, data=data, follow_redirects=True)
+        assert r.status_code == 200
+        assert len(messages) == 1
+        assert messages[0][0] == 'Your email have been updated!'
+
+    # test go sign in with new email
+    messages = []
+    url = url_for('user.login')
+    data = {'login': 'new_email@example.org', 'password': 'test'}
+    with captured_flash_message(app, messages):
+        r = test_client.post(url, data=data, follow_redirects=True)
+        assert r.status_code == 200
+        assert len(messages) == 1
+        assert messages[0][0] == 'Sign in successful'
+
+def test_change_password(app, test_client, user):
+    """ change password """
+
+    # sign in first
+    messages = []
+    url = url_for('user.login')
+    data = {'login': user.email, 'password': 'test'}
+    with captured_flash_message(app, messages):
+        r = test_client.post(url, data=data, follow_redirects=True)
+        assert r.status_code == 200
+        assert len(messages) == 1
+        assert messages[0][0] == 'Sign in successful'
+
+    # change password with old password not correct
+    messages = []
+    url = url_for('user.settings_password')
+    data = {'old_password': 'invalid_old_password',
+        'new_password': 'new_password',
+        'confirm_new_password': 'new_password'}
+    with captured_flash_message(app, messages):
+        r = test_client.post(url, data=data, follow_redirects=True)
+        assert r.status_code == 200
+        assert len(messages) == 0
+
+    # change password
+    messages = []
+    url = url_for('user.settings_password')
+    data = {'old_password': 'test',
+        'new_password': 'new_password',
+        'confirm_new_password': 'new_password'}
+    with captured_flash_message(app, messages):
+        r = test_client.post(url, data=data, follow_redirects=True)
+        assert r.status_code == 200
+        assert len(messages) == 1
+        assert messages[0][0] == 'Your password have been updated!'
+
+    # sign in with new password
+    messages = []
+    url = url_for('user.login')
+    data = {'login': user.email, 'password': 'new_password'}
+    with captured_flash_message(app, messages):
+        r = test_client.post(url, data=data, follow_redirects=True)
+        assert r.status_code == 200
+        assert len(messages) == 1
+        assert messages[0][0] == 'Sign in successful'
 
 
 

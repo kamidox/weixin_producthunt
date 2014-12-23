@@ -16,3 +16,4 @@ pytest-random==0.02
 itsdangerous==0.24
 requests==2.5.0
 markdown2==2.3.0
+blinker==1.3

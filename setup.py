@@ -56,6 +56,7 @@ setup(
         'pytest-random',
         'pytest-cov',
         'requests',
+        'blinker'
     ],
     classifiers=[
         'Development Status :: 4 - Beta',

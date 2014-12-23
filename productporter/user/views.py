@@ -37,13 +37,13 @@ def login():
     if form.validate_on_submit():
         user, authenticated = User.authenticate(form.login.data,
                                                 form.password.data)
-
         if user and authenticated:
             login_user(user, remember=form.remember_me.data)
+            flash(("Sign in successful"), "success")
             return redirect(request.args.get("next") or
                             url_for("product.posts"))
 
-        flash(("Username or password error"), "danger")
+        flash(("Username or password error"), "error")
     return render_template("user/login.jinja.html", form=form)
 
 
@@ -105,8 +105,7 @@ def forgot_password():
             flash(("E-Mail sent! Please check your inbox."), "info")
             return redirect(url_for("user.login"))
         else:
-            flash(("You have entered an username or email that is not linked \
-                with your account"), "danger")
+            flash(("E-mail not exist!"), "danger")
     return render_template("user/forgot_password.jinja.html", form=form)
 
 
