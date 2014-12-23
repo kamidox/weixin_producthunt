@@ -30,7 +30,7 @@ Send 'help' in Wechat(weixin) to producthunt to get help information
     * `python manage.py createall`
 * Run the development server
     * `python manage.py runserver`
-* Visit [localhost:5000/product/posts](http://localhost:5000/product/posts)
+* Visit [localhost:5000/porter/posts](http://localhost:5000/porter/posts)
 
 ## deploy
 
@@ -41,7 +41,8 @@ Send 'help' in Wechat(weixin) to producthunt to get help information
 
 If you deploy the first time or setup a new server instance. Please follow these steps:
 
-* install nginx/uwsgi/pip and other tools. This can be done in fabric automatically, but we do not do this currently.
+* install nginx/uwsgi/pip and other tools.
+    `sudo apt-get -y install python-pip nginx-full uwsgi uwsgi-plugin-python`
 * setup nginx config file on remote server, please refer to `deploy/nginxconf.example`
 * setup uwsgi config file on remote server, please refer to `deploy/uwsgiconf.example`
 * run `fab -H newserver.example.com bootstrap`
