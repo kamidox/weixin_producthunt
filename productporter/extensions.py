@@ -12,6 +12,7 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager
 from flask.ext.themes2 import Themes
 from flask.ext.cache import Cache
+from flask.ext.migrate import Migrate
 
 # Database
 db = SQLAlchemy()
@@ -24,3 +25,6 @@ themes = Themes()
 
 # Caching
 cache = Cache()
+
+# Migrate
+migrate = Migrate()

@@ -15,6 +15,7 @@ import json
 
 from flask import current_app
 from flask.ext.script import (Manager, Shell, Server)
+from flask.ext.migrate import MigrateCommand
 
 from productporter.app import create_app
 from productporter.product.models import Product
@@ -35,6 +36,9 @@ manager = Manager(app)
 
 # Run local server
 manager.add_command("runserver", Server("localhost", port=5000))
+
+# Migration commands
+manager.add_command('db', MigrateCommand)
 
 # Add interactive project shell
 def make_shell_context():

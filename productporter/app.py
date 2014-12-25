@@ -19,7 +19,7 @@ from productporter.user.views import user
 from productporter.user.models import Guest, User
 from productporter.utils import render_markup, root_url_prefix
 # extensions
-from productporter.extensions import db, cache, themes, login_manager
+from productporter.extensions import db, cache, themes, login_manager, migrate
 # default config
 from productporter.configs.default import DefaultConfig
 
@@ -70,6 +70,9 @@ def configure_extensions(app):
 
     # Flask-SQLAlchemy
     db.init_app(app)
+
+    # Flask-Migrate
+    migrate.init_app(app, db)
 
     # Flask-Cache
     cache.init_app(app)

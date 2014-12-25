@@ -45,6 +45,7 @@ setup(
         'Flask-Script',
         'Flask-Themes2',
         'Flask-WTF',
+        'Flask-Migrate',
         'Flask-Cache',
         'Jinja2',
         'SQLAlchemy',
@@ -56,7 +57,8 @@ setup(
         'pytest-random',
         'pytest-cov',
         'requests',
-        'blinker'
+        'blinker',
+        'alembic'
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
