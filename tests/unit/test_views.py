@@ -122,6 +122,7 @@ def cowork_commit(app, test_client, db_posts, user, operate):
         query_string=param, content_type='application/json', \
         follow_redirects=True)
     assert r.status_code == 401
+    jsondata = json.loads(r.data)
     assert p.postid == jsondata['postid']
     assert jsondata['status'] == 'error'
 

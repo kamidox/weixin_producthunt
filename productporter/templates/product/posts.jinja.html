@@ -42,7 +42,8 @@
             </div>
             <div class="col-md-2">
                 <button name="translate" type="button" class="btn btn-primary"
-                        data-postid="{{post.postid}}">Translate</button>
+                        data-postid="{{post.postid}}"
+                        data-url="{{url_for('product.translate')}}">Translate</button>
             </div>
         </div>
     </div>
@@ -59,9 +60,11 @@
                         </textarea>
                         <br/>
                         <button name="commit-translate" type="button" class="btn btn-success"
-                            data-postid="{{post.postid}}">Submit</button>
+                            data-postid="{{post.postid}}"
+                            data-url="{{url_for('product.translate')}}">Submit</button>
                         <button name="cancel" type="button" class="btn btn-danger"
-                            data-postid="{{post.postid}}">Cancel</button>
+                            data-postid="{{post.postid}}"
+                            data-url="{{url_for('product.translate')}}">Cancel</button>
                     </div>
                 </div>
                 <div class="tagline-content" data-postid="{{post.postid}}">

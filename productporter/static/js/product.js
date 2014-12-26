@@ -5,7 +5,7 @@ $(document).ready(function () {
     // Translate & Review
     $("button[name='translate']").click(function () {
         var postid = $(this).attr('data-postid');
-        var url = getTranslateUrl(window.location.href, postid, 'translate');
+        var url = getTranslateUrl($(this).attr('data-url'), postid, 'translate');
         var settings = {
             type: "GET",
             url: url,
@@ -34,7 +34,7 @@ $(document).ready(function () {
             operate: 'translate',
             canceled: 'true'
         };
-        var url = getTranslateUrl(window.location.href, postid, 'translate');
+        var url = getTranslateUrl($(this).attr('data-url'), postid, 'translate');
         var settings = {
             type: "PUT",
             url: url,
@@ -65,7 +65,7 @@ $(document).ready(function () {
             operate: 'translate',
             ctagline: $.trim(ctagline)
         };
-        var url = getTranslateUrl(window.location.href, postid, 'translate');
+        var url = getTranslateUrl($(this).attr('data-url'), postid, 'translate');
         var settings = {
             type: "PUT",
             url: url,
@@ -89,6 +89,93 @@ $(document).ready(function () {
         $.ajax(settings);
     });
 
+    // detailed introduce article
+    $("button[name='introduce']").click(function () {
+        var postid = $(this).attr('data-postid');
+        var url = getTranslateUrl($(this).attr('data-url'), postid, 'introduce');
+        var settings = {
+            type: "GET",
+            url: url,
+            dataType: "json",
+            error: function(XHR,textStatus,errorThrown) {
+                alert ("textStatus="+textStatus+"\nerrorThrown=" + errorThrown);
+            },
+            success: function(data,textStatus) {
+                var content = data['cintro'];
+                $("button[name='introduce']").hide();
+                $('.cintro-translate').hide();
+                $('.cintro-content').show();
+                $('.cintro-translate[data-postid=' + postid + ']').show();
+                $('.cintro-content[data-postid=' + postid + ']').hide();
+                $('textarea[name="cintro"][data-postid=' + postid + ']').val(content);
+            }
+        };
+        $.ajax(settings);
+    });
+
+    // Cancel Translate
+    $("button[name='cancel-cintro']").click(function() {
+        var postid = $(this).attr('data-postid');
+        var jsondata = {
+            postid: postid,
+            operate: 'introduce',
+            canceled: 'true'
+        };
+        var url = getTranslateUrl($(this).attr('data-url'), postid, 'introduce');
+        var settings = {
+            type: "PUT",
+            url: url,
+            dataType: "json",
+            data: JSON.stringify(jsondata),
+            error: function(XHR,textStatus,errorThrown) {
+                alert ("textStatus="+textStatus+"\nerrorThrown=" + errorThrown);
+            },
+            success: function(data,textStatus) {
+                var content = data['cintro'];
+                $("button[name='cintro']").show();
+                $('.cintro-translate[data-postid=' + postid + ']').hide();
+                $('.cintro-content[data-postid=' + postid + ']').show();
+            },
+            beforeSend: function(xhr, settings) {
+                xhr.setRequestHeader('Content-Type', 'application/json');
+            }
+        };
+        $.ajax(settings);
+    });
+
+    // Submit introduction
+    $("button[name='commit-cintro']").click(function() {
+        var postid = $(this).attr('data-postid');
+        var cintro = $("textarea[name='cintro'][data-postid=" + postid + "]").val();
+        var jsondata = {
+            postid: postid,
+            operate: 'introduce',
+            cintro: $.trim(cintro)
+        };
+        var url = getTranslateUrl($(this).attr('data-url'), postid, 'introduce');
+        var settings = {
+            type: "PUT",
+            url: url,
+            dataType: "json",
+            data: JSON.stringify(jsondata),
+            error: function(XHR,textStatus,errorThrown) {
+                alert ("textStatus="+textStatus+"\nerrorThrown=" + errorThrown);
+            },
+            success: function(data,textStatus) {
+                var content = data['cintro'];
+                $("button[name='introduce']").show();
+                $('.cintro-content-data[data-postid=' + postid + ']').empty();
+                $('.cintro-content-data[data-postid=' + postid + ']').prepend(content);
+                $('.cintro-translate[data-postid=' + postid + ']').hide();
+                $('.cintro-content[data-postid=' + postid + ']').show();
+            },
+            beforeSend: function(xhr, settings) {
+                xhr.setRequestHeader('Content-Type', 'application/json');
+            }
+        };
+        $.ajax(settings);
+    });
+
     // datepicker
     $('#input-select-day input').datepicker({
         format: "yyyy-mm-dd",
@@ -103,16 +190,7 @@ $(document).ready(function () {
     });
 
     function getTranslateUrl(url, postid, operate) {
-        if (postid) {
-            return getUrlParent(url).concat("/translate?postid=").concat(postid)
-                .concat("&operate=").concat(operate);
-        } else {
-            return getUrlParent(url).concat("/translate")
-        }
-    }
-
-    function getUrlParent(url) {
-        var index = url.lastIndexOf("/");
-        return url.substring(0, index);
+        return url.concat("?postid=").concat(postid)
+            .concat("&operate=").concat(operate);
     }
 });
