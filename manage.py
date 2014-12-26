@@ -20,7 +20,8 @@ from flask.ext.migrate import MigrateCommand
 from productporter.app import create_app
 from productporter.product.models import Product
 from productporter.extensions import db
-from productporter.utils import pull_and_save_posts
+from productporter.utils import pull_and_save_posts, create_default_groups, \
+    create_admin_user
 from tests.fixtures.sampledata import SAMPLE_DATA
 
 # Use the development configuration if available
@@ -61,6 +62,8 @@ def createall():
     print("create database in %s" % (Config.SQLALCHEMY_DATABASE_URI))
     db.drop_all()
     db.create_all()
+    create_default_groups()
+    create_admin_user('admin', 'admin', 'admin@example.org')
 
 @manager.command
 def pullsample():

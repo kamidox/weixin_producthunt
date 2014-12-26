@@ -10,6 +10,7 @@
 """
 import os
 import logging
+import datetime
 
 from flask import Flask
 
@@ -17,11 +18,13 @@ from productporter.weixin.views import weixin
 from productporter.product.views import product
 from productporter.user.views import user
 from productporter.user.models import Guest, User
-from productporter.utils import render_markup, root_url_prefix
+from productporter.utils import render_markup, root_url_prefix, is_online, can_translate, \
+        can_comment, can_review, can_report, can_topic, can_setgroup
 # extensions
 from productporter.extensions import db, cache, themes, login_manager, migrate
 # default config
 from productporter.configs.default import DefaultConfig
+from flask.ext.login import current_user
 
 def create_app(config=None):
     """
@@ -105,7 +108,13 @@ def configure_template_filters(app):
     Configures the template filters
     """
     app.jinja_env.filters['markup'] = render_markup
-
+    app.jinja_env.filters['is_online'] = is_online
+    app.jinja_env.filters['can_translate'] = can_translate
+    app.jinja_env.filters['can_comment'] = can_comment
+    app.jinja_env.filters['can_review'] = can_review
+    app.jinja_env.filters['can_report'] = can_report
+    app.jinja_env.filters['can_topic'] = can_topic
+    app.jinja_env.filters['can_setgroup'] = can_setgroup
 
 def configure_context_processors(app):
     """
@@ -117,7 +126,16 @@ def configure_before_handlers(app):
     """
     Configures the before request handlers
     """
-    pass
+    
+    @app.before_request
+    def update_lastseen():
+        """
+        Updates `lastseen` before every reguest if the user is authenticated
+        """
+        if current_user.is_authenticated():
+            current_user.lastseen = datetime.datetime.utcnow()
+            db.session.add(current_user)
+            db.session.commit()
 
 
 def configure_errorhandlers(app):

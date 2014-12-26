@@ -34,48 +34,130 @@ def test_view_sample_posts(app, test_client, db_posts, some_day):
     r = test_client.get(url, query_string=param)
     assert r.status_code == 200
 
-def test_translate(app, test_client, db_posts):
+def cowork_request(app, test_client, db_posts, user, moderator_user, operate):
     """Test to aquire translation request and commmit translation"""
 
     p = Product.query.filter().first();
     assert p is not None
 
     url = url_for('product.translate')
-    param = {'postid': p.postid}
-    invalid_param = {'postid': 'non-exist-postid'}
+    param = {'postid': p.postid, 'operate': operate}
+    invalid_param = {'postid': 'non-exist-postid', 'operate': operate}
 
-    # test to aquire translation
-    r = test_client.get(url, query_string=param)
+    # test to aquire translation with a guest
+    r = test_client.get(url, query_string=param, follow_redirects=True)
+    assert r.status_code == 401
+    jsondata = json.loads(r.data)
+    assert p.postid == jsondata['postid']
+    assert jsondata['status'] == 'error'
+
+    # login
+    messages = []
+    url = url_for('user.login')
+    data = {'login': user.username, 'password': 'test'}
+    with captured_flash_message(app, messages):
+        r = test_client.post(url, data=data, follow_redirects=True)
+        assert r.status_code == 200
+        assert len(messages) == 1
+        assert messages[0][0] == 'Sign in successful'
+
+    # aquire translate
+    url = url_for('product.translate')
+    param = {'postid': p.postid, 'operate': operate}
+    r = test_client.get(url, query_string=param, follow_redirects=True)
     assert r.status_code == 200
     jsondata = json.loads(r.data)
     assert p.postid == jsondata['postid']
     assert jsondata['status'] == 'success'
 
-    # test to aquire translation on a non-exist post
-    r = test_client.get(url, query_string=invalid_param)
-    assert r.status_code == 404
+    # login with mod user
+    messages = []
+    url = url_for('user.login')
+    data = {'login': moderator_user.username, 'password': 'test'}
+    with captured_flash_message(app, messages):
+        r = test_client.post(url, data=data, follow_redirects=True)
+        assert r.status_code == 200
+        assert len(messages) == 1
+        assert messages[0][0] == 'Sign in successful'
 
-def test_translate_commit(app, test_client, db_posts):
-    """Test to aquire translation request and commmit translation"""
+    # aquire translate
+    url = url_for('product.translate')
+    param = {'postid': p.postid, 'operate': operate}
+    r = test_client.get(url, query_string=param, follow_redirects=True)
+    assert r.status_code == 400
+    jsondata = json.loads(r.data)
+    assert p.postid == jsondata['postid']
+    assert jsondata['status'] == 'error'
+    assert jsondata['error'] == 'this product is in %s by test_normal' % (operate)
+
+def test_translate(app, test_client, db_posts, user, moderator_user):
+    """test translate request"""
+    cowork_request(app, test_client, db_posts, user, moderator_user, 'translate')
+    
+def test_introduce(app, test_client, db_posts, user, moderator_user):
+    """test introduce request"""
+    cowork_request(app, test_client, db_posts, user, moderator_user, 'introduce')
+
+def cowork_commit(app, test_client, db_posts, user, operate):
+    """Test to commmit cowork result"""
 
     p = Product.query.filter().first();
     assert p is not None
 
     url = url_for('product.translate')
-    param = {'postid': p.postid}
+    param = {'postid': p.postid, 'operate': operate}
 
     # test to commit translation
     jsondata = {
         'postid': p.postid,
-        'ctagline': 'my awesome translation'
+        'operate': operate,
     }
+    if operate == 'translate':
+        jsondata.update({'ctagline': 'my awesome translation'})
+    else:
+        jsondata.update({'cintro': 'my awesome translation'})
+
+    # commit translate with guest will failed
     r = test_client.post(url, data=json.dumps(jsondata), \
-        query_string=param, content_type='application/json')
+        query_string=param, content_type='application/json', \
+        follow_redirects=True)
+    assert r.status_code == 401
+    assert p.postid == jsondata['postid']
+    assert jsondata['status'] == 'error'
+
+    # login
+    messages = []
+    url = url_for('user.login')
+    data = {'login': user.username, 'password': 'test'}
+    with captured_flash_message(app, messages):
+        r = test_client.post(url, data=data, follow_redirects=True)
+        assert r.status_code == 200
+        assert len(messages) == 1
+        assert messages[0][0] == 'Sign in successful'
+
+    # commit translate
+    url = url_for('product.translate')
+    param = {'postid': p.postid, 'operate': operate}
+
+    jsondata = {
+        'postid': p.postid,
+        'operate': operate,
+    }
+    if operate == 'translate':
+        jsondata.update({'ctagline': 'my awesome translation'})
+    else:
+        jsondata.update({'cintro': 'my awesome translation'})
+
+    r = test_client.post(url, data=json.dumps(jsondata), \
+            query_string=param, content_type='application/json')
     assert r.status_code == 200
     jsondata = json.loads(r.data)
     assert p.postid == jsondata['postid']
     assert jsondata['status'] == 'success'
-    assert jsondata['ctagline'].find('my awesome translation') >= 0
+    if operate == 'translate':
+        assert jsondata['ctagline'].find('my awesome translation') >= 0
+    else:
+        assert jsondata['cintro'].find('my awesome translation') >= 0
 
     # test to post invalid json data
     r = test_client.post(url, data='not a json data', \
@@ -83,6 +165,33 @@ def test_translate_commit(app, test_client, db_posts):
     assert r.status_code == 405
     jsondata = json.loads(r.data)
     assert jsondata['status'] == 'error'
+
+    # cancel commit
+    url = url_for('product.translate')
+    param = {'postid': p.postid, 'operate': operate}
+
+    # test to commit translation
+    jsondata = {
+        'postid': p.postid,
+        'operate': operate,
+        'canceled': 'true'
+    }
+    r = test_client.post(url, data=json.dumps(jsondata), \
+            query_string=param, content_type='application/json')
+    assert r.status_code == 200
+    jsondata = json.loads(r.data)
+    assert p.postid == jsondata['postid']
+    assert jsondata['status'] == 'success'
+
+def test_translate_commit(app, test_client, db_posts, user):
+    """test to commit translate result"""
+
+    cowork_commit(app, test_client, db_posts, user, 'translate')
+
+def test_introduce_commit(app, test_client, db_posts, user):
+    """test to commit translate result"""
+
+    cowork_commit(app, test_client, db_posts, user, 'introduce')
 
 def test_user_profile(app, test_client, user):
     """test view user profile"""

@@ -1,4 +1,4 @@
-{% set page_title = "Posts" %}
+{% set page_title = "Post" %}
 
 {% extends theme("layout.jinja.html") %}
 
@@ -8,36 +8,16 @@
 {% endblock %}
 
 {% block content %}
-
-<div class="panel panel-primary">
-    <div class="panel-heading">
-        <h3 class="panel-title">{{ day }}</h3>
-    </div>
-    <div class="panel-body">
-        <div class="row">
-            <div id="input-select-day" class="col-md-2">
-                <input type="text" class="form-control" value="{{ day }}">
-            </div>
-            <div class="col-md-8">
-                <h4>Totally {{ post_count }} products</h4>
-            </div>
-        </div>
-    </div>
-</div>
-
-{% for post in posts %}
 <div class="panel panel-default">
-    <div class="panel-heading product-item">
+    <div class="panel-heading">
         <div class="row">
             <div class="col-md-10">
                 <h4>
-                    <span>{{ posts.index(post) + 1 }}# </span>
-                    <a class="post-url" href="{{ post.redirect_url }}" target="_blank">{{ post.name }}</a>
-                    <span> - {{ post.tagline }}</span>
-                    <a class="product-link" 
-                        href="{{ url_for('product.post_intro', postid=post.postid) }}" 
-                        target="_blank">
+                    <a class="post-url" 
+                        href="{{ post.redirect_url }}" 
+                        target="_blank">{{ post.name }}
                     </a>
+                    <span> - {{ post.tagline }}</span>
                 </h4>
             </div>
             <div class="col-md-2">
@@ -75,7 +55,41 @@
         </div>
     </div>
 </div>
-{% endfor %}
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4 class-"panel-title">
+            <span> Detail introduced</span>
+        </h4>
+    </div>
+
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="cintro-translate" data-postid="{{post.postid}}">
+                    <div class="col-sm-12">
+                        <textarea class="form-control"
+                            data-postid="{{post.postid}}"
+                            id="cintro" name="cintro" rows="10">
+                        </textarea>
+                        <br/>
+                        <button name="commit-cintro" type="button" class="btn btn-success"
+                            data-postid="{{post.postid}}">Submit</button>
+                        <button name="cancel" type="button" class="btn btn-danger"
+                            data-postid="{{post.postid}}">Cancel</button>
+                    </div>
+                </div>
+                <div class="cintro-content" data-postid="{{post.postid}}">
+                    <div class="cintro-content-data" data-postid="{{post.postid}}">
+                        {% autoescape false %}
+                        {{ post.cintro|markup }}
+                        {% endautoescape %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
 

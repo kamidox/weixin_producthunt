@@ -17,7 +17,8 @@ from flask import current_app, url_for
 from flask.ext.login import UserMixin, AnonymousUserMixin
 from productporter._compat import max_integer
 from productporter.extensions import db, cache
-
+from productporter.product.models import Product
+from productporter.configs.default import porter_config
 
 groups_users = db.Table(
     'groups_users',
@@ -99,6 +100,21 @@ class User(db.Model, UserMixin):
                         primaryjoin=(groups_users.c.user_id == id),
                         backref=db.backref('users', lazy='dynamic'),
                         lazy='dynamic')
+
+    products_translate = db.relationship('Product', 
+                                        backref="translate_by", 
+                                        lazy='dynamic',
+                                        foreign_keys=[Product.translate_user_id])
+
+    products_review = db.relationship('Product', 
+                                    backref="review_by", 
+                                    lazy='dynamic',
+                                    foreign_keys=[Product.review_user_id])
+
+    products_introduce = db.relationship('Product', 
+                                    backref="introduce_by", 
+                                    lazy='dynamic',
+                                    foreign_keys=[Product.introduce_user_id])
 
     @property
     def url(self):
@@ -269,6 +285,27 @@ class User(db.Model, UserMixin):
         """Invalidates this objects cached metadata."""
 
         cache.delete_memoized(self.get_permissions, self)
+
+    def all_translated_products(self, page=1):
+        """get all products translated by this user"""
+
+        return Product.query.filter(Product.translate_user_id == self.id).\
+            order_by(Product.id.desc()).\
+            paginate(page, porter_config['PRODUCT_PER_PAGE'], False)
+
+    def all_reviewed_products(self, page=1):
+        """get all products reviewed by this user"""
+
+        return Product.query.filter(Product.review_user_id == self.id).\
+            order_by(Product.id.desc()).\
+            paginate(page, porter_config['PRODUCT_PER_PAGE'], False)
+
+    def all_introduced_products(self, page=1):
+        """get all products introduced by this user"""
+
+        return Product.query.filter(Product.introduce_user_id == self.id).\
+            order_by(Product.id.desc()).\
+            paginate(page, porter_config['PRODUCT_PER_PAGE'], False)
 
     def save(self):
         """Saves a user"""

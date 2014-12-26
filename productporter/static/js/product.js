@@ -5,7 +5,7 @@ $(document).ready(function () {
     // Translate & Review
     $("button[name='translate']").click(function () {
         var postid = $(this).attr('data-postid');
-        var url = getTranslateUrl(window.location.href, postid);
+        var url = getTranslateUrl(window.location.href, postid, 'translate');
         var settings = {
             type: "GET",
             url: url,
@@ -29,9 +29,31 @@ $(document).ready(function () {
     // Cancel Translate
     $("button[name='cancel']").click(function() {
         var postid = $(this).attr('data-postid');
-        $("button[name='translate']").show();
-        $('.tagline-translate[data-postid=' + postid + ']').hide();
-        $('.tagline-content[data-postid=' + postid + ']').show();
+        var jsondata = {
+            postid: postid,
+            operate: 'translate',
+            canceled: 'true'
+        };
+        var url = getTranslateUrl(window.location.href, postid, 'translate');
+        var settings = {
+            type: "PUT",
+            url: url,
+            dataType: "json",
+            data: JSON.stringify(jsondata),
+            error: function(XHR,textStatus,errorThrown) {
+                alert ("textStatus="+textStatus+"\nerrorThrown=" + errorThrown);
+            },
+            success: function(data,textStatus) {
+                var content = data['ctagline'];
+                $("button[name='translate']").show();
+                $('.tagline-translate[data-postid=' + postid + ']').hide();
+                $('.tagline-content[data-postid=' + postid + ']').show();
+            },
+            beforeSend: function(xhr, settings) {
+                xhr.setRequestHeader('Content-Type', 'application/json');
+            }
+        };
+        $.ajax(settings);
     });
 
     // Submit Translate
@@ -40,9 +62,10 @@ $(document).ready(function () {
         var ctagline = $("textarea[name='ctagline'][data-postid=" + postid + "]").val();
         var jsondata = {
             postid: postid,
+            operate: 'translate',
             ctagline: $.trim(ctagline)
         };
-        var url = getTranslateUrl(window.location.href, postid);
+        var url = getTranslateUrl(window.location.href, postid, 'translate');
         var settings = {
             type: "PUT",
             url: url,
@@ -66,19 +89,6 @@ $(document).ready(function () {
         $.ajax(settings);
     });
 
-    // Show or Hide sreenshot
-    // $("button#btn-show-screenshot").click(function() {
-    //     if ($(this).text().indexOf('Show') >= 0) {
-    //         $('tr.post-screenshot').show();
-    //         $('td.post-index').attr('rowspan', 3);
-    //         $(this).text('Hide screenshot');
-    //     } else {
-    //         $('tr.post-screenshot').hide();
-    //         $('td.post-index').attr('rowspan', 2);
-    //         $(this).text('Show screenshot');
-    //     }
-    // });
-
     // datepicker
     $('#input-select-day input').datepicker({
         format: "yyyy-mm-dd",
@@ -92,9 +102,10 @@ $(document).ready(function () {
         window.location.href = url;
     });
 
-    function getTranslateUrl(url, postid) {
+    function getTranslateUrl(url, postid, operate) {
         if (postid) {
-            return getUrlParent(url).concat("/translate?postid=").concat(postid);
+            return getUrlParent(url).concat("/translate?postid=").concat(postid)
+                .concat("&operate=").concat(operate);
         } else {
             return getUrlParent(url).concat("/translate")
         }

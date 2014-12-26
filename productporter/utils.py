@@ -19,6 +19,7 @@ from productporter.extensions import db
 from productporter.user.models import User, Group
 from productporter.product.phapi import ProductHuntAPI
 from productporter.product.models import Product
+from productporter.configs.default import porter_config
 
 def create_default_groups():
     """
@@ -74,6 +75,8 @@ def render_markup(text):
 
     :param text: The text to be rendered
     """
+    if text is None:
+        text = ""
     return render_markdown(text, extras=['tables'])
 
 def query_products(spec_day=None):
@@ -158,3 +161,68 @@ def send_mail(subject, recipient, body, subtype='plain', as_attachment=False):
     smtp.login(username, password)
     smtp.sendmail(sender, recipient, msgroot.as_string())
     smtp.quit()
+
+def is_online(user):
+    """A simple check to see if the user was online within a specified
+    time range
+
+    :param user: The user who needs to be checked
+    """
+    return user.lastseen >= time_diff()
+
+
+def time_diff():
+    """Calculates the time difference between now and the ONLINE_LAST_MINUTES
+    variable from the configuration.
+    """
+    now = datetime.datetime.utcnow()
+    diff = now - datetime.timedelta(minutes=porter_config['ONLINE_LAST_MINUTES'])
+    return diff
+
+## permission related
+
+def is_moderator(user):
+    """Returns ``True`` if the user is in a moderator group.
+
+    :param user: The user who should be checked.
+    """
+    return user.permissions['mod']
+
+
+def is_admin(user):
+    """Returns ``True`` if the user is a administrator.
+
+    :param user:  The user who should be checked.
+    """
+    return user.permissions['admin']
+
+
+def can_translate(user):
+    """Checks if a user translate a product"""
+
+    return user.permissions['perm_translate']
+
+def can_comment(user):
+    """Checks if a user can post comments to product"""
+
+    return user.permissions['perm_comment']
+
+def can_review(user):
+    """Checks if a user can review a translate"""
+
+    return user.permissions['perm_review']
+
+def can_report(user):
+    """Checks if a user can generate a daily report"""
+
+    return user.permissions['perm_report']
+
+def can_topic(user):
+    """Checks if a user can generate a topic"""
+
+    return user.permissions['perm_topic']
+
+def can_setgroup(user):
+    """Checks if a user can change other user's secondary group"""
+
+    return user.permissions['perm_setgroup']

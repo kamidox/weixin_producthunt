@@ -84,3 +84,10 @@ class DefaultConfig(object):
 
     ## theme
     DEFAULT_THEME = ""
+
+## application common setting
+
+porter_config = {
+    'PRODUCT_PER_PAGE': 10,         # 10 products per page
+    'ONLINE_LAST_MINUTES': 10       # 10 minutes online
+}
