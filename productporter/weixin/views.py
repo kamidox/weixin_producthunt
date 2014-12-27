@@ -15,7 +15,7 @@ import xml.etree.ElementTree as ET
 from flask import Blueprint, request, current_app, redirect, url_for
 
 from productporter.weixin.consts import *
-from productporter.utils import query_products, date_format, \
+from productporter.utils import query_products, format_date, \
     query_top_voted_products, query_search_products
 from productporter.utils import send_mail
 
@@ -241,7 +241,7 @@ def response_products_msg(msg, products):
     result = ARTICLES_MSG_TPL_HEAD % (msg['FromUserName'], msg['ToUserName'],
         str(int(time.time())), len(products))
     for prod in products:
-        tagline = '[%s] %s' % (date_format(prod.date), prod.tagline)
+        tagline = '[%s] %s' % (format_date(prod.date), prod.tagline)
         if prod == products[0]:
             title = '[%dV] [%s] %s - %s' % (prod.votes_count, prod.date, \
                 prod.name, prod.tagline)

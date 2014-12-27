@@ -83,7 +83,7 @@ def query_products(spec_day=None):
     """ get all the products of the day """
     day = spec_day
     if not day:
-        day = date_format(datetime.date.today())
+        day = format_date(datetime.date.today())
     posts = Product.query.filter(Product.date==day).\
         order_by(Product.votes_count.desc()).all()
 
@@ -91,7 +91,7 @@ def query_products(spec_day=None):
     if not spec_day and len(posts) == 0:
         delta = datetime.timedelta(days=-1)
         d = datetime.date.today() + delta
-        day = date_format(d)
+        day = format_date(d)
     posts = Product.query.filter(Product.date==day).\
         order_by(Product.votes_count.desc()).all()
 
@@ -112,7 +112,7 @@ def query_search_products(keyword, limit=10):
         Product.tagline.like(k))).order_by(Product.votes_count.desc()).\
         limit(limit).offset(0).all()
 
-def date_format(d):
+def format_date(d):
     """ format a datetime.date object to string """
     return '%04d-%02d-%02d' % (d.year, d.month, d.day)
 

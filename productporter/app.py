@@ -19,7 +19,7 @@ from productporter.product.views import product
 from productporter.user.views import user
 from productporter.user.models import Guest, User
 from productporter.utils import render_markup, root_url_prefix, is_online, can_translate, \
-        can_comment, can_review, can_report, can_topic, can_setgroup
+        can_comment, can_review, can_report, can_topic, can_setgroup, format_date
 # extensions
 from productporter.extensions import db, cache, themes, login_manager, migrate
 # default config
@@ -108,6 +108,7 @@ def configure_template_filters(app):
     Configures the template filters
     """
     app.jinja_env.filters['markup'] = render_markup
+    app.jinja_env.filters['format_date'] = format_date
     app.jinja_env.filters['is_online'] = is_online
     app.jinja_env.filters['can_translate'] = can_translate
     app.jinja_env.filters['can_comment'] = can_comment

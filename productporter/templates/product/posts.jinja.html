@@ -40,9 +40,11 @@
                 </h4>
             </div>
             <div class="col-md-2">
+                {% if current_user|can_translate %}
                 <button name="translate" type="button" class="btn btn-primary"
                         data-postid="{{post.postid}}"
                         data-url="{{url_for('product.translate')}}">Translate</button>
+                {% endif %}
             </div>
         </div>
     </div>

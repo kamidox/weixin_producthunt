@@ -1,4 +1,5 @@
 {% set page_title = "Post" %}
+{% set date = post.date|format_date %}
 
 {% extends theme("layout.jinja.html") %}
 
@@ -8,6 +9,15 @@
 {% endblock %}
 
 {% block content %}
+<ul class="breadcrumb">
+    <li>
+        <a href="{{ url_for('product.posts', day=date) }}">
+            {{post.date|format_date}}
+        </a>
+    </li>
+    <li class="active">{{post.name}}</li>
+</ul>
+
 <div class="panel panel-default">
     <div class="panel-heading">
         <div class="row">
@@ -21,9 +31,11 @@
                 </h4>
             </div>
             <div class="col-md-2">
+                {% if current_user|can_translate %}
                 <button name="translate" type="button" class="btn btn-primary"
                         data-postid="{{post.postid}}"
                         data-url="{{url_for('product.translate')}}">Translate</button>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -61,14 +73,16 @@
     <div class="panel-heading">
         <div class="row">
             <div class="col-md-10">
-                <h4 class="panel-title">
+                <h4>
                     <span> Detail introduce</span>
                 </h4>
             </div>
             <div class="col-md-2">
+                {% if current_user|can_translate %}                
                 <button name="introduce" type="button" class="btn btn-primary"
                     data-postid="{{post.postid}}"
                     data-url="{{url_for('product.translate')}}">Introduce</button>
+                {% endif %}
             </div>
         </div>
         
