@@ -8,6 +8,7 @@
 {% endblock %}
 
 {% block content %}
+{%- from theme("macros.jinja.html") import contributors -%}
 
 <div class="panel panel-primary">
     <div class="panel-heading">
@@ -72,6 +73,9 @@
                     <div class="tagline-content-data" data-postid="{{post.postid}}">
                         {{ post.ctagline }}
                     </div>
+                    {% if post.ctagline %}
+                    {{contributors(post.translaters)}}
+                    {% endif %}
                 </div>
             </div>
         </div>

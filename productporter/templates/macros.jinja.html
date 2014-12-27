@@ -203,3 +203,17 @@
 ]</small>
 {%- endif -%}
 {%- endmacro -%}
+
+{% macro contributors(users) %}
+{% if users.filter().count > 0 %}
+<div class="translaters-list">
+    by 
+    {% for user in users %}
+    <a
+        href="{{url_for('user.profile', username=user.username)}}">
+        @{{ user.username }}
+    </a>
+    {% endfor %}
+</div>
+{% endif %}
+{% endmacro %}

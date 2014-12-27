@@ -9,6 +9,8 @@
 {% endblock %}
 
 {% block content %}
+{%- from theme("macros.jinja.html") import contributors -%}
+
 <ul class="breadcrumb">
     <li>
         <a href="{{ url_for('product.posts', day=date) }}">
@@ -63,6 +65,9 @@
                     <div class="tagline-content-data" data-postid="{{post.postid}}">
                         {{ post.ctagline }}
                     </div>
+                    {% if post.ctagline %}
+                    {{ contributors(post.translaters) }}
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -112,6 +117,9 @@
                         {{ post.cintro|markup }}
                         {% endautoescape %}
                     </div>
+                    {% if post.cintro %}
+                    {{ contributors(post.introducers) }}
+                    {% endif %}
                 </div>
             </div>
         </div>

@@ -16,7 +16,7 @@ from wtforms import StringField, PasswordField, BooleanField, HiddenField, \
 from wtforms.validators import (DataRequired, Email, EqualTo, regexp, Optional,
                                 URL, Length, ValidationError)
 
-from productporter.user.models import User
+from productporter.user.models import User, Group
 from productporter.extensions import db
 
 USERNAME_RE = r'^[\w.+-]+$'
@@ -63,11 +63,13 @@ class RegisterForm(Form):
             raise ValidationError("This email is taken")
 
     def save(self):
+        member_group = Group.query.filter_by(member=True).first()
         user = User(username=self.username.data,
                     email=self.email.data,
                     password=self.password.data,
                     date_joined=datetime.utcnow(),
                     primary_group_id=4)
+        user.primary_group_id = member_group.id
         return user.save()
 
 class ReauthForm(Form):
