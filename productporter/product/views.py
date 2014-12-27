@@ -144,7 +144,7 @@ def translate():
         post.translating_user_id = None
         post.save()
         current_user.add_translated_product(post)
-        ret.update({'ctagline': render_markup(post.ctagline)})
+        ret.update({'ctagline': post.ctagline})
     else:
         try:
             post.cintro = jsondata['cintro']

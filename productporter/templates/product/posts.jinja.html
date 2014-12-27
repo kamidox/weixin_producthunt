@@ -35,8 +35,7 @@
                     <a class="post-url" href="{{ post.redirect_url }}" target="_blank">{{ post.name }}</a>
                     <span> - {{ post.tagline }}</span>
                     <a class="product-link" 
-                        href="{{ url_for('product.post_intro', postid=post.postid) }}" 
-                        target="_blank">
+                        href="{{ url_for('product.post_intro', postid=post.postid) }}">
                     </a>
                 </h4>
             </div>
@@ -69,9 +68,7 @@
                 </div>
                 <div class="tagline-content" data-postid="{{post.postid}}">
                     <div class="tagline-content-data" data-postid="{{post.postid}}">
-                        {% autoescape false %}
-                        {{ post.ctagline|markup }}
-                        {% endautoescape %}
+                        {{ post.ctagline }}
                     </div>
                 </div>
             </div>
