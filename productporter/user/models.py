@@ -25,6 +25,15 @@ groups_users = db.Table(
     db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
     db.Column('group_id', db.Integer(), db.ForeignKey('groups.id')))
 
+users_translated = db.Table(
+    'users_translated',
+    db.Column('product_postid', db.Integer(), db.ForeignKey('products.postid')),
+    db.Column('user_id', db.Integer(), db.ForeignKey('users.id')))
+
+users_introduced = db.Table(
+    'users_introduced',
+    db.Column('product_postid', db.Integer(), db.ForeignKey('products.postid')),
+    db.Column('user_id', db.Integer(), db.ForeignKey('users.id')))
 
 class Group(db.Model):
     __tablename__ = "groups"
@@ -101,20 +110,19 @@ class User(db.Model, UserMixin):
                         backref=db.backref('users', lazy='dynamic'),
                         lazy='dynamic')
 
-    products_translate = db.relationship('Product', 
-                                        backref="translate_by", 
-                                        lazy='dynamic',
-                                        foreign_keys=[Product.translate_user_id])
+    products_translated = \
+        db.relationship('Product',
+                        secondary=users_translated,
+                        primaryjoin=(users_translated.c.user_id == id),
+                        backref=db.backref('translaters', lazy='dynamic'), 
+                        lazy='dynamic')
 
-    products_review = db.relationship('Product', 
-                                    backref="review_by", 
-                                    lazy='dynamic',
-                                    foreign_keys=[Product.review_user_id])
-
-    products_introduce = db.relationship('Product', 
-                                    backref="introduce_by", 
-                                    lazy='dynamic',
-                                    foreign_keys=[Product.introduce_user_id])
+    products_introduced = \
+        db.relationship('Product',
+                        secondary=users_introduced,
+                        primaryjoin=(users_introduced.c.user_id == id),
+                        backref=db.backref('introducers', lazy='dynamic'), 
+                        lazy='dynamic')
 
     @property
     def url(self):
@@ -286,26 +294,31 @@ class User(db.Model, UserMixin):
 
         cache.delete_memoized(self.get_permissions, self)
 
-    def all_translated_products(self, page=1):
-        """get all products translated by this user"""
+    def in_translated_list(self, product):
+        """check does product in users translated list"""
 
-        return Product.query.filter(Product.translate_user_id == self.id).\
-            order_by(Product.id.desc()).\
-            paginate(page, porter_config['PRODUCT_PER_PAGE'], False)
+        return self.products_translated.filter(
+            users_translated.c.product_postid == product.postid).count() > 0
 
-    def all_reviewed_products(self, page=1):
-        """get all products reviewed by this user"""
+    def add_translated_product(self, product):
+        """add a product to users translate list"""
+        if not self.in_translated_list(product):
+            self.products_translated.append(product)
+            db.session.commit()
+            return self
 
-        return Product.query.filter(Product.review_user_id == self.id).\
-            order_by(Product.id.desc()).\
-            paginate(page, porter_config['PRODUCT_PER_PAGE'], False)
+    def in_introduced_list(self, product):
+        """check does product in users translated list"""
 
-    def all_introduced_products(self, page=1):
-        """get all products introduced by this user"""
+        return self.products_introduced.filter(
+            users_introduced.c.product_postid == product.postid).count() > 0
 
-        return Product.query.filter(Product.introduce_user_id == self.id).\
-            order_by(Product.id.desc()).\
-            paginate(page, porter_config['PRODUCT_PER_PAGE'], False)
+    def add_introduced_product(self, product):
+        """add a product to users translate list"""
+        if not self.in_introduced_list(product):
+            self.products_introduced.append(product)
+            db.session.commit()
+            return self
 
     def save(self):
         """Saves a user"""

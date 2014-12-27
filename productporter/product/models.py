@@ -62,24 +62,12 @@ class Product(db.Model):
                                     backref="product_translating", uselist=False,
                                     foreign_keys=[translating_user_id])
 
-    # user who review this product
-    reviewing_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    reviewing_user = db.relationship('User', 
-                                    lazy="joined",
-                                    backref="product_reviewing", uselist=False,
-                                    foreign_keys=[reviewing_user_id])
-
     # user who write introduce article to this product
     introducing_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     introducing_user = db.relationship('User', 
                                     lazy="joined",
                                     backref="product_introducing", uselist=False,
                                     foreign_keys=[introducing_user_id])
-
-    # user id who translate this product
-    translate_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    review_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    introduce_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     # Methods
     def __repr__(self):

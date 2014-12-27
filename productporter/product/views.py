@@ -28,7 +28,6 @@ def _post_aquire_translate(request):
     operate = request.args.get('operate')
 
     current_app.logger.info('aquire %s for post %s' % (operate, str(postid)))
-    print('aquire %s for post %s' % (operate, str(postid)))
     if not can_translate(current_user):
         ret = {
             'status': 'error',
@@ -39,29 +38,23 @@ def _post_aquire_translate(request):
 
     post = Product.query.filter(Product.postid==postid).first_or_404()
 
-    translating_user = post.translating_user
-    translate_user = post.translate_by
-    if operate == 'introduce':
-        translating_user = post.introducing_user
-        translate_user = post.introduce_by
+    operating_user = None
+    if operate == 'translate':
+        operating_user = post.translating_user
+    else:
+        operating_user = post.introducing_user
 
-    if (translating_user is not None) and (is_online(translating_user)):
+    if (operating_user is not None) and \
+            (operating_user.username != current_user.username) and \
+            (is_online(operating_user)):
         ret = {
             'status': 'error',
             'postid': post.postid,
             'error': 'this product is in %s by %s' % \
-                (operate, translating_user.username)
+                (operate, operating_user.username)
             }
         return make_response(jsonify(**ret), 400)
-    elif (translate_user is not None) and (not can_review(current_user)):
-        ret = {
-            'status': 'error',
-            'postid': post.postid,
-            'error': 'this product is already %s by %s' \
-                (operate, translate_user.username)
-            }
-        return make_response(jsonify(**ret), 400)
-
+    
     if operate == 'translate':
         post.translating_user_id = current_user.id
         post.save()
@@ -104,8 +97,7 @@ def translate():
             'status': 'error',
             'message': "invalid json data"
         }
-        resp = make_response(jsonify(**ret), 405)
-        return resp
+        return make_response(jsonify(**ret), 405)
 
     if not postid:
         postid = jsondata['postid']
@@ -139,44 +131,28 @@ def translate():
         pass
 
     current_app.logger.info('commit %s for post %s' % (operate, str(postid)))
-    print('commit %s for post %s' % (operate, str(postid)))
-    translate_by = post.translate_by
-    if operate == 'introduce':
-        translate_by = post.introduce_by
-    if (translate_by is not None) and (not can_review(current_user)):
-        ret = {
-            'status': 'error',
-            'postid': post.postid,
-            'error': 'this product is already %s by %s' \
-                (operate, post.translate_user.username)
-            }
-        return make_response(jsonify(**ret), 400)
-
     ret = {
         'status': 'success',
         'postid': post.postid,
-        }
+    }
 
     if operate == 'translate':
-        if post.translate_by is not None:
-            post.review_user_id = current_user.id   ## review
-        else:
-            post.translate_user_id = current_user.id   ## translate
-
         try:
             post.ctagline = jsondata['ctagline']
         except KeyError:
             post.ctagline = ""
+        post.translating_user_id = None
         post.save()
+        current_user.add_translated_product(post)
         ret.update({'ctagline': render_markup(post.ctagline)})
     else:
-        post.introduce_user_id = current_user.id  ## introduce
-
         try:
             post.cintro = jsondata['cintro']
         except KeyError:
             post.cintro = ""
+        post.introducing_user_id = None
         post.save()
+        current_user.add_introduced_product(post)
         ret.update({'cintro': render_markup(post.cintro)})
 
     return jsonify(**ret)
@@ -188,7 +164,7 @@ def index():
     return redirect(url_for('product.posts'))
 
 # posts list
-@product.route('/posts', methods=["GET"])
+@product.route('/posts/', methods=["GET"])
 def posts():
     """ product posts home dashboard """
     spec_day = request.args.get('day', '')
