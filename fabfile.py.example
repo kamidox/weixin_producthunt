@@ -18,6 +18,13 @@ def virtualenv(command):
     with cd('%s/%s' % (APP_ROOT_PATH, APP_LOCAL_NAME)):
         run('source .venv/bin/activate && ' + command)
 
+def resetdb():
+    """ WARNNING!!! This command will remove all data from database """
+    # setup data owner and permission
+    sudo('chown -R %s:%s %s' % (env.user, env.user, INSTANCE_PATH))
+    virtualenv('python manage.py createall')
+    sudo('chown -R www-data:www-data %s' % (INSTANCE_PATH))
+
 def deploy():
     """continuous development deploy"""
     with cd('%s/%s' % (APP_ROOT_PATH, APP_LOCAL_NAME)):
@@ -26,6 +33,7 @@ def deploy():
         # upload production configure file
         put('deploy/production.py', '%s/%s/productporter/configs/production.py' % \
             (APP_ROOT_PATH, APP_LOCAL_NAME))
+        virtualenv('pip install -r requirements.txt')
         # restart uwsgi service, we should do this graceful later
         sudo('service uwsgi restart')
 
