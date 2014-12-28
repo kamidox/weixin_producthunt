@@ -19,6 +19,7 @@ from productporter.user.forms import (LoginForm, ReauthForm, ForgotPasswordForm,
                                 ChangeUserProfileForm, ChangeEmailForm,
                                 ChangePasswordForm)
 from productporter.user.models import User
+from productporter.user.weibo import APIClient
 
 user = Blueprint("user", __name__)
 
@@ -183,3 +184,31 @@ def settings_password():
 
         flash("Your password have been updated!", "success")
     return render_template("user/settings_password.jinja.html", form=form)
+
+@user.route("/weiboauth", methods=["GET"])
+def weibo_auth():
+    """ login with weibo """
+    key = current_app.config['WEIBO_APP_KEY']
+    secret = current_app.config['WEIBO_APP_SECRET']
+    callback = url_for('user.weibo_auth_callback', _external=True)
+    client = APIClient(app_key=key, app_secret=secret, redirect_uri=callback)
+    return redirect(client.get_authorize_url())
+
+@user.route("/weiboauthcb", methods=["GET"])
+def weibo_auth_callback():
+    """ weibo auth callback"""
+    code = request.args.get('code')
+    current_app.logger.error('weibo code: %s' % (code))
+    key = current_app.config['WEIBO_APP_KEY']
+    secret = current_app.config['WEIBO_APP_SECRET']
+    callback = url_for('product.posts', _external=True)
+    client = APIClient(app_key=key, app_secret=secret, redirect_uri=callback)
+    r = client.request_access_token(code)
+    # TODO: save access token and expires in
+    client.set_access_token(r.access_token, r.expires_in)
+
+    # get weibo uid
+    wbuid = client.account.get_uid.get()
+    current_app.logger.error('weibo uid: %s' % (wbuid))
+    wbuser = client.users.show.get(uid=wbuid)
+    current_app.logger.error('users.show: %s' % (wbuser))

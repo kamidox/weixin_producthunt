@@ -85,6 +85,9 @@ class DefaultConfig(object):
     ## theme
     DEFAULT_THEME = ""
 
+    WEIBO_APP_KEY = '' # your weibo app key
+    WEIBO_APP_SECRET = '' # your weibo app secret
+
 ## application common setting
 
 porter_config = {

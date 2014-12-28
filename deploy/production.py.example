@@ -77,3 +77,7 @@ class ProductionConfig(DefaultConfig):
     ## weixin token
     WEIXIN_UNITTEST = False
     WEIXIN_TOKEN = "your weixin backend token"
+
+    # For weibo auth
+    WEIBO_APP_KEY = '' # your weibo app key
+    WEIBO_APP_SECRET = '' # your weibo app secret

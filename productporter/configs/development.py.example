@@ -59,3 +59,7 @@ class DevelopmentConfig(DefaultConfig):
     # Caching
     CACHE_TYPE = "simple"
     CACHE_DEFAULT_TIMEOUT = 60
+
+    # For weibo auth
+    WEIBO_APP_KEY = '' # your weibo app key
+    WEIBO_APP_SECRET = '' # your weibo app secret

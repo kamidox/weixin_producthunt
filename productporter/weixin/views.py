@@ -164,7 +164,7 @@ def mail_day_top_voted_products(msg):
     """ mail day top voted products """
     # skip prefix 'mail:'
     receiver = msg['Content'][5:]
-    products = query_top_voted_products(days_ago=2, limit=10)
+    products = query_top_voted_products(days_ago=2, limit=50)
     current_app.logger.info("mailto: %s" % (receiver))
     return mail_products(msg, products, receiver)
 
