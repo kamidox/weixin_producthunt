@@ -198,7 +198,6 @@ def weibo_auth():
 def weibo_auth_callback():
     """ weibo auth callback"""
     code = request.args.get('code')
-    current_app.logger.error('weibo code: %s' % (code))
     key = current_app.config['WEIBO_APP_KEY']
     secret = current_app.config['WEIBO_APP_SECRET']
     callback = url_for('product.posts', _external=True)
@@ -209,6 +208,6 @@ def weibo_auth_callback():
 
     # get weibo uid
     wbuid = client.account.get_uid.get()
-    current_app.logger.error('weibo uid: %s' % (wbuid))
-    wbuser = client.users.show.get(uid=wbuid)
-    current_app.logger.error('users.show: %s' % (wbuser))
+    wbuser = client.users.show.get(uid=wbuid['uid'])
+    flash(("Sign in successful"), "success")
+    return redirect(callback)
