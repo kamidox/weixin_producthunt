@@ -8,7 +8,7 @@
     :copyright: (c) 2014 by the ProductPorter Team.
     :license: BSD, see LICENSE for more details.
 """
-import datetime
+import datetime, time
 from markdown2 import markdown as render_markdown
 
 from flask import current_app

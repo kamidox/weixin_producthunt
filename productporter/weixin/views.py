@@ -164,7 +164,7 @@ def mail_day_top_voted_products(msg):
     """ mail day top voted products """
     # skip prefix 'mail:'
     receiver = msg['Content'][5:]
-    products = model.ProductHuntDB().read_top_vote_products(days=2, maxnum=30)
+    products = query_top_voted_products(days_ago=2, limit=10)
     current_app.logger.info("mailto: %s" % (receiver))
     return mail_products(msg, products, receiver)
 
