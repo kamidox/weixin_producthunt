@@ -95,6 +95,16 @@ def query_products(spec_day=None):
     posts = Product.query.filter(Product.date==day).\
         order_by(Product.votes_count.desc()).all()
 
+    # when spec_day is some old date and data is empty, we pull from PH server
+    if spec_day and len(posts) == 0:
+        today = datetime.date.today()
+        ymd = spec_day.split('-')
+        spec_date = datetime.date(int(ymd[0]), int(ymd[1]), int(ymd[2]))
+        if spec_date < today:
+            day = spec_day
+            pull_and_save_posts(day)
+            posts = Product.query.filter(Product.date==day).\
+                order_by(Product.votes_count.desc()).all()
     return day, posts
 
 def query_top_voted_products(days_ago=2, limit=10):
