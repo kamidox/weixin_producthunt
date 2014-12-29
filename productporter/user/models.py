@@ -9,7 +9,7 @@
     :license: BSD, see LICENSE for more details.
 """
 from datetime import datetime
-
+import random
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from itsdangerous import SignatureExpired
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -80,7 +80,19 @@ class User(db.Model, UserMixin):
     __tablename__ = "users"
     __searchable__ = ['username', 'email']
 
+    # field map between User and Weibo API users/show json data
+    FIELD_MAP = {
+        "wbuid": "id",
+        "username": "screen_name",
+        "gender": "gender",
+        "website": "url",
+        "notes": "description",
+        "nickname": "name",
+        "avatar": "avatar_large",
+    }
+
     id = db.Column(db.Integer, primary_key=True)
+    wbuid = db.Column(db.String(16))
     username = db.Column(db.String(200), unique=True, nullable=False)
     email = db.Column(db.String(200), unique=True, nullable=False)
     _password = db.Column('password', db.String(120), nullable=False)
@@ -88,10 +100,10 @@ class User(db.Model, UserMixin):
     lastseen = db.Column(db.DateTime, default=datetime.utcnow())
     birthday = db.Column(db.DateTime)
     gender = db.Column(db.String(10))
-    website = db.Column(db.String(200))
+    website = db.Column(db.String(512))
     location = db.Column(db.String(100))
-    signature = db.Column(db.Text)
-    avatar = db.Column(db.String(200))
+    nickname = db.Column(db.String(100))
+    avatar = db.Column(db.String(512))
     notes = db.Column(db.Text)
 
     theme = db.Column(db.String(15))
@@ -114,14 +126,14 @@ class User(db.Model, UserMixin):
         db.relationship('Product',
                         secondary=users_translated,
                         primaryjoin=(users_translated.c.user_id == id),
-                        backref=db.backref('translaters', lazy='dynamic'), 
+                        backref=db.backref('translaters', lazy='dynamic'),
                         lazy='dynamic')
 
     products_introduced = \
         db.relationship('Product',
                         secondary=users_introduced,
                         primaryjoin=(users_introduced.c.user_id == id),
-                        backref=db.backref('introducers', lazy='dynamic'), 
+                        backref=db.backref('introducers', lazy='dynamic'),
                         lazy='dynamic')
 
     @property
@@ -319,6 +331,28 @@ class User(db.Model, UserMixin):
             self.products_introduced.append(product)
             db.session.commit()
             return self
+
+    @classmethod
+    def from_json(cls, json):
+        """
+        Create User from weibo json data
+        """
+        u = User()
+        for k, v in User.FIELD_MAP.items():
+            if k == 'gender':
+                if json[v] == 'm':
+                    u.gender = 'Male'
+                elif json[v] == 'f':
+                    u.gender = 'Female'
+            else:
+                setattr(u, k, json[v])
+
+        # special field
+        u.email = u.username + '@example.org'
+        u.password = random.sample('1234567890zyxwvutsrqponmlkjihgfedcba',8)
+        member_group = Group.query.filter_by(member=True).first()
+        u.primary_group_id = member_group.id
+        return u
 
     def save(self):
         """Saves a user"""

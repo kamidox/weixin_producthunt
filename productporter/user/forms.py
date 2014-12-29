@@ -68,8 +68,7 @@ class RegisterForm(Form):
                     email=self.email.data,
                     password=self.password.data,
                     date_joined=datetime.utcnow(),
-                    primary_group_id=4)
-        user.primary_group_id = member_group.id
+                    primary_group_id=member_group.id)
         return user.save()
 
 class ReauthForm(Form):
@@ -154,6 +153,9 @@ class ChangePasswordForm(Form):
 
 class ChangeUserProfileForm(Form):
 
+    nickname = StringField("Nickname", validators=[
+        Optional()])
+
     birthday = DateField("Your Birthday", format="%Y-%m-%d",
                          validators=[Optional()])
 
@@ -167,9 +169,6 @@ class ChangeUserProfileForm(Form):
 
     website = StringField("Website", validators=[
         Optional(), URL()])
-
-    signature = TextAreaField("Signature", validators=[
-        Optional(), Length(min=0, max=500)])
 
     notes = TextAreaField("Notes", validators=[
         Optional(), Length(min=0, max=1000)])

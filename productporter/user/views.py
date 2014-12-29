@@ -203,11 +203,18 @@ def weibo_auth_callback():
     callback = url_for('product.posts', _external=True)
     client = APIClient(app_key=key, app_secret=secret, redirect_uri=callback)
     r = client.request_access_token(code)
-    # TODO: save access token and expires in
     client.set_access_token(r.access_token, r.expires_in)
 
-    # get weibo uid
-    wbuid = client.account.get_uid.get()
-    wbuser = client.users.show.get(uid=wbuid['uid'])
+    # get weibo uid and check if the user is signed up already
+    uid = client.account.get_uid.get()
+    wbuid = str(uid['uid'])
+    user = User.query.filter(User.wbuid==wbuid).first()
+    if not user:
+        userinfo = client.users.show.get(uid=uid['uid'])
+        user = User.from_json(userinfo)
+        user.save()
+
+    login_user(user, remember=True)
     flash(("Sign in successful"), "success")
-    return redirect(callback)
+    return redirect(request.args.get("next") or
+        url_for("product.posts"))

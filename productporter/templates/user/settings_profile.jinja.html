@@ -13,11 +13,11 @@
     <div class="panel-body">
         <form class="form-horizontal" role="form" method="POST">
             {{ form.hidden_tag() }}
+            {{ horizontal_field(form.nickname, rows=1, div_class="col-sm-9") }}
+            {{ horizontal_field(form.website) }}
             {{ horizontal_field(form.birthday) }}
             {{ horizontal_field(form.gender) }}
             {{ horizontal_field(form.location) }}
-            {{ horizontal_field(form.website) }}
-            {{ horizontal_field(form.signature, rows=2, div_class="col-sm-9") }}
             {{ horizontal_field(form.notes, rows=5, div_class="col-sm-9") }}
 
             <div class="form-group row">
