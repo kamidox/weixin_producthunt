@@ -204,10 +204,10 @@
 {%- endif -%}
 {%- endmacro -%}
 
-{% macro contributors(users) %}
+{% macro contributors(users, postid) %}
 {% if users.filter().count > 0 %}
-<div class="translaters-list">
-    by 
+<div class="translaters-list" data-postid="{{postid}}">
+    by
     {% for user in users %}
     <a
         href="{{url_for('user.profile', username=user.username)}}">

@@ -22,6 +22,17 @@ from productporter.utils import render_template, pull_and_save_posts, render_mar
 
 product = Blueprint('product', __name__)
 
+def _render_contributors(contributers, postid):
+    """render contributors, refer to macro 'contributors' in macro.jinja.html"""
+    div_template = "<div class='translaters-list' data-postid='%s'> by %s</div>"
+    user_template = "<a href='%s'>@%s</a>"
+    user_htmls = []
+    users = contributers.all()
+    for user in users:
+        user_htmls.append(user_template % \
+            (url_for('user.profile', username=user.username), user.username))
+    return div_template % (postid, '\n'.join(user_htmls))
+
 def _post_aquire_translate(request):
     """aquire to translate post"""
     postid = request.args.get('postid')
@@ -54,7 +65,7 @@ def _post_aquire_translate(request):
                 (operate, operating_user.username)
             }
         return make_response(jsonify(**ret), 400)
-    
+
     if operate == 'translate':
         post.translating_user_id = current_user.id
         post.save()
@@ -145,6 +156,8 @@ def translate():
         post.save()
         current_user.add_translated_product(post)
         ret.update({'ctagline': post.ctagline})
+        ret.update({'contributors': _render_contributors( \
+            post.translaters, post.postid)})
     else:
         try:
             post.cintro = jsondata['cintro']
@@ -154,6 +167,8 @@ def translate():
         post.save()
         current_user.add_introduced_product(post)
         ret.update({'cintro': render_markup(post.cintro)})
+        ret.update({'contributors': _render_contributors( \
+            post.introducers, post.postid)})
 
     return jsonify(**ret)
 

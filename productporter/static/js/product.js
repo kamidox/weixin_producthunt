@@ -76,11 +76,16 @@ $(document).ready(function () {
             },
             success: function(data,textStatus) {
                 var content = data['ctagline'];
+                var contributor = data['contributors'];
+                var tagline_content = $('.tagline-content[data-postid=' + postid + ']');
+                var tagline_content_data = $('.tagline-content-data[data-postid=' + postid + ']');
                 $("button[name='translate']").show();
-                $('.tagline-content-data[data-postid=' + postid + ']').empty();
-                $('.tagline-content-data[data-postid=' + postid + ']').prepend(content);
                 $('.tagline-translate[data-postid=' + postid + ']').hide();
-                $('.tagline-content[data-postid=' + postid + ']').show();
+                $('.translaters-list[data-postid=' + postid + ']').remove();
+                tagline_content_data.empty();
+                tagline_content_data.prepend(content);
+                tagline_content.append(contributor)
+                tagline_content.show();
             },
             beforeSend: function(xhr, settings) {
                 xhr.setRequestHeader('Content-Type', 'application/json');
@@ -163,11 +168,16 @@ $(document).ready(function () {
             },
             success: function(data,textStatus) {
                 var content = data['cintro'];
+                var contributor = data['contributors'];
+                var cintro_content = $('.cintro-content[data-postid=' + postid + ']');
+                var cintro_content_data = $('.cintro-content-data[data-postid=' + postid + ']');
                 $("button[name='introduce']").show();
-                $('.cintro-content-data[data-postid=' + postid + ']').empty();
-                $('.cintro-content-data[data-postid=' + postid + ']').prepend(content);
                 $('.cintro-translate[data-postid=' + postid + ']').hide();
-                $('.cintro-content[data-postid=' + postid + ']').show();
+                $('.translaters-list[data-postid=' + postid + ']').remove();
+                cintro_content_data.empty();
+                cintro_content_data.prepend(content);
+                cintro_content.append(contributor)
+                cintro_content.show();
             },
             beforeSend: function(xhr, settings) {
                 xhr.setRequestHeader('Content-Type', 'application/json');

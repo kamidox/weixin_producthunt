@@ -25,8 +25,8 @@
         <div class="row">
             <div class="col-md-10">
                 <h4>
-                    <a class="post-url" 
-                        href="{{ post.redirect_url }}" 
+                    <a class="post-url"
+                        href="{{ post.redirect_url }}"
                         target="_blank">{{ post.name }}
                     </a>
                     <span> - {{ post.tagline }}</span>
@@ -66,7 +66,7 @@
                         {{ post.ctagline }}
                     </div>
                     {% if post.ctagline %}
-                    {{ contributors(post.translaters) }}
+                    {{ contributors(post.translaters, post.postid) }}
                     {% endif %}
                 </div>
             </div>
@@ -83,14 +83,14 @@
                 </h4>
             </div>
             <div class="col-md-2">
-                {% if current_user|can_translate %}                
+                {% if current_user|can_translate %}
                 <button name="introduce" type="button" class="btn btn-primary"
                     data-postid="{{post.postid}}"
                     data-url="{{url_for('product.translate')}}">Introduce</button>
                 {% endif %}
             </div>
         </div>
-        
+
     </div>
 
     <div class="panel-body">
@@ -118,7 +118,7 @@
                         {% endautoescape %}
                     </div>
                     {% if post.cintro %}
-                    {{ contributors(post.introducers) }}
+                    {{ contributors(post.introducers, post.postid) }}
                     {% endif %}
                 </div>
             </div>

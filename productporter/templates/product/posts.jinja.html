@@ -35,7 +35,7 @@
                     <span>{{ posts.index(post) + 1 }}# </span>
                     <a class="post-url" href="{{ post.redirect_url }}" target="_blank">{{ post.name }}</a>
                     <span> - {{ post.tagline }}</span>
-                    <a class="product-link" 
+                    <a class="product-link"
                         href="{{ url_for('product.post_intro', postid=post.postid) }}">
                     </a>
                 </h4>
@@ -74,7 +74,7 @@
                         {{ post.ctagline }}
                     </div>
                     {% if post.ctagline %}
-                    {{contributors(post.translaters)}}
+                    {{contributors(post.translaters, post.postid)}}
                     {% endif %}
                 </div>
             </div>
