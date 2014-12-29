@@ -349,7 +349,8 @@ class User(db.Model, UserMixin):
 
         # special field
         u.email = u.username + '@example.org'
-        u.password = random.sample('1234567890zyxwvutsrqponmlkjihgfedcba',8)
+        u.password = ''.join(random.sample( \
+            '1234567890zyxwvutsrqponmlkjihgfedcba',8))
         member_group = Group.query.filter_by(member=True).first()
         u.primary_group_id = member_group.id
         return u
