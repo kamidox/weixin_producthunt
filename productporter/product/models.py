@@ -53,11 +53,17 @@ class Product(db.Model):
     # ctagline is a one line translate information
     ctagline = db.Column(db.Text)
     ctagline_locked = db.Column(db.Boolean, default=False)
-
+    ctagline_locked_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    ctagline_locked_user = db.relationship('User',
+                                    lazy="joined", uselist=False,
+                                    foreign_keys=[ctagline_locked_user_id])
     # cintro is a detail introduct of the product
     cintro = db.Column(db.Text)
     cintro_locked = db.Column(db.Boolean, default=False)
-
+    cintro_locked_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    cintro_locked_user = db.relationship('User',
+                                    lazy="joined", uselist=False,
+                                    foreign_keys=[cintro_locked_user_id])
     # user who translate this product
     editing_ctagline_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     editing_ctagline_user = db.relationship('User',

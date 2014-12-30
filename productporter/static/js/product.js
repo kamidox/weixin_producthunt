@@ -5,7 +5,8 @@ $(document).ready(function () {
     // Translate & Review
     $("button[name='translate']").click(function () {
         var postid = $(this).attr('data-postid');
-        var url = addTranslateParam($(this).attr('data-url'), postid, 'ctagline');
+        var field = $(this).attr('field');
+        var url = addTranslateParam($(this).attr('data-url'), postid, field);
         var settings = {
             type: "GET",
             url: url,
@@ -15,12 +16,12 @@ $(document).ready(function () {
             },
             success: function(data,textStatus) {
                 var content = data['value'];
-                $("button[name='translate']").hide();
-                $('.tagline-translate').hide();
-                $('.tagline-content').show();
-                $('.tagline-translate[data-postid=' + postid + ']').show();
-                $('.tagline-content[data-postid=' + postid + ']').hide();
-                $('textarea[name="ctagline"][data-postid=' + postid + ']').val(content);
+                $('button[name="lock"]').hide();
+                $('.tagline-translate[field=' + field + ']').hide();
+                $('.tagline-content[field=' + field + ']').show();
+                $('.tagline-translate[data-postid=' + postid + '][field=' + field + ']').show();
+                $('.tagline-content[data-postid=' + postid + '][field=' + field + ']').hide();
+                $('textarea[name=' + field + '][data-postid=' + postid + ']').val(content);
             }
         };
         $.ajax(settings);
@@ -29,14 +30,15 @@ $(document).ready(function () {
     // Cancel Translate
     $("button[name='cancel']").click(function() {
         var postid = $(this).attr('data-postid');
+        var field = $(this).attr('field');
         var jsondata = {
             postid: postid,
-            field: 'ctagline',
+            field: field,
             canceled: 'true'
         };
-        var url = addTranslateParam($(this).attr('data-url'), postid, 'ctagline');
+        var url = addTranslateParam($(this).attr('data-url'), postid, field);
         var settings = {
-            type: "PUT",
+            type: "POST",
             url: url,
             dataType: "json",
             data: JSON.stringify(jsondata),
@@ -44,9 +46,9 @@ $(document).ready(function () {
                 alert ("textStatus="+textStatus+"\nerrorThrown=" + errorThrown);
             },
             success: function(data,textStatus) {
-                $("button[name='translate']").show();
-                $('.tagline-translate[data-postid=' + postid + ']').hide();
-                $('.tagline-content[data-postid=' + postid + ']').show();
+                $('button[name="lock"]').show();
+                $('.tagline-translate[data-postid=' + postid + '][field=' + field + ']').hide();
+                $('.tagline-content[data-postid=' + postid + '][field=' + field + ']').show();
             },
             beforeSend: function(xhr, settings) {
                 xhr.setRequestHeader('Content-Type', 'application/json');
@@ -56,15 +58,16 @@ $(document).ready(function () {
     });
 
     // Commit Translate
-    $("button[name='commit-translate']").click(function() {
+    $("button[name='commit']").click(function() {
         var postid = $(this).attr('data-postid');
-        var ctagline = $("textarea[name='ctagline'][data-postid=" + postid + "]").val();
+        var field = $(this).attr('field');
+        var value = $("textarea[name=" + field + "][data-postid=" + postid + "]").val();
         var jsondata = {
             postid: postid,
-            field: 'ctagline',
-            value: $.trim(ctagline)
+            field: field,
+            value: $.trim(value)
         };
-        var url = addTranslateParam($(this).attr('data-url'), postid, 'ctagline');
+        var url = addTranslateParam($(this).attr('data-url'), postid, field);
         var settings = {
             type: "POST",
             url: url,
@@ -76,11 +79,11 @@ $(document).ready(function () {
             success: function(data,textStatus) {
                 var content = data['value'];
                 var contributor = data['contributors'];
-                var tagline_content = $('.tagline-content[data-postid=' + postid + ']');
-                var tagline_content_data = $('.tagline-content-data[data-postid=' + postid + ']');
-                $("button[name='translate']").show();
-                $('.tagline-translate[data-postid=' + postid + ']').hide();
-                $('.translaters-list[data-postid=' + postid + ']').remove();
+                var tagline_content = $('.tagline-content[data-postid=' + postid + '][field=' + field + ']');
+                var tagline_content_data = $('.tagline-content-data[data-postid=' + postid + '][field=' + field + ']');
+                $('button[name="lock"]').show();
+                $('.tagline-translate[data-postid=' + postid + '][field=' + field + ']').hide();
+                $('.translaters-list[data-postid=' + postid + '][field=' + field + ']').remove();
                 tagline_content_data.empty();
                 tagline_content_data.prepend(content);
                 tagline_content.append(contributor)
@@ -93,102 +96,12 @@ $(document).ready(function () {
         $.ajax(settings);
     });
 
-    // aquire translate for cintro
-    $("button[name='introduce']").click(function () {
-        var postid = $(this).attr('data-postid');
-        var url = addTranslateParam($(this).attr('data-url'), postid, 'cintro');
-        var settings = {
-            type: "GET",
-            url: url,
-            dataType: "json",
-            error: function(XHR,textStatus,errorThrown) {
-                alert ("textStatus="+textStatus+"\nerrorThrown=" + errorThrown);
-            },
-            success: function(data,textStatus) {
-                var content = data['value'];
-                $("button[name='introduce']").hide();
-                $('.cintro-translate').hide();
-                $('.cintro-content').show();
-                $('.cintro-translate[data-postid=' + postid + ']').show();
-                $('.cintro-content[data-postid=' + postid + ']').hide();
-                $('textarea[name="cintro"][data-postid=' + postid + ']').val(content);
-            }
-        };
-        $.ajax(settings);
-    });
-
-    // Cancel Translate
-    $("button[name='cancel-cintro']").click(function() {
-        var postid = $(this).attr('data-postid');
-        var jsondata = {
-            postid: postid,
-            field: 'cintro',
-            canceled: 'true'
-        };
-        var url = addTranslateParam($(this).attr('data-url'), postid, 'cintro');
-        var settings = {
-            type: "POST",
-            url: url,
-            dataType: "json",
-            data: JSON.stringify(jsondata),
-            error: function(XHR,textStatus,errorThrown) {
-                alert ("textStatus="+textStatus+"\nerrorThrown=" + errorThrown);
-            },
-            success: function(data,textStatus) {
-                $("button[name='cintro']").show();
-                $('.cintro-translate[data-postid=' + postid + ']').hide();
-                $('.cintro-content[data-postid=' + postid + ']').show();
-            },
-            beforeSend: function(xhr, settings) {
-                xhr.setRequestHeader('Content-Type', 'application/json');
-            }
-        };
-        $.ajax(settings);
-    });
-
-    // Commit cintro
-    $("button[name='commit-cintro']").click(function() {
-        var postid = $(this).attr('data-postid');
-        var cintro = $("textarea[name='cintro'][data-postid=" + postid + "]").val();
-        var jsondata = {
-            postid: postid,
-            field: 'cintro',
-            value: $.trim(cintro)
-        };
-        var url = addTranslateParam($(this).attr('data-url'), postid, 'cintro');
-        var settings = {
-            type: "POST",
-            url: url,
-            dataType: "json",
-            data: JSON.stringify(jsondata),
-            error: function(XHR,textStatus,errorThrown) {
-                alert ("textStatus="+textStatus+"\nerrorThrown=" + errorThrown);
-            },
-            success: function(data,textStatus) {
-                var content = data['value'];
-                var contributor = data['contributors'];
-                var cintro_content = $('.cintro-content[data-postid=' + postid + ']');
-                var cintro_content_data = $('.cintro-content-data[data-postid=' + postid + ']');
-                $("button[name='introduce']").show();
-                $('.cintro-translate[data-postid=' + postid + ']').hide();
-                $('.translaters-list[data-postid=' + postid + ']').remove();
-                cintro_content_data.empty();
-                cintro_content_data.prepend(content);
-                cintro_content.append(contributor)
-                cintro_content.show();
-            },
-            beforeSend: function(xhr, settings) {
-                xhr.setRequestHeader('Content-Type', 'application/json');
-            }
-        };
-        $.ajax(settings);
-    });
-
     // lock and unlock ctagline
     $("button[name='lock']").click(function () {
         var postid = $(this).attr('data-postid');
         var op = $(this).attr('op');
-        var url = addLockParam($(this).attr('data-url'), postid, 'ctagline', op);
+        var field = $(this).attr('field');
+        var url = addLockParam($(this).attr('data-url'), postid, field, op);
         var settings = {
             type: "GET",
             url: url,
@@ -197,14 +110,21 @@ $(document).ready(function () {
                 alert ("textStatus="+textStatus+"\nerrorThrown=" + errorThrown);
             },
             success: function(data,textStatus) {
-                var translate_btn = data['translate']
-                var lock_btn = data['lock']
-                var div_translate = $('div[name="translate-btn"][data-postid=' + postid + ']');
-                var div_lock = $('div[name="lock-btn"][data-postid=' + postid + ']');
-                div_translate.empty();
-                div_lock.empty();
-                div_translate.append(translate_btn);
-                div_lock.append(lock_btn);
+                var translate_btn = $('button[name="translate"][data-postid=' + postid + '][field=' + field + ']');
+                var lock_btn = $('button[name="lock"][data-postid=' + postid + '][field=' + field + ']');
+                if(op.toLowerCase() == 'lock') {
+                    translate_btn.attr('class', 'btn btn-primary fix-width hide');
+                    lock_btn.attr('op', 'unlock');
+                    lock_btn.text('Unlock');
+                } else {
+                    translate_btn.attr('class', 'btn btn-primary fix-width show');
+                    lock_btn.attr('op', 'lock');
+                    lock_btn.text('Lock');
+                }
+                var translaters_list = $('.translaters-list[data-postid=' + postid + '][field=' + field + ']');
+                translaters_list.remove();
+                var contributors = data['contributors'];
+                $('.tagline-content[data-postid=' + postid + '][field=' + field + ']').append(contributors);
             }
         };
         $.ajax(settings);

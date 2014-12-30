@@ -214,6 +214,18 @@ margin-bottom: 0px;
 
 }
 
+.show {
+  display: block;
+}
+
+.hide {
+  display: none;
+}
+
+.fix-width {
+  width: 8em;
+}
+
 .product-item:hover {
   color:#468847;
   background-color:#dff0d8;
@@ -228,25 +240,26 @@ margin-bottom: 0px;
   left:0
 }
 
-.post-url,.user-image {
+.post-url,
+.user-image {
   z-index:1;
   position:relative
 }
 
 .translaters-list {
   margin-top: 20px;
-  color:#cccccc;
+  color:#aaa;
 }
 
-.translaters-list a:link, 
+.translaters-list a:link,
 .translaters-list a:visited {
-  color:#cccccc;
+  color:#aaa;
   text-decoration:none;
 }
 
-.translaters-list a:hover, 
+.translaters-list a:hover,
 .translaters-list a:active {
-  color:#cccccc;
-  background-color:#888888;
+  color:#aaa;
+  background-color:#444;
   text-decoration:none;
 }

@@ -204,16 +204,23 @@
 {%- endif -%}
 {%- endmacro -%}
 
-{% macro contributors(users, postid) %}
-{% if users.filter().count > 0 %}
-<div class="translaters-list" data-postid="{{postid}}">
-    by
+{% macro contributors(users, postid, locked_by, field) %}
+{% if users.filter().count() > 0 %}
+<div class="translaters-list" data-postid="{{postid}}" field="{{field}}">
+    edit by
     {% for user in users %}
     <a
         href="{{url_for('user.profile', username=user.username)}}">
         @{{ user.username }}
     </a>
     {% endfor %}
+    {% if locked_by %}
+    - locked by
+    <a
+        href="{{url_for('user.profile', username=locked_by.username)}}">
+        @{{ locked_by.username }}
+    </a>
+    {% endif %}
 </div>
 {% endif %}
 {% endmacro %}

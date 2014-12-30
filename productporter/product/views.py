@@ -24,9 +24,9 @@ from productporter.user.models import User
 
 product = Blueprint('product', __name__)
 
-def _render_contributors(contributers, postid):
-    """render contributors, refer to macro 'contributors' in macro.jinja.html"""
-    div_template = "<div class='translaters-list' data-postid='%s'> by %s</div>"
+def _render_contributors(contributers, postid, locked_by, field):
+    """render contributors, MUST BE THE SAME of macro 'contributors' in macro.jinja.html"""
+    div_template = "<div class='translaters-list' data-postid='%s' field='%s'>edit by %s</div>"
     user_template = "<a href='%s'>@%s</a>"
     user_htmls = []
     users = contributers.all()
@@ -34,7 +34,11 @@ def _render_contributors(contributers, postid):
         nickname = user.nickname if user.nickname else user.username
         user_htmls.append(user_template % \
             (url_for('user.profile', username=user.username), nickname))
-    return div_template % (postid, '\n'.join(user_htmls))
+    if locked_by:
+        nickname = locked_by.nickname if locked_by.nickname else locked_by.username
+        user_htmls.append((' - locked by ' + user_template) % \
+            (url_for('user.profile', username=locked_by.username), nickname))
+    return div_template % (postid, field, '\n'.join(user_htmls))
 
 def _post_aquire_translate(request):
     """aquire to translate post"""
@@ -145,7 +149,8 @@ def translate():
         'field': field,
         'value': render_markup(getattr(post, field)),
         'contributors': _render_contributors( \
-            getattr(post, field + '_editors'), post.postid)
+            getattr(post, field + '_editors'), post.postid, \
+            getattr(post, field + '_locked_user'), field)
     }
 
     return jsonify(**ret)
@@ -183,26 +188,6 @@ def pull():
     count = pull_and_save_posts(day)
     return "pulled %d posts " % (count)
 
-def _render_translate_button(post, op):
-    """render translate button"""
-    if op.lower() == 'lock':
-        template = '<button name="translate" type="button" class="btn btn-primary" \
-                    data-postid="%s" \
-                    data-url="%s">Translate</button>'
-        return template % (post.postid, url_for('product.translate'))
-    return ''
-
-def _render_lock_button(post, op):
-    """render lock button"""
-    param = {'postid': post.postid,
-        'op': op,
-        'url': url_for('product.lock'),
-    }
-    template = '<button name="lock" type="button" class="btn btn-primary" \
-                data-postid="%(postid)s" op="%(op)s" \
-                data-url="%(url)s">%(op)s</button>'
-    return template % param
-
 @product.route('/lock', methods=['GET'])
 @moderator_required
 def lock():
@@ -218,19 +203,21 @@ def lock():
     field = request.args.get('field', 'ctagline')
     post = Product.query.filter(Product.postid==postid).first_or_404()
 
-    fieldname = field + '_locked'
     if op.lower() == 'lock':
-        setattr(post, fieldname, True)
+        setattr(post, field + '_locked', True)
+        setattr(post, field + '_locked_user_id', current_user.id)
         op = 'Unlock'
     else:
-        setattr(post, fieldname, False)
+        setattr(post, field + '_locked', False)
+        setattr(post, field + '_locked_user_id', None)
         op = 'Lock'
     post.save()
     ret = {
         'status': 'success',
         'postid': post.postid,
-        'translate': _render_translate_button(post, op),
-        'lock': _render_lock_button(post, op),
+        'contributors': _render_contributors( \
+            getattr(post, field + '_editors'), post.postid, \
+            getattr(post, field + '_locked_user'), field)
     }
     return jsonify(**ret)
 

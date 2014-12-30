@@ -23,7 +23,7 @@
 <div class="panel panel-default">
     <div class="panel-heading">
         <div class="row">
-            <div class="col-md-10">
+            <div class="col-md-8">
                 <h4>
                     <a class="post-url"
                         href="{{ post.redirect_url }}"
@@ -33,19 +33,36 @@
                 </h4>
             </div>
             <div class="col-md-2">
-                {% if current_user|can_translate %}
-                <button name="translate" type="button" class="btn btn-primary"
-                        data-postid="{{post.postid}}"
-                        data-url="{{url_for('product.translate')}}">Translate</button>
+                {% if current_user|can_translate and not post.ctagline_locked %}
+                {% set visible='show' %}
+                {% else %}
+                {% set visible='hide' %}
                 {% endif %}
+                <button name="translate" type="button"
+                        class="btn btn-primary fix-width {{visible}}"
+                        data-postid="{{post.postid}}" field="ctagline"
+                        data-url="{{url_for('product.translate')}}">Translate</button>
             </div>
+            {% if current_user|is_moderator %}
+            <div class="col-md-2">
+                {% if post.ctagline_locked %}
+                {% set op = 'Unlock' %}
+                {% else %}
+                {% set op = 'Lock' %}
+                {% endif %}
+                <button name="lock" type="button"
+                        class="btn btn-success fix-width"
+                        data-postid="{{post.postid}}" op="{{op}}" field="ctagline"
+                        data-url="{{url_for('product.lock')}}">{{op}}</button>
+            </div>
+            {% endif %}
         </div>
     </div>
 
     <div class="panel-body">
         <div class="row">
             <div class="col-md-12">
-                <div class="tagline-translate" data-postid="{{post.postid}}">
+                <div class="tagline-translate" data-postid="{{post.postid}}" field="ctagline">
                     <div class="col-sm-12">
                         <textarea class="form-control"
                             data-postid="{{post.postid}}"
@@ -53,20 +70,22 @@
                             placeholder="Translation" rows="4">
                         </textarea>
                         <br/>
-                        <button name="commit-translate" type="button" class="btn btn-success"
-                            data-postid="{{post.postid}}"
+                        <button name="commit" type="button" class="btn btn-success"
+                            data-postid="{{post.postid}}" field="ctagline"
                             data-url="{{url_for('product.translate')}}">Submit</button>
                         <button name="cancel" type="button" class="btn btn-danger"
-                            data-postid="{{post.postid}}"
+                            data-postid="{{post.postid}}" field="ctagline"
                             data-url="{{url_for('product.translate')}}">Cancel</button>
                     </div>
                 </div>
-                <div class="tagline-content" data-postid="{{post.postid}}">
-                    <div class="tagline-content-data" data-postid="{{post.postid}}">
-                        {{ post.ctagline }}
+                <div class="tagline-content" data-postid="{{post.postid}}" field="ctagline">
+                    <div class="tagline-content-data" data-postid="{{post.postid}}" field="ctagline">
+                        {% autoescape false %}
+                        {{ post.ctagline|markup }}
+                        {% endautoescape %}
                     </div>
                     {% if post.ctagline %}
-                    {{ contributors(post.ctagline_editors, post.postid) }}
+                    {{ contributors(post.ctagline_editors, post.postid, post.ctagline_locked_user, "ctagline") }}
                     {% endif %}
                 </div>
             </div>
@@ -77,18 +96,35 @@
 <div class="panel panel-default">
     <div class="panel-heading">
         <div class="row">
-            <div class="col-md-10">
+            <div class="col-md-8">
                 <h4>
                     <span> Detail introduce</span>
                 </h4>
             </div>
             <div class="col-md-2">
-                {% if current_user|can_translate %}
-                <button name="introduce" type="button" class="btn btn-primary"
-                    data-postid="{{post.postid}}"
-                    data-url="{{url_for('product.translate')}}">Introduce</button>
+                {% if current_user|can_translate and not post.cintro_locked %}
+                {% set visible='show' %}
+                {% else %}
+                {% set visible='hide' %}
                 {% endif %}
+                <button name="translate" type="button"
+                        class="btn btn-primary fix-width {{visible}}"
+                        data-postid="{{post.postid}}" field="cintro"
+                        data-url="{{url_for('product.translate')}}">Introduce</button>
             </div>
+            {% if current_user|is_moderator %}
+            <div class="col-md-2">
+                {% if post.cintro_locked %}
+                {% set op = 'Unlock' %}
+                {% else %}
+                {% set op = 'Lock' %}
+                {% endif %}
+                <button name="lock" type="button"
+                        class="btn btn-success fix-width"
+                        data-postid="{{post.postid}}" op="{{op}}" field="cintro"
+                        data-url="{{url_for('product.lock')}}">{{op}}</button>
+            </div>
+            {% endif %}
         </div>
 
     </div>
@@ -96,29 +132,29 @@
     <div class="panel-body">
         <div class="row">
             <div class="col-md-12">
-                <div class="cintro-translate" data-postid="{{post.postid}}">
+                <div class="tagline-translate" data-postid="{{post.postid}}" field="cintro">
                     <div class="col-sm-12">
                         <textarea class="form-control"
                             data-postid="{{post.postid}}"
                             id="cintro" name="cintro" rows="10" data-provide="markdown">
                         </textarea>
                         <br/>
-                        <button name="commit-cintro" type="button" class="btn btn-success"
-                            data-postid="{{post.postid}}"
+                        <button name="commit" type="button" class="btn btn-success"
+                            data-postid="{{post.postid}}"  field="cintro"
                             data-url="{{url_for('product.translate')}}">Submit</button>
-                        <button name="cancel-cintro" type="button" class="btn btn-danger"
-                            data-postid="{{post.postid}}"
+                        <button name="cancel" type="button" class="btn btn-danger"
+                            data-postid="{{post.postid}}"  field="cintro"
                             data-url="{{url_for('product.translate')}}">Cancel</button>
                     </div>
                 </div>
-                <div class="cintro-content" data-postid="{{post.postid}}">
-                    <div class="cintro-content-data" data-postid="{{post.postid}}">
+                <div class="tagline-content" data-postid="{{post.postid}}" field="cintro">
+                    <div class="tagline-content-data" data-postid="{{post.postid}}" field="cintro">
                         {% autoescape false %}
                         {{ post.cintro|markup }}
                         {% endautoescape %}
                     </div>
                     {% if post.cintro %}
-                    {{ contributors(post.cintro_editors, post.postid) }}
+                    {{ contributors(post.cintro_editors, post.postid, post.cintro_locked_user, "cintro") }}
                     {% endif %}
                 </div>
             </div>
