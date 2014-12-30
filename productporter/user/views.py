@@ -44,7 +44,7 @@ def login():
             return redirect(request.args.get("next") or
                             url_for("product.posts"))
 
-        flash(("Username or password error"), "error")
+        flash(("Username or password error"), "danger")
     return render_template("user/login.jinja.html", form=form)
 
 
