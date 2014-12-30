@@ -30,7 +30,7 @@
 <div class="panel panel-default">
     <div class="panel-heading product-item">
         <div class="row">
-            <div class="col-md-10">
+            <div class="col-md-8">
                 <h4>
                     <span>{{ posts.index(post) + 1 }}# </span>
                     <a class="post-url" href="{{ post.redirect_url }}" target="_blank">{{ post.name }}</a>
@@ -40,13 +40,25 @@
                     </a>
                 </h4>
             </div>
-            <div class="col-md-2">
-                {% if current_user|can_translate %}
+            <div class="col-md-2" name="translate-btn" data-postid="{{post.postid}}">
+                {% if current_user|can_translate and not post.ctagline_locked %}
                 <button name="translate" type="button" class="btn btn-primary"
                         data-postid="{{post.postid}}"
                         data-url="{{url_for('product.translate')}}">Translate</button>
                 {% endif %}
             </div>
+            {% if current_user|is_moderator %}
+            <div class="col-md-2" name="lock-btn" data-postid="{{post.postid}}">
+                {% if post.ctagline_locked %}
+                {% set op = 'Unlock' %}
+                {% else %}
+                {% set op = 'Lock' %}
+                {% endif %}
+                <button name="lock" type="button" class="btn btn-primary"
+                        data-postid="{{post.postid}}" op="{{op}}"
+                        data-url="{{url_for('product.lock')}}">{{op}}</button>
+            </div>
+            {% endif %}
         </div>
     </div>
 
@@ -74,7 +86,7 @@
                         {{ post.ctagline }}
                     </div>
                     {% if post.ctagline %}
-                    {{contributors(post.translaters, post.postid)}}
+                    {{contributors(post.ctagline_editors, post.postid)}}
                     {% endif %}
                 </div>
             </div>

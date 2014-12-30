@@ -23,6 +23,7 @@ def user(default_groups):
     Creates a user with normal permissions.
     """
     user = User(username="test_normal", email="test_normal@example.org",
+                nickname="test_normal",
                 password="test", primary_group_id=default_groups[2].id)
     user.save()
     return user
@@ -33,6 +34,7 @@ def moderator_user(default_groups):
     Creates a test user with moderator permissions.
     """
     user = User(username="test_mod", email="test_mod@example.org",
+                nickname="test_mod",
                 password="test", primary_group_id=default_groups[1].id)
     user.save()
 
@@ -44,6 +46,7 @@ def admin_user(default_groups):
     Creates a admin user.
     """
     user = User(username="test_admin", email="test_admin@example.org",
+                nickname="test_admin",
                 password="test", primary_group_id=default_groups[0].id)
     user.save()
     return user

@@ -122,18 +122,18 @@ class User(db.Model, UserMixin):
                         backref=db.backref('users', lazy='dynamic'),
                         lazy='dynamic')
 
-    products_translated = \
+    ctagline_products = \
         db.relationship('Product',
                         secondary=users_translated,
                         primaryjoin=(users_translated.c.user_id == id),
-                        backref=db.backref('translaters', lazy='dynamic'),
+                        backref=db.backref('ctagline_editors', lazy='dynamic'),
                         lazy='dynamic')
 
-    products_introduced = \
+    cintro_products = \
         db.relationship('Product',
                         secondary=users_introduced,
                         primaryjoin=(users_introduced.c.user_id == id),
-                        backref=db.backref('introducers', lazy='dynamic'),
+                        backref=db.backref('cintro_editors', lazy='dynamic'),
                         lazy='dynamic')
 
     @property
@@ -306,29 +306,29 @@ class User(db.Model, UserMixin):
 
         cache.delete_memoized(self.get_permissions, self)
 
-    def in_translated_list(self, product):
+    def in_ctagline_list(self, product):
         """check does product in users translated list"""
 
-        return self.products_translated.filter(
+        return self.ctagline_products.filter(
             users_translated.c.product_postid == product.postid).count() > 0
 
-    def add_translated_product(self, product):
+    def add_ctagline_product(self, product):
         """add a product to users translate list"""
-        if not self.in_translated_list(product):
-            self.products_translated.append(product)
+        if not self.in_ctagline_list(product):
+            self.ctagline_products.append(product)
             db.session.commit()
             return self
 
-    def in_introduced_list(self, product):
+    def in_cintro_list(self, product):
         """check does product in users translated list"""
 
-        return self.products_introduced.filter(
+        return self.cintro_products.filter(
             users_introduced.c.product_postid == product.postid).count() > 0
 
-    def add_introduced_product(self, product):
+    def add_cintro_product(self, product):
         """add a product to users translate list"""
-        if not self.in_introduced_list(product):
-            self.products_introduced.append(product)
+        if not self.in_cintro_list(product):
+            self.cintro_products.append(product)
             db.session.commit()
             return self
 

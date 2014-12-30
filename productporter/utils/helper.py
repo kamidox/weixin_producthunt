@@ -196,7 +196,7 @@ def is_moderator(user):
 
     :param user: The user who should be checked.
     """
-    return user.permissions['mod']
+    return user.permissions['mod'] or user.permissions['admin']
 
 
 def is_admin(user):

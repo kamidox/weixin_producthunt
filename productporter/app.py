@@ -18,8 +18,9 @@ from productporter.weixin.views import weixin
 from productporter.product.views import product
 from productporter.user.views import user
 from productporter.user.models import Guest, User
-from productporter.utils.helper import render_markup, root_url_prefix, is_online, can_translate, \
-        can_comment, can_review, can_report, can_topic, can_setgroup, format_date
+from productporter.utils.helper import render_markup, root_url_prefix, \
+        is_online, can_translate, can_comment, can_review, can_report, \
+        can_topic, can_setgroup, format_date, is_moderator, is_admin
 # extensions
 from productporter.extensions import db, cache, themes, login_manager, migrate
 # default config
@@ -116,6 +117,8 @@ def configure_template_filters(app):
     app.jinja_env.filters['can_report'] = can_report
     app.jinja_env.filters['can_topic'] = can_topic
     app.jinja_env.filters['can_setgroup'] = can_setgroup
+    app.jinja_env.filters['is_moderator'] = is_moderator
+    app.jinja_env.filters['is_admin'] = is_admin
 
 def configure_context_processors(app):
     """

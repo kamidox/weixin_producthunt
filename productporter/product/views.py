@@ -19,6 +19,8 @@ from productporter.product.phapi import ProductHuntAPI
 from productporter.product.models import Product
 from productporter.utils.helper import render_template, pull_and_save_posts, render_markup, \
     query_products, can_translate, can_review, is_online
+from productporter.utils.decorators import moderator_required
+from productporter.user.models import User
 
 product = Blueprint('product', __name__)
 
@@ -29,16 +31,17 @@ def _render_contributors(contributers, postid):
     user_htmls = []
     users = contributers.all()
     for user in users:
+        nickname = user.nickname if user.nickname else user.username
         user_htmls.append(user_template % \
-            (url_for('user.profile', username=user.username), user.username))
+            (url_for('user.profile', username=user.username), nickname))
     return div_template % (postid, '\n'.join(user_htmls))
 
 def _post_aquire_translate(request):
     """aquire to translate post"""
     postid = request.args.get('postid')
-    operate = request.args.get('operate')
+    field = request.args.get('field', 'ctagline')
 
-    current_app.logger.info('aquire %s for post %s' % (operate, str(postid)))
+    current_app.logger.info('aquire translate %s for post %s' % (field, str(postid)))
     if not can_translate(current_user):
         ret = {
             'status': 'error',
@@ -48,41 +51,33 @@ def _post_aquire_translate(request):
         return make_response(jsonify(**ret), 401)
 
     post = Product.query.filter(Product.postid==postid).first_or_404()
+    if getattr(post, field + '_locked'):
+        ret = {
+            'status': 'error',
+            'postid': postid,
+            'error': '%s is locked. Please contact adminitrator.'
+            }
+        return make_response(jsonify(**ret), 403)
 
-    operating_user = None
-    if operate == 'translate':
-        operating_user = post.translating_user
-    else:
-        operating_user = post.introducing_user
-
-    if (operating_user is not None) and \
-            (operating_user.username != current_user.username) and \
-            (is_online(operating_user)):
+    editing_user = getattr(post, 'editing_' + field + '_user')
+    if (editing_user) and \
+        (editing_user.username != current_user.username) and \
+        (is_online(editing_user)):
         ret = {
             'status': 'error',
             'postid': post.postid,
-            'error': 'this product is in %s by %s' % \
-                (operate, operating_user.username)
+            'error': '%s is editing by %s' % \
+                (field, editing_user.username)
             }
         return make_response(jsonify(**ret), 400)
 
-    if operate == 'translate':
-        post.translating_user_id = current_user.id
-        post.save()
-
-        ret = {
+    setattr(post, 'editing_' + field + '_user_id', current_user.id)
+    post.save()
+    ret = {
             'status': 'success',
             'postid': post.postid,
-            'ctagline': post.ctagline
-        }
-    else:
-        post.introduing_user_id = current_user.id
-        post.save()
-
-        ret = {
-            'status': 'success',
-            'postid': post.postid,
-            'cintro': post.cintro
+            'field': field,
+            'value': getattr(post, field)
         }
     return jsonify(**ret)
 
@@ -93,13 +88,13 @@ def translate():
     use GET to aquire translation
     use PUT/POST to commit translation
 
-    return json data of product tagline
+    :param postid: The postid of product
+    :param field: The field of operation, could be 'ctagline' or 'cintro'
+    :param value: The value of translate field
     """
     if request.method == 'GET':
         return _post_aquire_translate(request)
 
-    postid = request.args.get('postid')
-    operate = request.args.get('operate')
     jsondata = None
     try:
         jsondata = json.loads(request.data)
@@ -110,15 +105,14 @@ def translate():
         }
         return make_response(jsonify(**ret), 405)
 
-    if not postid:
-        postid = jsondata['postid']
-    if not operate:
-        operate = jsondata['operate']
+    postid = jsondata['postid']
+    field = jsondata['field']
 
     if not can_translate(current_user):
         ret = {
             'status': 'error',
             'postid': postid,
+            'field': field,
             'error': 'Please sign in first'
             }
         return make_response(jsonify(**ret), 401)
@@ -128,47 +122,31 @@ def translate():
     try:
         canceled = jsondata['canceled']
         if canceled:
-            if operate == 'translate':
-                post.translating_user_id = None
-            else:
-                post.introducing_user_id = None
+            setattr(post, 'editing_' + field + '_user_id', None)
             post.save()
             ret = {
                 'status': 'success',
                 'postid': post.postid,
+                'field': field
                 }
             return jsonify(**ret)
     except KeyError:
         pass
 
-    current_app.logger.info('commit %s for post %s' % (operate, str(postid)))
+    current_app.logger.info('commit %s for post %s' % (field, str(postid)))
+
+    setattr(post, field, jsondata['value'])
+    setattr(post, 'editing_' + field + '_user_id', None)
+    post.save()
+    getattr(current_user, 'add_' + field + '_product')(post)
     ret = {
         'status': 'success',
         'postid': post.postid,
+        'field': field,
+        'value': render_markup(getattr(post, field)),
+        'contributors': _render_contributors( \
+            getattr(post, field + '_editors'), post.postid)
     }
-
-    if operate == 'translate':
-        try:
-            post.ctagline = jsondata['ctagline']
-        except KeyError:
-            post.ctagline = ""
-        post.translating_user_id = None
-        post.save()
-        current_user.add_translated_product(post)
-        ret.update({'ctagline': post.ctagline})
-        ret.update({'contributors': _render_contributors( \
-            post.translaters, post.postid)})
-    else:
-        try:
-            post.cintro = jsondata['cintro']
-        except KeyError:
-            post.cintro = ""
-        post.introducing_user_id = None
-        post.save()
-        current_user.add_introduced_product(post)
-        ret.update({'cintro': render_markup(post.cintro)})
-        ret.update({'contributors': _render_contributors( \
-            post.introducers, post.postid)})
 
     return jsonify(**ret)
 
@@ -197,11 +175,63 @@ def post_intro(postid):
     post = Product.query.filter(Product.postid==postid).first_or_404()
     return render_template('product/post_intro.jinja.html', post=post)
 
-#homepage just for fun
+#pull products
 @product.route('/pull')
 def pull():
     """ pull data from producthunt.com """
     day = request.args.get('day', '')
     count = pull_and_save_posts(day)
     return "pulled %d posts " % (count)
+
+def _render_translate_button(post, op):
+    """render translate button"""
+    if op.lower() == 'lock':
+        template = '<button name="translate" type="button" class="btn btn-primary" \
+                    data-postid="%s" \
+                    data-url="%s">Translate</button>'
+        return template % (post.postid, url_for('product.translate'))
+    return ''
+
+def _render_lock_button(post, op):
+    """render lock button"""
+    param = {'postid': post.postid,
+        'op': op,
+        'url': url_for('product.lock'),
+    }
+    template = '<button name="lock" type="button" class="btn btn-primary" \
+                data-postid="%(postid)s" op="%(op)s" \
+                data-url="%(url)s">%(op)s</button>'
+    return template % param
+
+@product.route('/lock', methods=['GET'])
+@moderator_required
+def lock():
+    """
+    lock product
+
+    :param postid: The postid of product
+    :param op: Operation, clould be 'lock' or 'unlock'
+    :param field: Field, could be 'ctagline' or 'cintro'
+    """
+    postid = request.args.get('postid', '')
+    op = request.args.get('op', 'lock')
+    field = request.args.get('field', 'ctagline')
+    post = Product.query.filter(Product.postid==postid).first_or_404()
+
+    fieldname = field + '_locked'
+    if op.lower() == 'lock':
+        setattr(post, fieldname, True)
+        op = 'Unlock'
+    else:
+        setattr(post, fieldname, False)
+        op = 'Lock'
+    post.save()
+    ret = {
+        'status': 'success',
+        'postid': post.postid,
+        'translate': _render_translate_button(post, op),
+        'lock': _render_lock_button(post, op),
+    }
+    return jsonify(**ret)
+
 
