@@ -13,7 +13,7 @@ from flask import Blueprint, flash, redirect, url_for, request, current_app
 from flask.ext.login import (current_user, login_user, login_required,
                              logout_user, confirm_login, login_fresh)
 
-from productporter.utils import render_template, send_reset_token
+from productporter.utils.helper import render_template, send_reset_token
 from productporter.user.forms import (LoginForm, ReauthForm, ForgotPasswordForm,
                                 ResetPasswordForm, RegisterForm,
                                 ChangeUserProfileForm, ChangeEmailForm,

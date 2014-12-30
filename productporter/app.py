@@ -18,7 +18,7 @@ from productporter.weixin.views import weixin
 from productporter.product.views import product
 from productporter.user.views import user
 from productporter.user.models import Guest, User
-from productporter.utils import render_markup, root_url_prefix, is_online, can_translate, \
+from productporter.utils.helper import render_markup, root_url_prefix, is_online, can_translate, \
         can_comment, can_review, can_report, can_topic, can_setgroup, format_date
 # extensions
 from productporter.extensions import db, cache, themes, login_manager, migrate
@@ -127,7 +127,7 @@ def configure_before_handlers(app):
     """
     Configures the before request handlers
     """
-    
+
     @app.before_request
     def update_lastseen():
         """

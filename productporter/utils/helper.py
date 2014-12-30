@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    productporter.utils.populate
+    productporter.utils.helper
     ~~~~~~~~~~~~~~~~~~~~
 
     A module that makes creating data more easily

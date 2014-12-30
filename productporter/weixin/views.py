@@ -15,9 +15,8 @@ import xml.etree.ElementTree as ET
 from flask import Blueprint, request, current_app, redirect, url_for
 
 from productporter.weixin.consts import *
-from productporter.utils import query_products, format_date, \
-    query_top_voted_products, query_search_products
-from productporter.utils import send_mail
+from productporter.utils.helper import query_products, format_date, \
+    query_top_voted_products, query_search_products, send_mail
 
 weixin = Blueprint('weixin', __name__)
 

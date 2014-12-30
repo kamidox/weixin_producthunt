@@ -17,7 +17,7 @@ from flask.ext.login import current_user
 
 from productporter.product.phapi import ProductHuntAPI
 from productporter.product.models import Product
-from productporter.utils import render_template, pull_and_save_posts, render_markup, \
+from productporter.utils.helper import render_template, pull_and_save_posts, render_markup, \
     query_products, can_translate, can_review, is_online
 
 product = Blueprint('product', __name__)

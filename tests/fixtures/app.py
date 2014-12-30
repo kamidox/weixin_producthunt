@@ -12,8 +12,7 @@ import os
 from productporter import create_app
 from productporter.extensions import db
 from productporter.configs.testing import TestingConfig as Config
-#from productporter.utils.populate import create_default_groups
-from productporter.utils import create_default_groups
+from productporter.utils.helper import create_default_groups
 
 @pytest.yield_fixture(autouse=True)
 def app():

@@ -20,7 +20,7 @@ from flask.ext.migrate import MigrateCommand
 from productporter.app import create_app
 from productporter.product.models import Product
 from productporter.extensions import db
-from productporter.utils import pull_and_save_posts, create_default_groups, \
+from productporter.utils.helper import pull_and_save_posts, create_default_groups, \
     create_admin_user
 from tests.fixtures.sampledata import SAMPLE_DATA
 
