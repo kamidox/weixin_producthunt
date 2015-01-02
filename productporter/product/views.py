@@ -221,4 +221,22 @@ def lock():
     }
     return jsonify(**ret)
 
+@product.route('/dailybriefing/<day>', methods=['GET'])
+@moderator_required
+def dailybriefing(day):
+    """ Generate daily briefing """
+    qday, posts = query_products(day)
+    post_count = len(posts)
+
+    # Thanks to contributors
+    editors = []
+    for post in posts:
+        if post.ctagline:
+            editors += post.ctagline_editors
+    # Thank once is enough
+    editors = {}.fromkeys(editors).keys()
+    
+    return render_template('product/dailybriefing.jinja.html',
+        post_count=post_count, posts=posts, day=qday, editors=editors)
+
 
