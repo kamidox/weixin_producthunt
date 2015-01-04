@@ -22,6 +22,16 @@
             <div class="col-md-8">
                 <h4>Totally {{ post_count }} products</h4>
             </div>
+            <div class="col-md-2">
+                {% if current_user|is_moderator and post_count>0 %}
+                {% set visible='show' %}
+                {% else %}
+                {% set visible='hide' %}
+                {% endif %}
+                <a class="btn btn-primary fix-width {{visible}}" href="{{ url_for('product.dailybriefing', day=day) }}">
+                    Daily Briefing
+                </a>            
+            </div>
         </div>
     </div>
 </div>
