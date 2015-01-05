@@ -88,6 +88,11 @@ class DefaultConfig(object):
     WEIBO_APP_KEY = '' # your weibo app key
     WEIBO_APP_SECRET = '' # your weibo app secret
 
+    # qiniu key
+    # if you change bucket ,you should also change js qiniu config
+    QINIU_ACCESS_KEY = ""
+    QINIU_SECRET_KEY = ""
+    QINIU_BUCKET = ""
 ## application common setting
 
 porter_config = {

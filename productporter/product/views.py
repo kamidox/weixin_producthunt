@@ -14,6 +14,8 @@ import json
 from flask import Blueprint, request, current_app, flash, redirect, \
     url_for, jsonify, make_response
 from flask.ext.login import current_user
+from qiniu import Auth
+
 
 from productporter.product.phapi import ProductHuntAPI
 from productporter.product.models import Product
@@ -239,4 +241,10 @@ def dailybriefing(day):
     return render_template('product/dailybriefing.jinja.html',
         post_count=post_count, posts=posts, day=qday, editors=editors)
 
+@product.route('/qiniutoken', methods=['GET'])
+def get_qiniu_token():
+    q = Auth(current_app.config["QINIU_ACCESS_KEY"], current_app.config["QINIU_SECRET_KEY"])
+    token = q.upload_token(current_app.config["QINIU_BUCKET"])
+    ret = {'uptoken': token}
+    return jsonify(**ret)
 

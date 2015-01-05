@@ -1032,8 +1032,8 @@
             } else {
               chunk = selected.text
             }
-
-            link = prompt(e.__localize('Insert Image Hyperlink'),'http://')
+            $("#myModal").modal("show")
+//            link = prompt(e.__localize('Insert Image Hyperlink'),'http://')
 
             if (link != null && link != '' && link != 'http://' && link.substr(0,4) == 'http') {
               var sanitizedLink = $('<div>'+link+'</div>').text()
