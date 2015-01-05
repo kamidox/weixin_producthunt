@@ -28,9 +28,9 @@
                 {% else %}
                 {% set visible='hide' %}
                 {% endif %}
-                <a class="btn btn-primary fix-width {{visible}}" href="{{ url_for('product.dailybriefing', day=day) }}">
+                <a class="btn btn-primary fix-width {{visible}}" href="{{ url_for('product.dailybriefing', day=day) }}" target="_blank">
                     Daily Briefing
-                </a>            
+                </a>
             </div>
         </div>
     </div>

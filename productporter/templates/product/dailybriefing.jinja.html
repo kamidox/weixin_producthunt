@@ -1,63 +1,52 @@
-﻿{% set page_title = "Daily Briefing" %}
+﻿<!DOCTYPE html>
+<html lang="cn">
+    <head>
+        <meta charset="utf-8">
+        <title>ProductPorter</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="ProductPorter - Let cool products embrace China">
+        <meta name="author" content="ProductPorter Team">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    </head>
 
-{% extends theme("layout.jinja.html") %}
+    <body>
+        <div>
+            <section style="max-width: 100%; word-wrap: break-word; box-sizing: border-box;
+                margin: 20px 3px 0px 3px; padding: 12px; border: 1px solid rgb(249, 110, 87);
+                border-radius: 6px; line-height: 1.4; word-break: break-all; font-family: inherit;">
+                <span style="color: rgb(49, 133, 155);">
+                    <strong>点击文章底部的“原文阅读”即可以查看到带产品链接的原文。</strong>
+                </span>
+            </section>
+        </div>
 
-{% block custcss %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/datepicker3.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-markdown.min.css') }}">
-{% endblock %}
-
-{% block content %}
-{%- from theme("macros.jinja.html") import contributors -%}
-
-<div>
-    <section style="max-width: 100%; word-wrap: break-word; box-sizing: border-box; 
-        margin: 20px 3px 0px 3px; padding: 12px; border: 1px solid rgb(249, 110, 87); 
-        border-radius: 6px; line-height: 1.4; word-break: break-all; font-family: inherit;">
-        <span style="color: rgb(49, 133, 155);">
-            <strong>点击文章底部的“原文阅读”即可以查看到带产品链接的原文。</strong>
-        </span>
-    </section>
-</div>
-
-{% for post in posts %}
-    {% if post.ctagline %}
-<div>
-    <br/>
-    <p><span style="font-size: 18px; color: rgb(255, 255, 255); background-color: rgb(12, 12, 12);">
-        {{ post.name }}
-    </span></p>
-    <p><span style="font-size: 14px; color: grey;">
-        {{ post.redirect_url }}
-    </span></p>
-    <br/>
-    <p><span style="font-size: 16px; ">
-        {% autoescape false %}
-        {{ post.ctagline|markup }}
-        {% endautoescape %}
-    </span></p>
-</div>
-    {% endif %}
-{% endfor %}
-
-<div>
-    <span style="font-size: 14px; color: grey;">
-        <p><br/>感谢编译者：<br/></p>
-        {% for editor in editors %}
-        <p> @{{ editor.username }} </p>
+        {% for post in posts %}
+            {% if post.ctagline and post.ctagline_locked %}
+            <div>
+                <br/>
+                <p><span style="font-size: 18px; color: rgb(255, 255, 255); background-color: rgb(12, 12, 12);">
+                    {{ post.name }}
+                </span></p>
+                <p><span style="font-size: 14px; color: grey;">
+                    {{ post.redirect_url }}
+                </span></p>
+                <p><span style="font-size: 16px; ">
+                    {% autoescape false %}
+                    {{ post.ctagline|markup }}
+                    {% endautoescape %}
+                </span></p>
+            </div>
+            {% endif %}
         {% endfor %}
-    </span>
-</div>
 
-{% endblock %}
+        <div>
+            <span style="font-size: 14px; color: grey;">
+                <p><br/>感谢编译者：<br/></p>
+                {% for editor in editors %}
+                <p> @{{ editor.username }} </p>
+                {% endfor %}
+            </span>
+        </div>
+    </body>
+</html>
 
-{% block scripts %}
-    <script type="text/javascript" src="{{ url_for('static', filename='js/datepicker/bootstrap-datepicker.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/product.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/markdown/bootstrap-markdown.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/markdown/markdown.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/markdown/to-markdown.js') }}"></script>
-
-{% endblock %}
-
- 

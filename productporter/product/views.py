@@ -231,11 +231,11 @@ def dailybriefing(day):
     # Thanks to contributors
     editors = []
     for post in posts:
-        if post.ctagline:
+        if post.ctagline and post.ctagline_locked:
             editors += post.ctagline_editors
     # Thank once is enough
     editors = {}.fromkeys(editors).keys()
-    
+
     return render_template('product/dailybriefing.jinja.html',
         post_count=post_count, posts=posts, day=qday, editors=editors)
 
