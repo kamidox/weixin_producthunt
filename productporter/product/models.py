@@ -10,7 +10,8 @@
 """
 import re
 import datetime
-from productporter.extensions import db
+from productporter.extensions import db, cache
+from productporter._compat import max_integer
 
 # markdown template
 _MD_TEMPLATE = """## [%s](%s)
@@ -18,6 +19,73 @@ _MD_TEMPLATE = """## [%s](%s)
 
 ![screenshot](%s)
 """
+
+products_tags = db.Table(
+    'products_tags',
+    db.Column('tag_id', db.Integer(), db.ForeignKey('tags.id')),
+    db.Column('product_postid', db.Integer(), db.ForeignKey('products.postid')))
+
+class Tag(db.Model):
+    __tablename__ = "tags"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(32), nullable=False)
+    description = db.Column(db.Text)
+
+    # Methods
+    def __repr__(self):
+        """Set to a unique key specific to the object in the database.
+        Required for cache.memoize() to work across requests.
+        """
+        return "<{} {}>".format(self.__class__.__name__, self.id)
+
+    def save(self):
+        """Saves a tag"""
+        db.session.add(self)
+        db.session.commit()
+        Tag.invalidate_cache()
+        return self
+
+    def delete(self):
+        """Deletes a tag"""
+        db.session.delete(self)
+        db.session.commit()
+        Tag.invalidate_cache()
+        return self
+
+    @classmethod
+    @cache.memoize(timeout=max_integer)
+    def tag_names(cls, limit):
+        """return the all tags name array"""
+
+        tags = Tag.query.order_by(Tag.id.asc()).limit(limit).offset(0).all()
+        tagnames = []
+        for tag in tags:
+            tagnames.append(tag.name)
+        return tagnames
+
+    @classmethod
+    def names(cls, limit=20):
+        """return tag name array"""
+
+        return cls.tag_names(limit)
+
+    @classmethod
+    def invalidate_cache(cls):
+        """Invalidates this objects cached metadata."""
+
+        cache.delete_memoized(cls.tag_names)
+
+    @classmethod
+    def from_name(cls, name):
+        """
+        Create from tag from name or return the tag with the specific name
+        """
+        tag = cls.query.filter(cls.name==name).first()
+        if not tag:
+            tag = cls(name=name)
+            tag.save()
+        return tag
 
 class Product(db.Model):
     __tablename__ = "products"
@@ -78,6 +146,12 @@ class Product(db.Model):
                                     backref="product_introducing", uselist=False,
                                     foreign_keys=[editing_cintro_user_id])
 
+    tags = db.relationship('Tag',
+                    secondary=products_tags,
+                    primaryjoin=(products_tags.c.product_postid == postid),
+                    backref=db.backref('products', lazy='dynamic'),
+                    lazy='dynamic')
+
     # Methods
     def __repr__(self):
         """Set to a unique key specific to the object in the database.
@@ -93,6 +167,34 @@ class Product(db.Model):
         db.session.add(self)
         db.session.commit()
         return self
+
+    def add_tag(self, tag):
+        """Adds the product to the `tag` if he isn't in it.
+
+        :param tag: The tag which should be added to the product.
+        """
+
+        if not self.has_tag(tag):
+            self.tags.append(tag)
+            return self
+
+    def remove_tag(self, tag):
+        """Removes the product from the `tag` if it is in it.
+
+        :param tag: The tag which should be removed from the product.
+        """
+
+        if self.has_tag(tag):
+            self.tags.remove(tag)
+            return self
+
+    def has_tag(self, tag):
+        """Returns True if the product has the specified tag
+
+        :param tag: The tag which should be checked.
+        """
+
+        return self.tags.filter(products_tags.c.tag_id == tag.id).count() > 0
 
     @classmethod
     def from_json(cls, json):

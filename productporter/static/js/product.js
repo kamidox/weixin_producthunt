@@ -62,10 +62,12 @@ $(document).ready(function () {
         var postid = $(this).attr('data-postid');
         var field = $(this).attr('field');
         var value = $("textarea[name=" + field + "][data-postid=" + postid + "]").val();
+        var tags = $('input[name="tag"][data-postid=' + postid + ']').val();
         var jsondata = {
             postid: postid,
             field: field,
-            value: $.trim(value)
+            value: $.trim(value),
+            tags: $.trim(tags)
         };
         var url = addTranslateParam($(this).attr('data-url'), postid, field);
         var settings = {
@@ -141,6 +143,18 @@ $(document).ready(function () {
         var day = e.format('yyyy-mm-dd');
         var url = window.location.origin + window.location.pathname + '?day=' + day;
         window.location.href = url;
+    });
+
+    // tags
+    $("span[name='build-in-tag']").click(function () {
+        var postid = $(this).attr('data-postid');
+        var tags = $('input[name="tag"][data-postid=' + postid + ']');
+        var tagnames = tags.val();
+        if (tagnames) {
+            tags.val(tagnames + "; " + $(this).attr('data-name'));
+        } else {
+            tags.val($(this).attr('data-name'));
+        }
     });
 
     function addTranslateParam(url, postid, field) {

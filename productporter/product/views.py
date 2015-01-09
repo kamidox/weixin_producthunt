@@ -18,13 +18,20 @@ from qiniu import Auth
 
 
 from productporter.product.phapi import ProductHuntAPI
-from productporter.product.models import Product
+from productporter.product.models import Product, Tag
 from productporter.utils.helper import render_template, pull_and_save_posts, render_markup, \
     query_products, can_translate, can_review, is_online
 from productporter.utils.decorators import moderator_required
 from productporter.user.models import User
 
 product = Blueprint('product', __name__)
+
+def _render_tags(post):
+    """render tags. MUST BE THE SAME of macro 'render_tags' in macro.jinja.html"""
+    tagnames = []
+    for tag in post.tags:
+        tagnames.append(tag.name)
+    return tagnames
 
 def _render_contributors(contributers, postid, locked_by, field):
     """render contributors, MUST BE THE SAME of macro 'contributors' in macro.jinja.html"""
@@ -141,6 +148,12 @@ def translate():
 
     current_app.logger.info('commit %s for post %s' % (field, str(postid)))
 
+    # deal with tags
+    tagnames = jsondata['tags'].split(';')
+    for tagname in tagnames:
+        tag = Tag.from_name(tagname)
+        post.add_tag(tag)
+    # deal with other filed data
     setattr(post, field, jsondata['value'])
     setattr(post, 'editing_' + field + '_user_id', None)
     post.save()
@@ -152,7 +165,8 @@ def translate():
         'value': render_markup(getattr(post, field)),
         'contributors': _render_contributors( \
             getattr(post, field + '_editors'), post.postid, \
-            getattr(post, field + '_locked_user'), field)
+            getattr(post, field + '_locked_user'), field),
+        'tags': _render_tags(post)
     }
 
     return jsonify(**ret)
@@ -170,9 +184,9 @@ def posts():
     spec_day = request.args.get('day', '')
     day, posts = query_products(spec_day)
     post_count = len(posts)
-
+    tags = Tag.names()
     return render_template('product/posts.jinja.html',
-        post_count=post_count, posts=posts, day=day)
+        post_count=post_count, posts=posts, day=day, tags=tags)
 
 # posts list
 @product.route('/posts/<postid>', methods=["GET"])

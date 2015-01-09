@@ -82,6 +82,23 @@
             <div class="col-md-12">
                 <div class="tagline-translate" data-postid="{{post.postid}}" field="ctagline">
                     <div class="col-sm-12">
+                        <div class="input-group">
+                            <span class="input-group-addon">#</span>
+                            <input type="text" class="form-control"
+                                placeholder="Tags"
+                                data-postid="{{post.postid}}"
+                                id="tag" name="tag">
+                            <span class="input-group-addon">Separate tags with semicolon (;)</span>
+                        </div>
+                        {% for tag in tags %}
+                            <span class="btn btn-default label label-default"
+                                name="build-in-tag" data-name="{{tag}}"
+                                data-postid="{{post.postid}}">
+                                {{tag}}
+                            </span>
+
+                        {% endfor %}
+                        <br/><br/>
                         <textarea class="form-control"
                             data-postid="{{post.postid}}"
                             id="ctagline" name="ctagline"

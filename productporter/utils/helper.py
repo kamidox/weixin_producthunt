@@ -18,7 +18,7 @@ from flask import render_template as flask_render_template
 from productporter.extensions import db
 from productporter.user.models import User, Group
 from productporter.product.phapi import ProductHuntAPI
-from productporter.product.models import Product
+from productporter.product.models import Product, Tag
 from productporter.configs.default import porter_config
 
 def create_default_groups():
@@ -35,6 +35,22 @@ def create_default_groups():
 
         group.save()
         result.append(group)
+    return result
+
+def create_default_tags():
+    """
+    This will create default tags
+    """
+    from productporter.fixtures.tags import fixture
+    result = []
+    for key, value in fixture.items():
+        tag = Tag(name=key)
+
+        for k, v in value.items():
+            setattr(tag, k, v)
+
+        tag.save()
+        result.append(tag)
     return result
 
 def create_admin_user(username, password, email):

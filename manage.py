@@ -21,7 +21,7 @@ from productporter.app import create_app
 from productporter.product.models import Product
 from productporter.extensions import db
 from productporter.utils.helper import pull_and_save_posts, create_default_groups, \
-    create_admin_user
+    create_admin_user, create_default_tags
 from tests.fixtures.sampledata import SAMPLE_DATA
 
 # Use the development configuration if available
@@ -63,6 +63,7 @@ def createall():
     db.drop_all()
     db.create_all()
     create_default_groups()
+    create_default_tags()
     create_admin_user('admin', 'admin', 'admin@example.org')
 
 @manager.command
