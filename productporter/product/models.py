@@ -81,6 +81,7 @@ class Tag(db.Model):
         """
         Create from tag from name or return the tag with the specific name
         """
+        name = name.strip()
         tag = cls.query.filter(cls.name==name).first()
         if not tag:
             tag = cls(name=name)
@@ -195,6 +196,20 @@ class Product(db.Model):
         """
 
         return self.tags.filter(products_tags.c.tag_id == tag.id).count() > 0
+
+    def set_tags(self, tagnames):
+        """set post tags"""
+
+        # remove old tags
+        for tag in self.tags:
+            self.remove_tag(tag)
+
+        tagnames = tagnames.split(';')
+        for name in tagnames:
+            if name.strip():
+                tag = Tag.from_name(name)
+                self.add_tag(tag)
+        db.session.commit()
 
     @classmethod
     def from_json(cls, json):

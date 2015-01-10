@@ -26,12 +26,26 @@ from productporter.user.models import User
 
 product = Blueprint('product', __name__)
 
-def _render_tags(post):
-    """render tags. MUST BE THE SAME of macro 'render_tags' in macro.jinja.html"""
+def _tag_names(post):
+    """return tag names of this post"""
+
     tagnames = []
     for tag in post.tags:
-        tagnames.append(tag.name)
-    return tagnames
+        if len(tagnames) == 0:
+            tagnames.append(tag.name)
+        else:
+            tagnames.append('; ' + tag.name)
+    return ''.join(tagnames)
+
+def _render_tags(post):
+    """render tags. MUST BE THE SAME of macro 'render_tags' in macro.jinja.html"""
+    tag_template = '<a class="label label-default" href="%s">%s</a>'
+    tag_html = []
+    for tag in post.tags:
+        tag_html.append(tag_template % \
+            (url_for('product.tags', tag=tag.name), tag.name))
+    tag_html.append('<br/><br/>')
+    return '\n'.join(tag_html)
 
 def _render_contributors(contributers, postid, locked_by, field):
     """render contributors, MUST BE THE SAME of macro 'contributors' in macro.jinja.html"""
@@ -90,7 +104,8 @@ def _post_aquire_translate(request):
             'status': 'success',
             'postid': post.postid,
             'field': field,
-            'value': getattr(post, field)
+            'value': getattr(post, field),
+            'tags': _tag_names(post)
         }
     return jsonify(**ret)
 
@@ -149,10 +164,8 @@ def translate():
     current_app.logger.info('commit %s for post %s' % (field, str(postid)))
 
     # deal with tags
-    tagnames = jsondata['tags'].split(';')
-    for tagname in tagnames:
-        tag = Tag.from_name(tagname)
-        post.add_tag(tag)
+    if field == 'ctagline':
+        post.set_tags(jsondata['tags'])
     # deal with other filed data
     setattr(post, field, jsondata['value'])
     setattr(post, 'editing_' + field + '_user_id', None)
@@ -194,7 +207,8 @@ def post_intro(postid):
     """ product detail information page """
 
     post = Product.query.filter(Product.postid==postid).first_or_404()
-    return render_template('product/post_intro.jinja.html', post=post)
+    tags = Tag.names()
+    return render_template('product/post_intro.jinja.html', post=post, tags=tags)
 
 #pull products
 @product.route('/pull')
@@ -236,6 +250,16 @@ def lock():
             getattr(post, field + '_locked_user'), field)
     }
     return jsonify(**ret)
+
+@product.route('/tags/', methods=["GET"])
+def tags():
+    """show all products"""
+    return "under construction"
+
+@product.route('/tags/<tagname>', methods=["GET"])
+def tags_name(tagname):
+    """show all products by selected tag"""
+    return "under construction"
 
 @product.route('/dailybriefing/<day>', methods=['GET'])
 @moderator_required

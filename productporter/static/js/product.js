@@ -22,6 +22,7 @@ $(document).ready(function () {
                 $('.tagline-translate[data-postid=' + postid + '][field=' + field + ']').show();
                 $('.tagline-content[data-postid=' + postid + '][field=' + field + ']').hide();
                 $('textarea[name=' + field + '][data-postid=' + postid + ']').val(content);
+                $('input[name="tag"][data-postid=' + postid + ']').val(data['tags']);
             }
         };
         $.ajax(settings);
@@ -83,12 +84,15 @@ $(document).ready(function () {
                 var contributor = data['contributors'];
                 var tagline_content = $('.tagline-content[data-postid=' + postid + '][field=' + field + ']');
                 var tagline_content_data = $('.tagline-content-data[data-postid=' + postid + '][field=' + field + ']');
+                var tagline_content_tags = $('.tagline-content-tags[data-postid=' + postid + '][field=' + field + ']');
                 $('button[name="lock"]').show();
                 $('.tagline-translate[data-postid=' + postid + '][field=' + field + ']').hide();
                 $('.translaters-list[data-postid=' + postid + '][field=' + field + ']').remove();
                 tagline_content_data.empty();
                 tagline_content_data.prepend(content);
                 tagline_content.append(contributor)
+                tagline_content_tags.empty();
+                tagline_content_tags.prepend(data['tags']);
                 tagline_content.show();
             },
             beforeSend: function(xhr, settings) {
