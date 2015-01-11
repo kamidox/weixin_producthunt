@@ -31,8 +31,19 @@
                     {{ post.redirect_url }}
                 </span></p>
                 <p><span style="font-size: 16px; ">
+                    {% if post.tags.count() > 0 %}
+                    【
+                    {% for tag in post.tags %}
+                        {% if tag == post.tags.first() %}
+                            {{tag.name}}
+                        {% else %}
+                            ; {{tag.name}}
+                        {% endif %}
+                    {% endfor %}
+                    】
+                    {% endif %}
                     {% autoescape false %}
-                    {{ post.ctagline|markup }}
+                    {{ post.ctagline }}
                     {% endautoescape %}
                 </span></p>
             </div>
