@@ -48,6 +48,15 @@ If you deploy the first time or setup a new server instance. Please follow these
 * run `fab -H newserver.example.com bootstrap`
 * create a crontab to pull products periodic
 
+### production
+
+Since SQLite do not support Flask-Migrate, we sugguest to use mysql in production mode.
+
+* install mysql and mysqldb.
+    `sudo apt-get -y install mysql-server python-mysqldb`
+* create database before bootstrap deploy
+    use `mysql -uuser -ppassword` to connect mysql database; and use `CREATE DATABASE productporter;` to create database named **productporter**.
+
 ### continuous deploy
 
 * run `fab deploy`

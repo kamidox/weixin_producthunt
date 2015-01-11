@@ -23,7 +23,7 @@ _MD_TEMPLATE = """## [%s](%s)
 products_tags = db.Table(
     'products_tags',
     db.Column('tag_id', db.Integer(), db.ForeignKey('tags.id')),
-    db.Column('product_postid', db.Integer(), db.ForeignKey('products.postid')))
+    db.Column('product_postid', db.String(32), db.ForeignKey('products.postid')))
 
 class Tag(db.Model):
     __tablename__ = "tags"

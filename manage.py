@@ -67,6 +67,13 @@ def createall():
     create_admin_user('admin', 'admin', 'admin@example.org')
 
 @manager.command
+def createdefault():
+    print("create default data for %s" % (Config.SQLALCHEMY_DATABASE_URI))
+    create_default_groups()
+    create_default_tags()
+    create_admin_user('admin', 'admin', 'admin@example.org')
+
+@manager.command
 def pullsample():
     """pull sample data"""
     jsondata = json.loads(SAMPLE_DATA)

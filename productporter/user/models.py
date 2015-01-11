@@ -27,12 +27,12 @@ groups_users = db.Table(
 
 users_translated = db.Table(
     'users_translated',
-    db.Column('product_postid', db.Integer(), db.ForeignKey('products.postid')),
+    db.Column('product_postid', db.String(32), db.ForeignKey('products.postid')),
     db.Column('user_id', db.Integer(), db.ForeignKey('users.id')))
 
 users_introduced = db.Table(
     'users_introduced',
-    db.Column('product_postid', db.Integer(), db.ForeignKey('products.postid')),
+    db.Column('product_postid', db.String(32), db.ForeignKey('products.postid')),
     db.Column('user_id', db.Integer(), db.ForeignKey('users.id')))
 
 class Group(db.Model):
