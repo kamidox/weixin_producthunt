@@ -20,7 +20,7 @@ u"""
 
 LET COOL PRODUCTS EMBRACE CHINA!
 
-有空来<a href="http://kamidox.com/product/posts">这里</a>溜达一下吧
+有关中文产品介绍，请关注每日推送及历史消息
 """
 
 THANKS_INFO = u"""感谢留言，我们将尽快回复"""
@@ -34,6 +34,8 @@ u"""
 
 搜索包含keyword的相关产品
 search:keyword
+
+如需中文产品介绍，请关注每日推送及历史消息
 """
 
 ERROR_INFO = \
