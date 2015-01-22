@@ -42,7 +42,7 @@ class ProductHuntAPI(object):
             'grant_type': 'client_credentials'
         }
         url = self.SCHEMA + self.HOST + self.URL_CLIENT_AUTH
-        r = requests.post(url, data=json.dumps(data), headers=self.HEADER)
+        r = requests.post(url, data=json.dumps(data), headers=self.HEADER, verify=False)
         rsp = r.json()
         if r.status_code == 200:
             self.expires_in = int(time.time()) + int(rsp['expires_in']) - 1
@@ -66,7 +66,7 @@ class ProductHuntAPI(object):
         url = self.SCHEMA + self.HOST + self.URL_POSTS
         headers = self.HEADER.copy()
         headers['Authorization'] = 'Bearer ' + self.access_token
-        r = requests.get(url, headers=headers, params=params)
+        r = requests.get(url, headers=headers, params=params, verify=False)
         rsp = r.json()
         if r.status_code == 200:
             return rsp['posts']
@@ -74,7 +74,7 @@ class ProductHuntAPI(object):
             # access token may expires unexpect, we try it one more time
             if r.status_code == 401:
                 self.client_auth()
-                r = requests.get(url, headers=headers)
+                r = requests.get(url, headers=headers, verify=False)
                 rsp = r.json()
                 if r.status_code == 200:
                     return rsp['posts']
